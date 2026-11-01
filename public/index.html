@@ -601,6 +601,16 @@ html[lang="ar"] .one-rules b{letter-spacing:0;font-family:"IBM Plex Sans Arabic"
 .pp-lbls span{border:1px solid var(--line-2);padding:3px 8px;font:500 10px/1.5 var(--head);letter-spacing:.2em;text-transform:uppercase}
 html[lang="ar"] .pp-lbls span{letter-spacing:0;font-family:"IBM Plex Sans Arabic";font-size:12px}
 .ann[hidden]{display:none}
+
+/* status colours: new arrival green, sold out red; sold-out pieces turn black and white */
+.card .lbl.new,.pp-lbls span.new{background:#2F6B4A;color:#fff;border-color:#2F6B4A}
+.card .lbl.out,.sold-tag{background:#A3302A;color:#fff}
+.card.sold .ph,.ot.sold .ph{background:#E6E6E6!important}
+.card.sold .ph img{filter:grayscale(1) contrast(.95);opacity:.8}
+.card.sold .ttl,.card.sold .pr{color:var(--muted)}
+.card.sold .pr{color:#A3302A}
+html.dark .card.sold .ph,html.dark .ot.sold .ph{background:#2A2A2A!important}
+.ot.sold .ph img{opacity:.7}
 </style>
 </head>
 <body>
@@ -900,25 +910,34 @@ function fbInit(){
     var app = m[0].initializeApp(FBCFG);
     FB = {F:m[1], db:m[1].getFirestore(app)};
     fbQueue.splice(0).forEach(function(fn){ fn(); });
-    fbLoadSold(); fbLoadCatalog();
+    fbWatch();
   }).catch(function(err){ console.warn('NMH: Firebase did not load; orders stay in this browser.', err); });
 }
 function fbDo(fn){ if(FB) fn(); else if(FBCFG) fbQueue.push(fn); }
 function fbReady(){ return new Promise(function(res, rej){ if(FB) return res(); if(!FBCFG) return rej(new Error('offline')); fbQueue.push(res); setTimeout(function(){ rej(new Error('timeout')); }, 15000); }); }
-function fbLoadCatalog(){
+/* live: every open page listens to the control room, so edits show everywhere without a reload */
+function refreshViews(){
+  var removed = pruneSold();
+  if(curKey === 'checkout'){ if(removed) rerender(); } else if(!/^order-/.test(curKey || '')) rerender();
+  if(drwOpen()) renderDrawer();
+}
+function fbWatch(){
   if(!FB) return;
-  var F = FB.F;
-  Promise.all([F.getDocs(F.collection(FB.db, 'products')), F.getDoc(F.doc(FB.db, 'settings', 'site'))]).then(function(r){
-    var over = {}; r[0].forEach(function(d){ over[d.id] = d.data(); });
-    var site = r[1].exists() ? r[1].data() : {};
+  var F = FB.F, over = null, site = null;
+  var apply = function(){
+    if(over === null || site === null) return;
     var changed = JSON.stringify(over) !== JSON.stringify(CATALOG) || JSON.stringify(site) !== JSON.stringify(SITE);
     DB.set('catalog', over); DB.set('site', site);
     if(!changed) return;
-    applyCatalog(over); applySite(site);
-    var removed = pruneSold();
-    if(curKey === 'checkout'){ if(removed) rerender(); } else if(!/^order-/.test(curKey || '')) rerender();
-    if(drwOpen()) renderDrawer();
-  }).catch(fbWarn);
+    applyCatalog(over); applySite(site); refreshViews();
+  };
+  F.onSnapshot(F.collection(FB.db, 'products'), function(qs){ over = {}; qs.forEach(function(d){ over[d.id] = d.data(); }); apply(); }, fbWarn);
+  F.onSnapshot(F.doc(FB.db, 'settings', 'site'), function(d){ site = d.exists() ? d.data() : {}; apply(); }, fbWarn);
+  F.onSnapshot(F.collection(FB.db, 'oneofone'), function(qs){
+    var next = {}; qs.forEach(function(d){ next[d.id] = 1; });
+    if(JSON.stringify(next) === JSON.stringify(SOLD)) return;
+    SOLD = next; refreshViews();
+  }, fbWarn);
 }
 function fbLoadSold(){
   if(!FB) return;
@@ -988,9 +1007,10 @@ function variant(it){ return [shadeName(it), sizeName(it.size), it.len ? (it.len
 /* ================= cards and grids ================= */
 function card(p, i){
   var a = p.imgs[0], b = p.imgs[1], sold = isSold(p);
+  var lcls = sold ? ' out' : (p.labels && p.labels.length) ? '' : p.isNew ? ' new' : p.one ? ' one' : '';
   var lbl = sold ? soldText(p) : (p.labels && p.labels.length) ? t(p.labels[0]) : p.isNew ? tr('New', 'جديد') : p.one ? tr('1 of 1', 'قطعة واحدة') : p.dye ? tr('Any colour', 'أي لون') : '';
   return '<a class="card' + (sold ? ' sold' : '') + '" href="#p-' + p.code + '" data-rv style="--d:' + (i % 4) + '">' +
-    '<div class="ph" style="--tone:' + (p.tone || '') + '">' + (lbl ? '<span class="lbl' + (p.one ? ' one' : '') + '">' + lbl + '</span>' : '') +
+    '<div class="ph" style="--tone:' + (p.tone || '') + '">' + (lbl ? '<span class="lbl' + lcls + '">' + lbl + '</span>' : '') +
     '<img class="a' + (b ? ' has-b' : '') + (isCut(a) ? ' cut' : '') + '" src="' + a + '" alt="' + esc(t(p.name)) + '" loading="lazy">' +
     (b ? '<img class="b' + (isCut(b) ? ' cut' : '') + '" src="' + b + '" alt="" loading="lazy">' : '') + '</div>' +
     '<span class="ttl">' + (p.one ? 'N° ' + p.no + ' · ' : '') + esc(t(p.name)) + '</span><span class="pr num">' + (sold ? soldText(p, true) : money(p.price)) + '</span></a>';
@@ -1141,7 +1161,7 @@ function viewProduct(code){
       '<div class="pp-info">' +
         '<nav class="crumb u-h7" style="justify-content:flex-start" aria-label="' + tr('Breadcrumb', 'المسار') + '"><a href="#" data-home>' + tr('Home', 'الرئيسية') + '</a><span>/</span><a href="#' + c.id + '">' + esc(t(c.name)) + '</a></nav>' +
         (one ? '<p class="one-badge"><span class="num">N° ' + p.no + '</span>' + (sold ? soldText(p, true) : tr('One of one', 'قطعة واحدة بس')) + '</p>' : '') +
-        ((p.labels && p.labels.length) || p.isNew ? '<p class="pp-lbls">' + (p.isNew ? '<span>' + tr('New', 'جديد') + '</span>' : '') + (p.labels || []).map(function(l){ return '<span>' + esc(t(l)) + '</span>'; }).join('') + '</p>' : '') +
+        ((p.labels && p.labels.length) || p.isNew ? '<p class="pp-lbls">' + (p.isNew ? '<span class="new">' + tr('New', 'جديد') + '</span>' : '') + (p.labels || []).map(function(l){ return '<span>' + esc(t(l)) + '</span>'; }).join('') + '</p>' : '') +
         '<h1 class="u-h1">' + esc(t(p.name)) + '</h1><p class="pp-pr num">' + (sold ? soldText(p) : money(p.price)) + '</p><hr>' +
         '<div class="rte"><p>' + esc(t(p.desc)) + '</p>' + (one ? '<p>' + tr('This dress exists as a single piece. Once claimed, it is cut to your size and the design is never made again.', 'الفستان ده موجود نسخة واحدة بس. أول ما تحجزيه، بيتفصّل على مقاسك والتصميم مش بيتعمل تاني.') + '</p>' : '<p>' + tr('Collection: ', 'الكولكشن: ') + esc(t(c.name)) + '</p>') + '<p>' + (one ? tr('Made once in Dubai. Code ', 'بيتعمل مرة واحدة في دبي. الكود ') : tr('Made to order in Dubai. Code ', 'بيتفصّل بالطلب في دبي. الكود ')) + p.code + '</p></div>' +
         '<button class="size-link" type="button" id="sizeChart"><svg viewBox="0 0 18 12" fill="none" stroke="currentColor"><rect x=".5" y=".5" width="17" height="11"/><path d="M4 1v4M7 1v6M10 1v4M13 1v6"/></svg>' + tr('Size chart', 'جدول المقاسات') + '</button>' +
