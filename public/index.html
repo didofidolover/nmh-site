@@ -623,6 +623,16 @@ html[lang="ar"] .card .ttl,html[lang="ar"] .pp-info .u-h1,html[lang="ar"] .li .t
 html[lang="ar"] .card .ttl{font-size:12px}
 html[lang="ar"] .sline b{font-family:var(--head);letter-spacing:.06em}
 .slide video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* hero fits the screen under the announcement bar */
+.hero{height:calc(100vh - var(--ann,0px));height:calc(100svh - var(--ann,0px))}
+.vbg{display:none}
+@media (max-width:700px){
+  .slide.is-video{background:#1a1716}
+  .slide.is-video .vbg{display:block;position:absolute;inset:-40px;background-size:cover;background-position:center;filter:blur(26px) brightness(.55);transform:scale(1.1)}
+  .slide.is-video video{object-fit:contain!important;object-position:50% 42%!important}
+}
+.banner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%}
 </style>
 </head>
 <body>
@@ -922,12 +932,15 @@ function applyCatalog(over){
   ALLP = list; PRODUCTS = list.filter(visible); ONE = PRODUCTS.filter(function(p){ return p.one; });
 }
 COLLECTIONS.forEach(function(c){ c.name = {en:c.name.en, ar:c.name.en}; });
+function annH(){ var a = document.getElementById('ann'); document.documentElement.style.setProperty('--ann', (a && !a.hidden ? a.offsetHeight : 0) + 'px'); }
+window.addEventListener('resize', annH);
 function applySite(site){
   SITE = site || {};
   applySiteTheme(SITE.theme || (Object.keys(SITE).length ? 'classic' : TH)); if(typeof applyThemeLabel === 'function' && document.getElementById('ftTheme')) applyThemeLabel();
   var a = document.getElementById('ann'); if(!a) return;
   if(SITE.ann && (SITE.ann.en || SITE.ann.ar)){ a.setAttribute('data-en', esc(SITE.ann.en || SITE.ann.ar)); a.setAttribute('data-ar', esc(SITE.ann.ar || SITE.ann.en)); a.innerHTML = a.getAttribute(L === 'ar' ? 'data-ar' : 'data-en'); }
   a.hidden = SITE.annOff === true;
+  annH();
 }
 function inCart(code){ return CART.some(function(it){ return it.code === code; }); }
 var SIZES = [
@@ -1119,7 +1132,7 @@ function viewHome(){
     '<section class="hero" id="hero" aria-roledescription="carousel" aria-label="' + tr('New season', 'الموسم الجديد') + '">' +
       heroSlides().map(function(s, i, all){
         var media = s.type === 'video' && s.v
-          ? '<video muted playsinline loop preload="' + (i ? 'none' : 'auto') + '" poster="' + esc(s.d || '') + '" style="object-position:' + esc(s.pos || '50% 50%') + '"' + (i || reduce ? '' : ' autoplay') + ' aria-hidden="true"><source src="' + esc(s.v) + '" type="video/mp4"></video>'
+          ? '<div class="vbg" style="background-image:url(' + esc(s.d || '') + ')" aria-hidden="true"></div><video muted playsinline loop preload="' + (i ? 'none' : 'auto') + '" poster="' + esc(s.d || '') + '" style="object-position:' + esc(s.pos || '50% 50%') + '"' + (i || reduce ? '' : ' autoplay') + ' aria-hidden="true"><source src="' + esc(s.v) + '" type="video/mp4"></video>'
           : '<picture><source media="(max-width:700px)" srcset="' + esc(s.m || s.d) + '"><img src="' + esc(s.d) + '" alt="" style="object-position:' + esc(s.pos || '50% 30%') + '"' + (i ? ' loading="lazy"' : ' fetchpriority="high"') + '></picture>';
         return '<div class="slide' + (i ? '' : ' on') + (s.type === 'video' ? ' is-video' : '') + '" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + ' / ' + all.length + '"' + (i ? ' aria-hidden="true"' : '') + '>' + media +
           '<div class="slide-t">' + (t(s.sub) ? '<p class="u-h7">' + esc(t(s.sub)) + '</p>' : '') + (t(s.big) ? '<' + (i ? 'p' : 'h1') + ' class="big">' + esc(t(s.big)) + '</' + (i ? 'p' : 'h1') + '>' : '') + (t(s.cta) && s.href ? '<a class="btn light" href="' + esc(s.href) + '"' + (i ? ' tabindex="-1"' : '') + '>' + esc(t(s.cta)) + '</a>' : '') + '</div></div>';
@@ -1148,7 +1161,7 @@ function viewHome(){
       }).join('') + '</div>' +
     '</div></section>' +
 
-    '<section class="banner ed-banner" id="edBanner"><img src="img/c/c13-w.jpg" alt="" loading="lazy" style="object-position:50% 30%"><div><p class="u-h7">' + tr('The abaya edit', 'مختارات العبايات') + '</p><h2 class="u-h1" style="margin-top:8px">' + tr('Details you find up close', 'تفاصيل تُرى عن قرب') + '</h2>' +
+    '<section class="banner ed-banner" id="edBanner"><video muted playsinline loop autoplay preload="metadata" poster="video/abaya-edit.jpg" aria-hidden="true"><source src="video/abaya-edit.mp4" type="video/mp4"></video><div><p class="u-h7">' + tr('The abaya edit', 'مختارات العبايات') + '</p><h2 class="u-h1" style="margin-top:8px">' + tr('Details you find up close', 'تفاصيل تُرى عن قرب') + '</h2>' +
       '<div class="rte"><p>' + tr('Black-on-black embroidery, satin lapels and fine copper piping. Abayas that stay quiet from across the room and reward a closer look.', 'تطريز أسود على أسود، وياقات من الساتان، وحواف نحاسية رفيعة. عبايات هادئة من بعيد، تكشف جمالها عن قرب.') + '</p></div>' +
       '<a class="btn light" href="#s-abayas" style="margin-top:24px">' + tr('Shop abayas', 'تسوّقي العبايات') + '</a></div></section>' +
 
