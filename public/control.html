@@ -254,7 +254,7 @@ var STYLES = [
   {id:'abaya', en:'Under-abaya', ar:'تحت العباية'}, {id:'jumpsuit', en:'Jumpsuits', ar:'جمبسوت'}
 ];
 var STYLE_INFO = {
-  all:{title:{en:'All pieces',ar:'كل القطع'}, intro:{en:'Every piece we make, across all four collections. Each one is cut to order in the colour you choose.',ar:'كل القطع اللي بنعملها من الأربع كولكشنز. كل قطعة بتتفصّل بالطلب باللون اللي تختاريه.'}, imgs:['img/bloom-1.jpg','img/front-olive.webp','img/n04.jpg']},
+  all:{title:{en:'All pieces',ar:'كل القطع'}, intro:{en:'Every piece we make, across every collection. Each one is cut to order in your size and length.',ar:'كل القطع اللي بنعملها من كل الكولكشنز. كل قطعة بتتفصّل بالطلب على مقاسك وطولك.'}, imgs:['img/bloom-1.jpg','img/front-olive.webp','img/n04.jpg']},
   evening:{title:{en:'Evening',ar:'سهرة'}, intro:{en:'Full skirts, long sleeves and prints that hold the light. Dresses for weddings, Eid and the evenings you plan for.',ar:'تنانير واسعة، أكمام طويلة وطبعات بتلمع مع الضوء. فساتين للأفراح والعيد والسهرات اللي بتستعدي ليها.'}, imgs:['img/desert-1.jpg','img/front-dew.webp','img/rose-wall.jpg']},
   everyday:{title:{en:'Everyday',ar:'يومي'}, intro:{en:'Easy shapes in calm colours, for work, errands and long days out.',ar:'قصّات مريحة بألوان هادية، للشغل والمشاوير والأيام الطويلة برّه.'}, imgs:['img/n07.jpg','img/front-azure.webp','img/n01.jpg']},
   abaya:{title:{en:'Under-abaya',ar:'تحت العباية'}, intro:{en:'Simple, light layers cut to sit cleanly under your abaya.',ar:'طبقات بسيطة وخفيفة متفصّلة عشان تقعد مظبوط تحت العباية.'}, imgs:['img/navy.jpg','img/n04.jpg','img/n09.jpg']},
@@ -355,11 +355,55 @@ COLLECTIONS.unshift({id:'the-one', season:{en:'Signature · One of one',ar:'ال
   name:{en:'The One',ar:'القطعة الواحدة'},
   story:{en:'One piece. Made once. Never again. Each dress in this line exists as a single piece; when it finds its owner, it is gone for good.',ar:'قطعة واحدة. بتتعمل مرة واحدة. ومش بتتكرر تاني. كل فستان في الخط ده موجود نسخة واحدة بس، ولما يلاقي صاحبته بيختفي للأبد.'}});
 
+/* ---- The Courtyard: autumn/winter 2026 campaign (prices are placeholders, editable in the control room) ---- */
+STYLES.splice(1, 0, {id:'abayas', en:'Abayas', ar:'عبايات'});
+STYLE_INFO.abayas = {title:{en:'Abayas',ar:'عبايات'}, intro:{en:'Open and closed abayas with quiet detail: satin lapels, fine piping and hand-placed embroidery.',ar:'عبايات مفتوحة ومقفولة بتفاصيل هادية: ياقات ساتان، حواف رفيعة وتطريز متوزّع باليد.'}};
+COLLECTIONS.splice(1, 0, {id:'courtyard', season:{en:'Autumn/Winter 2026',ar:'خريف وشتاء ٢٠٢٦'}, cover:'img/c/c06-w.jpg', small:'img/c/c13.jpg', tone:'#D9B8A6',
+  name:{en:'The Courtyard',ar:'الفناء'},
+  story:{en:'Shot between terracotta walls in the last hour of light. Abayas with quiet, considered detail and evening dresses that move as you walk.',ar:'اتصوّر بين حيطان التيراكوتا في آخر ساعة نور. عبايات بتفاصيل هادية ومدروسة، وفساتين سهرة بتتحرك مع خطوتك.'},
+  specs:[]});
+var COURTYARD = [
+  {code:'C01', col:'courtyard', style:'abayas', isNew:true, tone:'#2A2523', price:780, name:{en:'Noor Satin Lapel Abaya',ar:'عباية نور بياقة ساتان'}, imgs:['img/c/c04.jpg','img/c/c05.jpg','img/c/c02.jpg'],
+    desc:{en:'An open black abaya with a wide satin shawl lapel and layered cuffs.',ar:'عباية سوداء مفتوحة بياقة ساتان عريضة وأساور بطبقتين.'},
+    story:{en:'One line of satin, from collar to hem, catches the light as you move. Everything else is kept quiet.',ar:'خط واحد من الساتان، من الياقة لآخر العباية، بيلقط النور مع حركتك. وكل حاجة تانية هادية.'}},
+  {code:'C02', col:'courtyard', style:'abayas', isNew:true, tone:'#2A2523', price:850, name:{en:'Sahar Embroidered Abaya',ar:'عباية سحر المطرّزة'}, imgs:['img/c/c13.jpg','img/c/c11.jpg','img/c/c07.jpg'],
+    desc:{en:'A black abaya with a tonal embroidered panel down the front and embroidered cuffs.',ar:'عباية سوداء بشريط تطريز بنفس اللون على الأمام وأساور مطرّزة.'},
+    story:{en:'The embroidery is black on black, so it only shows up close. A detail for you, not for the room.',ar:'التطريز أسود على أسود، فبيبان من قريب بس. تفصيلة ليكِ إنتِ، مش للناس.'}},
+  {code:'C03', col:'courtyard', style:'abayas', isNew:true, tone:'#2A2523', price:820, name:{en:'Maghrib Piped Abaya',ar:'عباية مغرب'}, imgs:['img/c/c06.jpg','img/c/c08.jpg'],
+    desc:{en:'A flowing black abaya edged with fine copper piping along the front and sleeves.',ar:'عباية سوداء واسعة بحواف رفيعة لونها نحاسي على الأمام والأكمام.'},
+    story:{en:'Named for the hour the courtyard turns copper. The piping picks up that light and keeps it.',ar:'اسمها من الساعة اللي الفناء بيبقى فيها نحاسي. الحواف بتلقط النور ده وبتحتفظ بيه.'}},
+  {code:'C04', col:'courtyard', style:'abayas', isNew:true, tone:'#2A2523', price:690, name:{en:'Fina Open Abaya',ar:'عباية فناء المفتوحة'}, imgs:['img/c/c12.jpg','img/c/c03.jpg'],
+    desc:{en:'A clean, open abaya with wide sleeves and a soft drape. The everyday essential.',ar:'عباية مفتوحة بسيطة بأكمام واسعة ووقعة ناعمة. الأساسية لكل يوم.'},
+    story:{en:'The abaya you reach for every morning: light, easy and cut to fall straight from the shoulder.',ar:'العباية اللي بتلبسيها كل صباح: خفيفة، مريحة، ومتفصّلة تنزل مستقيمة من الكتف.'}},
+  {code:'C05', col:'courtyard', style:'evening', isNew:true, tone:'#E7D7BE', price:720, name:{en:'Mashrabiya Satin Dress',ar:'فستان مشربية الساتان'}, imgs:['img/c/c00.jpg'],
+    desc:{en:'A champagne satin dress with a high neck, bishop sleeves and a draped wrap skirt.',ar:'فستان ساتان شامبين برقبة عالية، أكمام منفوخة وتنورة ملفوفة منسدلة.'},
+    story:{en:'Made for light that falls through a carved screen: satin that shifts from gold to cream with every step.',ar:'معمول للنور اللي بيعدّي من المشربية: ساتان بيتحوّل من دهبي لكريمي مع كل خطوة.'}},
+  {code:'C06', col:'courtyard', style:'abayas', isNew:true, tone:'#4A3A4E', price:760, name:{en:'Lavender Panel Abaya',ar:'عباية اللافندر'}, imgs:['img/c/c01.jpg'],
+    desc:{en:'A closed abaya in two shades of violet, with patterned panels on the sleeves.',ar:'عباية مقفولة بدرجتين بنفسجي، وقطع منقوشة على الأكمام.'},
+    story:{en:'Colour, kept soft. Two violets meet at the sleeve, where a woven pattern sits like a quiet signature.',ar:'لون، بس هادي. درجتين بنفسجي بيتقابلوا عند الكم، وهناك نقشة منسوجة زي توقيع هادي.'}},
+  {code:'C07', col:'courtyard', style:'abayas', isNew:true, tone:'#D9D2C2', price:740, name:{en:'Zeitoun Abaya',ar:'عباية زيتون'}, imgs:['img/c/c09.jpg'],
+    desc:{en:'An olive abaya with a matching sheer shayla and fine tonal embroidery.',ar:'عباية زيتوني بطرحة شفافة من نفس اللون وتطريز رفيع بنفس الدرجة.'},
+    story:{en:'The green of olive leaves in a white courtyard. Light, layered and made to be worn all day.',ar:'أخضر ورق الزيتون في فناء أبيض. خفيفة، بطبقات، ومعمولة تتلبس طول اليوم.'}},
+  {code:'C08', col:'courtyard', style:'evening', isNew:true, tone:'#C98F8F', price:780, name:{en:'Emerald Satin Dress',ar:'فستان الزمرد'}, imgs:['img/c/c10.jpg'],
+    desc:{en:'An emerald satin dress with a tied waist, a full skirt and a matching shayla.',ar:'فستان ساتان زمردي بخصر معقود، تنورة واسعة وطرحة من نفس القماش.'},
+    story:{en:'A colour for celebrations: deep emerald satin that holds its shape and moves like water.',ar:'لون للمناسبات: ساتان زمردي غامق بيحافظ على شكله وبيتحرك زي المية.'}},
+  {code:'C09', col:'courtyard', style:'evening', isNew:true, tone:'#E3DBD1', price:890, name:{en:'Taupe Pleated Gown',ar:'فستان التوب المكسّر'}, imgs:['img/c/c15.jpg','img/c/c14.jpg'],
+    desc:{en:'A taupe gown with a crossover draped bodice and a floor-length sunray-pleated skirt.',ar:'فستان بلون التوب بصدر ملفوف ومنسدل، وتنورة طويلة بكسرات شمسية للأرض.'},
+    story:{en:'Hundreds of fine pleats open like a fan when you turn. Quiet in colour, never quiet in movement.',ar:'مئات الكسرات الرفيعة بتتفتح زي المروحة لما تلفّي. هادي في اللون، ومش هادي أبدًا في الحركة.'}},
+  {code:'C10', col:'courtyard', style:'evening', isNew:true, tone:'#CFC9B4', price:920, name:{en:'Burgundy Cape Gown',ar:'فستان العنابي بالكاب'}, imgs:['img/c/c16.jpg','img/c/c18.jpg','img/c/c17.jpg'],
+    desc:{en:'A burgundy gown with a draped wrap bodice and a cape that falls from one shoulder.',ar:'فستان عنابي بصدر ملفوف منسدل وكاب نازل من كتف واحد.'},
+    story:{en:'A gown for the evening you have been waiting for: deep burgundy, a sculpted waist and a cape that follows you.',ar:'فستان للسهرة اللي مستنياها: عنابي غامق، خصر منحوت، وكاب بيمشي وراكِ.'}},
+  {code:'C11', col:'courtyard', style:'everyday', isNew:true, tone:'#D9B9B6', price:760, name:{en:'Sage Drape Dress',ar:'فستان المريمية'}, imgs:['img/c/c19.jpg','img/c/c20.jpg'],
+    desc:{en:'A sage dress with a gathered side drape, long sleeves and a sheer matching shayla.',ar:'فستان بلون المريمية بطيّة مجمّعة على الجنب، أكمام طويلة وطرحة شفافة من نفس اللون.'},
+    story:{en:'Soft green, softer drape. A dress that works from a long lunch to a quiet evening.',ar:'أخضر ناعم وطيّة أنعم. فستان ينفع من غدا طويل لحد سهرة هادية.'}}
+];
+PRODUCTS = COURTYARD.concat(PRODUCTS);
+
 PRODUCTS = PRODUCTS.concat(ONE);
 var BASE = PRODUCTS.slice(), BASEMAP = {};
 BASE.forEach(function(p, i){ BASEMAP[p.code] = Object.assign({sort:i}, p); });
 var STYLE_OPTS = STYLES.filter(function(s){ return s.id !== 'all'; });
-var LIB = ['img/bloom-1.jpg','img/bloom-2.jpg','img/bloom-3.jpg','img/bloom-4.jpg','img/bloom-5.jpg','img/desert-1.jpg','img/desert-2.jpg','img/desert-3.jpg','img/desert-4.jpg','img/rose-wall.jpg','img/hero.jpg','img/n01.jpg','img/n04.jpg','img/n06.jpg','img/n07.jpg','img/n09.jpg','img/navy.jpg',
+var LIB = ['img/c/c00.jpg','img/c/c01.jpg','img/c/c02.jpg','img/c/c03.jpg','img/c/c04.jpg','img/c/c05.jpg','img/c/c06.jpg','img/c/c07.jpg','img/c/c08.jpg','img/c/c09.jpg','img/c/c10.jpg','img/c/c11.jpg','img/c/c12.jpg','img/c/c13.jpg','img/c/c14.jpg','img/c/c15.jpg','img/c/c16.jpg','img/c/c17.jpg','img/c/c18.jpg','img/c/c19.jpg','img/c/c20.jpg','img/bloom-1.jpg','img/bloom-2.jpg','img/bloom-3.jpg','img/bloom-4.jpg','img/bloom-5.jpg','img/desert-1.jpg','img/desert-2.jpg','img/desert-3.jpg','img/desert-4.jpg','img/rose-wall.jpg','img/hero.jpg','img/n01.jpg','img/n04.jpg','img/n06.jpg','img/n07.jpg','img/n09.jpg','img/navy.jpg',
   'img/front-azure.webp','img/side-azure.webp','img/rk-azure-back.webp','img/front-olive.webp','img/side-olive.webp','img/rk-olive-back.webp','img/front-dew.webp','img/side-dew.webp','img/rk-dew-back.webp','img/front-magnolia.webp','img/side-magnolia.webp','img/rk-magnolia-back.webp','img/front-rose.webp','img/side-rose.webp','img/rk-rose-back.webp','img/front-sienna.webp','img/side-sienna.webp','img/rk-sienna-back.webp'];
 var PRESET_LABELS = [
   {en:'Best seller', ar:'الأكثر مبيعًا'}, {en:'Limited', ar:'كمية محدودة'}, {en:'Last pieces', ar:'آخر قطع'}, {en:'Back in stock', ar:'رجع تاني'},
