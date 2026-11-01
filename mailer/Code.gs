@@ -39,7 +39,7 @@ function sendOrderEmails(o){
   var ar = o.lang === 'ar';
   MailApp.sendEmail({
     to: o.contact.email,
-    subject: ar ? 'استلمنا طلبك ' + o.id + ' | NMH Dubai' : 'We received your order ' + o.id + ' | NMH Dubai',
+    subject: ar ? 'استلمنا طلبج ' + o.id + ' | NMH Dubai' : 'We received your order ' + o.id + ' | NMH Dubai',
     htmlBody: customerHtml(o),
     name: CFG.fromName,
     replyTo: CFG.replyTo
@@ -76,7 +76,7 @@ function fsVal(v){
 /* ---------- helpers ---------- */
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 function money(n, ar){ n = Math.round(Number(n) * 100) / 100; var s = n.toLocaleString ? Number(n).toFixed(n % 1 ? 2 : 0).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : n; return ar ? s + ' درهم' : s + ' AED'; }
-var COUNTRY = {AE:['United Arab Emirates','الإمارات'], SA:['Saudi Arabia','السعودية'], KW:['Kuwait','الكويت'], QA:['Qatar','قطر'], BH:['Bahrain','البحرين'], OM:['Oman','عُمان'], EG:['Egypt','مصر'], GB:['United Kingdom','المملكة المتحدة'], US:['United States','الولايات المتحدة'], XX:['Other country','دولة تانية']};
+var COUNTRY = {AE:['United Arab Emirates','الإمارات'], SA:['Saudi Arabia','السعودية'], KW:['Kuwait','الكويت'], QA:['Qatar','قطر'], BH:['Bahrain','البحرين'], OM:['Oman','عُمان'], EG:['Egypt','مصر'], GB:['United Kingdom','المملكة المتحدة'], US:['United States','الولايات المتحدة'], XX:['Other country','دولة ثانية']};
 function imgUrl(src){ return /^https?:/.test(src || '') ? src : CFG.site + '/' + String(src || 'img/og.jpg').replace(/^\//, ''); }
 
 /* ---------- customer email ---------- */
@@ -92,7 +92,7 @@ function customerHtml(o){
     return '<tr>' +
       '<td width="76" style="padding:16px 0;border-bottom:1px solid #E7E2DB;vertical-align:top"><img src="' + esc(imgUrl(it.img)) + '" width="64" height="96" alt="" style="display:block;width:64px;height:96px;object-fit:' + (/\.webp$/.test(it.img || '') ? 'contain' : 'cover') + ';background:' + esc(it.tone || '#F5F0EA') + '"></td>' +
       '<td style="padding:16px 12px;border-bottom:1px solid #E7E2DB;vertical-align:top;text-align:' + al + '">' +
-        (it.no ? '<div style="' + cap + 'color:#1C1B1B;margin-bottom:4px">N° ' + esc(it.no) + ' · ' + T('One of one', 'قطعة واحدة') + '</div>' : '') +
+        (it.no ? '<div style="' + cap + 'color:#1C1B1B;margin-bottom:4px">N° ' + esc(it.no) + ' · ' + T('One of one', 'قطعة وحدة') + '</div>' : '') +
         '<div style="font-family:' + font + ';font-size:12px;letter-spacing:' + (ar ? '0' : '2px') + ';text-transform:uppercase;color:#1C1B1B;font-weight:600">' + esc(ar ? (it.name_ar || it.name) : it.name) + '</div>' +
         '<div style="font-family:' + body + ';font-size:13px;color:#6A6A6A;margin-top:6px">' + (it.hex ? '<span style="display:inline-block;width:9px;height:9px;border-radius:9px;background:' + esc(it.hex) + ';margin-' + (ar ? 'left' : 'right') + ':6px"></span>' : '') + esc(it.variant || '') + '</div>' +
         '<div style="font-family:' + body + ';font-size:13px;color:#6A6A6A;margin-top:2px">' + T('Qty ', 'الكمية ') + esc(it.qty) + '</div></td>' +
@@ -102,21 +102,21 @@ function customerHtml(o){
   var step = function(n, h, p){ return '<tr><td width="34" style="vertical-align:top;padding:0 0 16px"><div style="width:24px;height:24px;line-height:24px;border:1px solid #1C1B1B;border-radius:24px;text-align:center;font-family:' + font + ';font-size:11px;color:#1C1B1B">' + n + '</div></td><td style="vertical-align:top;padding:2px 0 16px;text-align:' + al + '"><div style="font-family:' + font + ';font-size:11px;letter-spacing:' + (ar ? '0' : '2px') + ';text-transform:uppercase;color:#1C1B1B;font-weight:600">' + h + '</div><div style="font-family:' + body + ';font-size:14px;line-height:1.6;color:#6A6A6A;margin-top:4px">' + p + '</div></td></tr>'; };
   return '<!doctype html><html lang="' + (ar ? 'ar' : 'en') + '" dir="' + dir + '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>NMH Dubai</title></head>' +
   '<body style="margin:0;padding:0;background:#F5F0EA">' +
-  '<div style="display:none;max-height:0;overflow:hidden;opacity:0">' + esc(T('We have your order request. We will message you on WhatsApp to confirm the details.', 'طلبك وصلنا. هنكلمك على واتساب نأكد التفاصيل.')) + '</div>' +
+  '<div style="display:none;max-height:0;overflow:hidden;opacity:0">' + esc(T('We have your order request. We will message you on WhatsApp to confirm the details.', 'طلبج وصلنا. بنتواصل وياج على الواتساب عشان نأكد التفاصيل.')) + '</div>' +
   '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0EA"><tr><td align="center" style="padding:32px 12px">' +
   '<table role="presentation" width="600" cellpadding="0" cellspacing="0" dir="' + dir + '" style="width:100%;max-width:600px;background:#FDF9F4">' +
-    '<tr><td style="background:#1C1B1B;padding:10px;text-align:center;font-family:' + font + ';font-size:10px;letter-spacing:' + (ar ? '0' : '2.5px') + ';text-transform:uppercase;color:#FDF9F4">' + T('Made to order in Dubai', 'بيتفصّل بالطلب في دبي') + '</td></tr>' +
+    '<tr><td style="background:#1C1B1B;padding:10px;text-align:center;font-family:' + font + ';font-size:10px;letter-spacing:' + (ar ? '0' : '2.5px') + ';text-transform:uppercase;color:#FDF9F4">' + T('Made to order in Dubai', 'يتفصّل حسب الطلب في دبي') + '</td></tr>' +
     '<tr><td align="center" style="padding:36px 32px 8px"><a href="' + CFG.site + '"><img src="' + CFG.site + '/img/logo-dark.png" width="84" alt="NMH Dubai" style="display:block;width:84px;height:auto;border:0"></a></td></tr>' +
     '<tr><td style="padding:28px 40px 8px;text-align:center"><div style="' + cap + '">' + T('Order ', 'طلب ') + '<span dir="ltr">' + esc(o.id) + '</span></div>' +
-      '<h1 style="margin:14px 0 0;font-family:' + font + ';font-weight:500;font-size:22px;line-height:1.4;letter-spacing:' + (ar ? '0' : '4px') + ';text-transform:' + (ar ? 'none' : 'uppercase') + ';color:#1C1B1B">' + esc(T('Thank you, ', 'شكرًا يا ') + first) + '</h1>' +
-      '<p style="margin:16px auto 0;max-width:440px;font-family:' + body + ';font-size:15px;line-height:1.7;color:#4A4848">' + T('We have received your order request. Nothing has been charged yet.', 'طلبك وصلنا. مفيش أي حاجة اتخصمت لسه.') + '</p></td></tr>' +
-    '<tr><td style="padding:28px 40px 4px"><div style="border-top:1px solid #E7E2DB;padding-top:26px;' + cap + 'color:#1C1B1B;text-align:' + al + '">' + T('What happens next', 'اللي هيحصل بعد كده') + '</div></td></tr>' +
+      '<h1 style="margin:14px 0 0;font-family:' + font + ';font-weight:500;font-size:22px;line-height:1.4;letter-spacing:' + (ar ? '0' : '4px') + ';text-transform:' + (ar ? 'none' : 'uppercase') + ';color:#1C1B1B">' + esc(T('Thank you, ', 'شكرًا ') + first) + '</h1>' +
+      '<p style="margin:16px auto 0;max-width:440px;font-family:' + body + ';font-size:15px;line-height:1.7;color:#4A4848">' + T('We have received your order request. Nothing has been charged yet.', 'طلبج وصلنا. وما انخصم أي مبلغ للحين.') + '</p></td></tr>' +
+    '<tr><td style="padding:28px 40px 4px"><div style="border-top:1px solid #E7E2DB;padding-top:26px;' + cap + 'color:#1C1B1B;text-align:' + al + '">' + T('What happens next', 'شو بيصير بعدين') + '</div></td></tr>' +
     '<tr><td style="padding:16px 40px 8px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">' +
-      step(1, T('We confirm with you', 'بنأكد معاكِ'), T('Within one working day we message you on WhatsApp at ', 'خلال يوم عمل هنكلمك على واتساب على ') + '<span dir="ltr">' + esc(o.contact.phone) + '</span>' + T(' to confirm the colour, fabric and fit.', ' عشان نأكد اللون والقماش والمقاس.')) +
-      step(2, T('You see the real fabric', 'بتشوفي القماش الحقيقي'), T('We send a photo of the fabric before anything is cut.', 'بنبعتلك صورة القماش قبل أي تفصيل.')) +
-      step(3, T('Cut in Dubai, then delivered', 'تفصيل في دبي وتوصيل'), o.pay === 'cod' ? T('You pay in cash or by card when your piece arrives.', 'بتدفعي كاش أو بالكارت لما القطعة توصلك.') : T('Once you approve, we send a secure card payment link, then start cutting.', 'بعد موافقتك بنبعتلك لينك دفع آمن، وبعدها بنبدأ التفصيل.')) +
+      step(1, T('We confirm with you', 'نأكد وياج'), T('Within one working day we message you on WhatsApp at ', 'خلال يوم عمل بنتواصل وياج على الواتساب على الرقم ') + '<span dir="ltr">' + esc(o.contact.phone) + '</span>' + T(' to confirm the fabric and fit.', ' عشان نأكد القماش والمقاس.')) +
+      step(2, T('You see the real fabric', 'تشوفين القماش الأصلي'), T('We send a photo of the fabric before anything is cut.', 'نرسل لج صورة القماش قبل أي تفصيل.')) +
+      step(3, T('Cut in Dubai, then delivered', 'التفصيل في دبي والتوصيل'), o.pay === 'cod' ? T('You pay in cash or by card when your piece arrives.', 'تدفعين كاش أو بالبطاقة لين توصلج القطعة.') : T('Once you approve, we send a secure card payment link, then start cutting.', 'عقب موافقتج نرسل لج رابط دفع آمن، وبعدها نبدأ التفصيل.')) +
     '</table></td></tr>' +
-    '<tr><td style="padding:12px 40px 0"><div style="border-top:1px solid #E7E2DB;padding-top:26px;' + cap + 'color:#1C1B1B;text-align:' + al + '">' + T('Your order', 'طلبك') + '</div></td></tr>' +
+    '<tr><td style="padding:12px 40px 0"><div style="border-top:1px solid #E7E2DB;padding-top:26px;' + cap + 'color:#1C1B1B;text-align:' + al + '">' + T('Your order', 'طلبج') + '</div></td></tr>' +
     '<tr><td style="padding:4px 40px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">' + items + '</table></td></tr>' +
     '<tr><td style="padding:16px 40px 8px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">' +
       row(T('Subtotal', 'المجموع'), money(o.sub, ar)) +
@@ -124,13 +124,13 @@ function customerHtml(o){
       row(T('Total', 'الإجمالي'), money(o.total, ar), true) +
     '</table><div style="font-family:' + body + ';font-size:12px;color:#6A6A6A;text-align:' + ar2 + ';margin-top:2px">' + T('Prices include VAT', 'الأسعار شاملة الضريبة') + '</div></td></tr>' +
     '<tr><td style="padding:22px 40px 8px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #E7E2DB"><tr>' +
-      '<td width="50%" style="vertical-align:top;padding:22px ' + (ar ? '0 0 12px' : '12px 0 0') + ';text-align:' + al + '"><div style="' + cap + 'color:#1C1B1B;margin-bottom:8px">' + T('Delivery to', 'التوصيل لـ') + '</div><div style="font-family:' + body + ';font-size:14px;line-height:1.6;color:#4A4848">' + esc(o.contact.name) + '<br>' + esc(o.address.line) + (o.address.apt ? ', ' + esc(o.address.apt) : '') + '<br>' + esc(o.address.city) + (o.address.region ? ', ' + esc(o.address.region) : '') + '<br>' + esc(ar ? c[1] : c[0]) + '</div></td>' +
-      '<td width="50%" style="vertical-align:top;padding:22px 0 0;text-align:' + al + '"><div style="' + cap + 'color:#1C1B1B;margin-bottom:8px">' + T('Payment', 'الدفع') + '</div><div style="font-family:' + body + ';font-size:14px;line-height:1.6;color:#4A4848">' + (o.pay === 'cod' ? T('Cash on delivery', 'الدفع عند الاستلام') : T('Card payment link, sent after we confirm', 'لينك دفع بالكارت بعد التأكيد')) + '</div></td>' +
+      '<td width="50%" style="vertical-align:top;padding:22px ' + (ar ? '0 0 12px' : '12px 0 0') + ';text-align:' + al + '"><div style="' + cap + 'color:#1C1B1B;margin-bottom:8px">' + T('Delivery to', 'التوصيل إلى') + '</div><div style="font-family:' + body + ';font-size:14px;line-height:1.6;color:#4A4848">' + esc(o.contact.name) + '<br>' + esc(o.address.line) + (o.address.apt ? ', ' + esc(o.address.apt) : '') + '<br>' + esc(o.address.city) + (o.address.region ? ', ' + esc(o.address.region) : '') + '<br>' + esc(ar ? c[1] : c[0]) + '</div></td>' +
+      '<td width="50%" style="vertical-align:top;padding:22px 0 0;text-align:' + al + '"><div style="' + cap + 'color:#1C1B1B;margin-bottom:8px">' + T('Payment', 'الدفع') + '</div><div style="font-family:' + body + ';font-size:14px;line-height:1.6;color:#4A4848">' + (o.pay === 'cod' ? T('Cash on delivery', 'الدفع عند الاستلام') : T('Card payment link, sent after we confirm', 'رابط دفع بالبطاقة عقب التأكيد')) + '</div></td>' +
     '</tr></table></td></tr>' +
-    '<tr><td align="center" style="padding:30px 40px 40px"><a href="' + CFG.instagram + '" style="display:inline-block;background:#1C1B1B;color:#FFFFFF;text-decoration:none;font-family:' + font + ';font-size:12px;letter-spacing:' + (ar ? '0' : '2.4px') + ';text-transform:uppercase;padding:15px 30px">' + T('Message us on Instagram', 'كلّمينا على إنستجرام') + '</a>' +
-      '<p style="margin:18px 0 0;font-family:' + body + ';font-size:13px;color:#6A6A6A">' + T('Questions? Just reply to this email.', 'عندك سؤال؟ ردّي على الإيميل ده.') + '</p></td></tr>' +
+    '<tr><td align="center" style="padding:30px 40px 40px"><a href="' + CFG.instagram + '" style="display:inline-block;background:#1C1B1B;color:#FFFFFF;text-decoration:none;font-family:' + font + ';font-size:12px;letter-spacing:' + (ar ? '0' : '2.4px') + ';text-transform:uppercase;padding:15px 30px">' + T('Message us on Instagram', 'تواصلي ويانا في إنستغرام') + '</a>' +
+      '<p style="margin:18px 0 0;font-family:' + body + ';font-size:13px;color:#6A6A6A">' + T('Questions? Just reply to this email.', 'عندج سؤال؟ ردّي على هالإيميل.') + '</p></td></tr>' +
     '<tr><td style="background:#FFFFFF;border-top:1px solid #E7E2DB;padding:24px 40px;text-align:center;font-family:' + body + ';font-size:12px;line-height:1.7;color:#6A6A6A">' +
-      '<a href="' + CFG.site + '" style="color:#1C1B1B;text-decoration:none;' + cap + 'color:#1C1B1B">nmh-dubai.web.app</a><br>' + T('Modest dresses, made to order in Dubai.', 'فساتين محتشمة، بتتفصّل بالطلب في دبي.') + '<br>' +
+      '<a href="' + CFG.site + '" style="color:#1C1B1B;text-decoration:none;' + cap + 'color:#1C1B1B">nmh-dubai.web.app</a><br>' + T('Modest dresses, made to order in Dubai.', 'فساتين وعبايات محتشمة، تتفصّل حسب الطلب في دبي.') + '<br>' +
       '<a href="' + CFG.site + '/#page-refund" style="color:#6A6A6A">' + T('Refund policy', 'سياسة الاسترجاع') + '</a> · <a href="' + CFG.site + '/#page-privacy" style="color:#6A6A6A">' + T('Privacy policy', 'سياسة الخصوصية') + '</a></td></tr>' +
   '</table></td></tr></table></body></html>';
 }
