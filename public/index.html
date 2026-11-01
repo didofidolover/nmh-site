@@ -27,6 +27,10 @@
   --head:"Montserrat","IBM Plex Sans Arabic",Arial,sans-serif; --body:"Nunito Sans","IBM Plex Sans Arabic",Arial,sans-serif;
   --g:50px; --hd:84px; --ease:cubic-bezier(.25,.46,.45,.94); --ease-out:cubic-bezier(.215,.61,.355,1); --slide:cubic-bezier(.645,.045,.355,1);
 }
+html[data-th="mono"]{--bg:#FFFFFF; --panel:#FFFFFF; --ink:#000000; --muted:#5C5C5C; --line:#E6E6E6; --line-2:#CCCCCC; --btn:#000000; --btn-ink:#FFFFFF; --soft:#F3F3F3}
+html[data-th="sand"]{--bg:#F5EDE2; --panel:#FBF7F1; --ink:#2B2118; --muted:#6B5D4F; --line:#E3D6C4; --line-2:#CFBFA9; --btn:#5B4532; --btn-ink:#FFFFFF; --soft:#ECE1D1}
+html[data-th="blush"]{--bg:#FBF4F2; --panel:#FFFFFF; --ink:#2A1E1E; --muted:#6E5D5B; --line:#EEDFDB; --line-2:#DCC6C0; --btn:#8A4A47; --btn-ink:#FFFFFF; --soft:#F4E6E2}
+html[data-th="sage"]{--bg:#F4F5F0; --panel:#FFFFFF; --ink:#1F2620; --muted:#5E665E; --line:#DEE3D8; --line-2:#C6CFBF; --btn:#3F5446; --btn-ink:#FFFFFF; --soft:#E8ECE3}
 html.dark{
   --bg:#141312; --panel:#1B1A19; --ink:#F2EDE7; --muted:#A29C95; --line:#2C2A28; --line-2:#3A3735;
   --btn:#F2EDE7; --btn-ink:#141312; --soft:#211F1D; --ok:#7CC39A; --err:#F2938C; --scrim:rgba(0,0,0,.6);
@@ -613,25 +617,31 @@ html.dark .card.sold .ph,html.dark .ot.sold .ph{background:#2A2A2A!important}
 .ot.sold .ph img{opacity:.7}
 .ed-banner{height:clamp(440px,52vw,700px)}
 .ed-banner .btn{display:inline-flex}
+
+/* Arabic mode keeps English product and collection names in the Latin brand style, like Kamin */
+html[lang="ar"] .card .ttl,html[lang="ar"] .pp-info .u-h1,html[lang="ar"] .li .ttl,html[lang="ar"] .ot-n,html[lang="ar"] .banner .u-h1,html[lang="ar"] .one-title,html[lang="ar"] .mega-pics .u-h7,html[lang="ar"] .slide-t .big.en{font-family:var(--head);text-transform:uppercase;letter-spacing:.2em;font-weight:500}
+html[lang="ar"] .card .ttl{font-size:12px}
+html[lang="ar"] .sline b{font-family:var(--head);letter-spacing:.06em}
+.slide video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 </style>
 </head>
 <body>
-<a class="skip" href="#main" data-ar="تخطّي للمحتوى">Skip to content</a>
+<a class="skip" href="#main" data-ar="انتقلي إلى المحتوى">Skip to content</a>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
   <filter id="dyeS" color-interpolation-filters="sRGB"><feFlood id="dyeSFlood" flood-color="#8A4A47" result="f"/><feComposite in="f" in2="SourceAlpha" operator="in" result="c"/><feBlend in="SourceGraphic" in2="c" mode="multiply"/></filter>
   <filter id="dyeP" color-interpolation-filters="sRGB"><feFlood id="dyePFlood" flood-color="#8A4A47" result="f"/><feComposite in="f" in2="SourceAlpha" operator="in" result="c"/><feBlend in="SourceGraphic" in2="c" mode="multiply"/></filter>
 </defs></svg>
 
-<div class="ann" id="ann" data-ar="توصيل مجاني داخل الإمارات للطلبات فوق ٥٠٠ درهم · كل قطعة تتفصّل حسب الطلب في دبي">Free UAE delivery over 500 AED · Every piece made to order in Dubai</div>
+<div class="ann" id="ann" data-ar="توصيل مجاني داخل الإمارات للطلبات التي تتجاوز ٥٠٠ د.إ · كل قطعة تُفصَّل حسب الطلب في دبي">Free UAE delivery over 500 AED · Every piece made to order in Dubai</div>
 
 <header class="hd" id="hd">
   <div class="wrap hd-in">
     <div style="display:flex;align-items:center;height:100%">
       <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="side"><svg viewBox="0 0 20 14" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M0 1h20M0 7h20M0 13h20"/></svg></button>
       <ul class="nav">
-        <li><button type="button" id="megaBtn" aria-expanded="false" aria-controls="mega" data-ar="الكولكشنز">Collections</button></li>
+        <li><button type="button" id="megaBtn" aria-expanded="false" aria-controls="mega" data-ar="المجموعات">Collections</button></li>
         <li><a href="#s-all" data-ar="تسوّقي">Shop</a></li>
-        <li><a href="#the-one" data-ar="القطعة الوحدة">The One</a></li>
+        <li><a href="#the-one" data-ar="القطعة الواحدة">The One</a></li>
       </ul>
     </div>
     <a class="logo" href="#" data-home aria-label="NMH Dubai, home"><img class="l-d" src="img/logo-dark.png" alt="NMH Dubai" width="80" height="38"><img class="l-w" src="img/logo.png" alt="" width="80" height="38"></a>
@@ -645,8 +655,8 @@ html.dark .card.sold .ph,html.dark .ot.sold .ph{background:#2A2A2A!important}
   </div>
   <div class="mega" id="mega" role="region" aria-label="Collections">
     <div class="wrap mega-in">
-      <div><h3 class="u-h7" data-ar="الكولكشنز">Collections</h3><ul id="megaCols"></ul></div>
-      <div><h3 class="u-h7" data-ar="تسوّقي حسب الاستايل">Shop by style</h3><ul id="megaStyles"></ul></div>
+      <div><h3 class="u-h7" data-ar="المجموعات">Collections</h3><ul id="megaCols"></ul></div>
+      <div><h3 class="u-h7" data-ar="تسوّقي حسب الفئة">Shop by style</h3><ul id="megaStyles"></ul></div>
       <div class="mega-pics" id="megaPics"></div>
     </div>
   </div>
@@ -665,7 +675,7 @@ html.dark .card.sold .ph,html.dark .ot.sold .ph{background:#2A2A2A!important}
   <div class="srch-bg" data-close-srch></div>
   <div class="srch-p" role="dialog" aria-modal="true" aria-label="Search">
     <div class="wrap">
-      <form class="srch-bar" id="srchForm" role="search"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8.5" cy="8.5" r="6.5"/><path d="M13.5 13.5L19 19"/></svg><label class="sr" for="srchIn" data-ar="ابحثي">Search</label><input id="srchIn" type="search" autocomplete="off" placeholder="Search..." data-ph-ar="ابحثي..."><button type="button" data-close-srch aria-label="Close search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1 1l14 14M15 1L1 15"/></svg></button></form>
+      <form class="srch-bar" id="srchForm" role="search"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8.5" cy="8.5" r="6.5"/><path d="M13.5 13.5L19 19"/></svg><label class="sr" for="srchIn" data-ar="البحث">Search</label><input id="srchIn" type="search" autocomplete="off" placeholder="Search..." data-ph-ar="ابحثي..."><button type="button" data-close-srch aria-label="Close search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1 1l14 14M15 1L1 15"/></svg></button></form>
       <div class="srch-res" id="srchRes"></div>
     </div>
   </div>
@@ -677,7 +687,7 @@ html.dark .card.sold .ph,html.dark .ot.sold .ph{background:#2A2A2A!important}
   <div class="wrap">
     <div class="ft-g">
       <div><h3 class="u-h7" data-ar="تسوّقي">Shop</h3><ul id="ftShop"></ul></div>
-      <div><h3 class="u-h7" data-ar="الكولكشنز">Collections</h3><ul id="ftCols"></ul></div>
+      <div><h3 class="u-h7" data-ar="المجموعات">Collections</h3><ul id="ftCols"></ul></div>
       <div><h3 class="u-h7" data-ar="المساعدة">Help</h3><ul>
         <li><a href="#page-how" data-ar="طريقة الطلب">How ordering works</a></li>
         <li><a href="#page-size" data-ar="دليل المقاسات">Size guide</a></li>
@@ -687,14 +697,14 @@ html.dark .card.sold .ph,html.dark .ot.sold .ph{background:#2A2A2A!important}
         <li><a href="#page-terms" data-ar="الشروط والأحكام">Terms of service</a></li>
       </ul></div>
       <div class="ft-news"><h3 class="u-h7" data-ar="النشرة البريدية">Newsletter</h3>
-        <p data-ar="كوني أول من يشوف الكولكشنز الجديدة وكل قطعة 1/1 جديدة.">Be the first to see new collections and every new 1 of 1 piece.</p>
-        <form id="newsForm" novalidate><label class="sr" for="newsIn" data-ar="الإيميل">Email</label><input class="in" id="newsIn" type="email" autocomplete="email" placeholder="Your email" data-ph-ar="الإيميل" dir="ltr"><button class="btn" type="submit" data-ar="اشتركي">Subscribe</button><p class="ok" id="newsOk" aria-live="polite"></p></form>
+        <p data-ar="كوني أول من يكتشف المجموعات الجديدة وكل قطعة فريدة جديدة.">Be the first to see new collections and every new 1 of 1 piece.</p>
+        <form id="newsForm" novalidate><label class="sr" for="newsIn" data-ar="البريد الإلكتروني">Email</label><input class="in" id="newsIn" type="email" autocomplete="email" placeholder="Your email" data-ph-ar="البريد الإلكتروني" dir="ltr"><button class="btn" type="submit" data-ar="اشتركي">Subscribe</button><p class="ok" id="newsOk" aria-live="polite"></p></form>
       </div>
     </div>
     <div class="ft-b">
       <span data-ar="© ٢٠٢٦ NMH دبي">© 2026 NMH Dubai</span>
       <div class="opts2"><button type="button" id="ftTheme" data-ar="الوضع الداكن">Dark mode</button><button type="button" id="ftLang" lang="ar">عربي</button><a href="https://www.instagram.com/_bynmh/" target="_blank" rel="noopener" class="u-h7">Instagram</a></div>
-      <div class="pay" aria-label="Payment methods"><span>VISA</span><span>MASTERCARD</span><span>APPLE PAY</span><span data-ar="كاش">CASH</span></div>
+      <div class="pay" aria-label="Payment methods"><span>VISA</span><span>MASTERCARD</span><span>APPLE PAY</span><span data-ar="نقدًا">CASH</span></div>
     </div>
   </div>
 </footer>
@@ -709,7 +719,16 @@ html.dark .card.sold .ph,html.dark .ot.sold .ph{background:#2A2A2A!important}
 'use strict';
 var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 var L = 'en', DARK = false;
-try{ L = localStorage.getItem('nmh-lang') || 'en'; DARK = localStorage.getItem('nmh-theme') === 'dark'; }catch(e){}
+var THEMES = {classic:'#FDF9F4', mono:'#FFFFFF', sand:'#F5EDE2', blush:'#FBF4F2', sage:'#F4F5F0', midnight:'#141312'}, TH = 'classic', THEME_PREF = null;
+try{ L = localStorage.getItem('nmh-lang') || 'en'; THEME_PREF = localStorage.getItem('nmh-theme'); TH = localStorage.getItem('nmh-site-theme') || 'classic'; }catch(e){}
+DARK = THEME_PREF ? THEME_PREF === 'dark' : TH === 'midnight';
+function applySiteTheme(th){
+  TH = THEMES[th] ? th : 'classic'; try{ localStorage.setItem('nmh-site-theme', TH); }catch(e){}
+  var h = document.documentElement; if(TH === 'classic' || TH === 'midnight') h.removeAttribute('data-th'); else h.setAttribute('data-th', TH);
+  if(!THEME_PREF){ DARK = TH === 'midnight'; h.classList.toggle('dark', DARK); }
+  var m = document.querySelector('meta[name=theme-color]'); if(m) m.content = DARK ? '#141312' : THEMES[TH];
+}
+applySiteTheme(TH);
 function t(o){ return o && typeof o === 'object' ? (o[L] || o.en) : o; }
 function tr(en, ar){ return L === 'ar' ? ar : en; }
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
@@ -720,15 +739,15 @@ var CHEV = '<svg viewBox="0 0 8 12" fill="none" stroke="currentColor" stroke-wid
 
 /* ================= data ================= */
 var STYLES = [
-  {id:'all', en:'All', ar:'الكل'}, {id:'evening', en:'Evening', ar:'سهرة'}, {id:'everyday', en:'Everyday', ar:'يومي'},
+  {id:'all', en:'All', ar:'الكل'}, {id:'evening', en:'Evening', ar:'السهرة'}, {id:'everyday', en:'Everyday', ar:'يومي'},
   {id:'abaya', en:'Under-abaya', ar:'تحت العباية'}, {id:'jumpsuit', en:'Jumpsuits', ar:'جمبسوت'}
 ];
 var STYLE_INFO = {
-  all:{title:{en:'All pieces',ar:'كل القطع'}, intro:{en:'Every piece we make, across every collection. Each one is cut to order in your size and length.',ar:'كل قطعنا من كل الكولكشنز. كل قطعة تتفصّل حسب الطلب على مقاسج وطولج.'}, imgs:['img/bloom-1.jpg','img/front-olive.webp','img/n04.jpg']},
-  evening:{title:{en:'Evening',ar:'سهرة'}, intro:{en:'Full skirts, long sleeves and prints that hold the light. Dresses for weddings, Eid and the evenings you plan for.',ar:'تنانير واسعة، أكمام طويلة وطبعات تلمع مع الضوء. فساتين للأعراس والعيد والسهرات اللي تستعدين لها.'}, imgs:['img/desert-1.jpg','img/front-dew.webp','img/rose-wall.jpg']},
-  everyday:{title:{en:'Everyday',ar:'يومي'}, intro:{en:'Easy shapes in calm colours, for work, errands and long days out.',ar:'قصّات مريحة بألوان هادية، للدوام والمشاوير والأيام الطويلة برّا البيت.'}, imgs:['img/n07.jpg','img/front-azure.webp','img/n01.jpg']},
-  abaya:{title:{en:'Under-abaya',ar:'تحت العباية'}, intro:{en:'Simple, light layers cut to sit cleanly under your abaya.',ar:'طبقات بسيطة وخفيفة متفصّلة عشان تيي مضبوطة تحت العباية.'}, imgs:['img/navy.jpg','img/n04.jpg','img/n09.jpg']},
-  jumpsuit:{title:{en:'Jumpsuits',ar:'جمبسوت'}, intro:{en:'One piece, belted and ready. Modest cover with the ease of trousers.',ar:'قطعة وحدة بحزام وجاهزة. محتشمة ومريحة مثل البنطلون.'}, imgs:['img/n06.jpg','img/n07.jpg','img/n01.jpg']}
+  all:{title:{en:'All pieces',ar:'جميع المنتجات'}, intro:{en:'Every piece we make, across every collection. Each one is cut to order in your size and length.',ar:'جميع قطعنا من كل المجموعات. تُفصَّل كل قطعة حسب الطلب وفق مقاسك وطولك.'}, imgs:['img/bloom-1.jpg','img/front-olive.webp','img/n04.jpg']},
+  evening:{title:{en:'Evening',ar:'السهرة'}, intro:{en:'Full skirts, long sleeves and prints that hold the light. Dresses for weddings, Eid and the evenings you plan for.',ar:'تنانير واسعة، وأكمام طويلة، وطبعات تلتقط الضوء. فساتين للأعراس والأعياد والأمسيات المنتظرة.'}, imgs:['img/desert-1.jpg','img/front-dew.webp','img/rose-wall.jpg']},
+  everyday:{title:{en:'Everyday',ar:'يومي'}, intro:{en:'Easy shapes in calm colours, for work, errands and long days out.',ar:'قصّات مريحة بألوان هادئة، للعمل والمشاوير والأيام الطويلة.'}, imgs:['img/n07.jpg','img/front-azure.webp','img/n01.jpg']},
+  abaya:{title:{en:'Under-abaya',ar:'تحت العباية'}, intro:{en:'Simple, light layers cut to sit cleanly under your abaya.',ar:'طبقات بسيطة وخفيفة، مفصّلة لتنسدل بانسيابية تحت العباية.'}, imgs:['img/navy.jpg','img/n04.jpg','img/n09.jpg']},
+  jumpsuit:{title:{en:'Jumpsuits',ar:'جمبسوت'}, intro:{en:'One piece, belted and ready. Modest cover with the ease of trousers.',ar:'قطعة واحدة بحزام. محتشمة ومريحة كالبنطال.'}, imgs:['img/n06.jpg','img/n07.jpg','img/n01.jpg']}
 };
 var SHADES = [
   {c:'#8A4A47', en:'Rosewood', ar:'خشب الورد'}, {c:'#24304F', en:'Midnight', ar:'كحلي ليلي'}, {c:'#C9A98A', en:'Sand', ar:'رملي'},
@@ -742,136 +761,146 @@ var DYES = {
 var COLLECTIONS = [
   { id:'bloom', season:{en:'Spring/Summer 2026',ar:'ربيع وصيف ٢٠٢٦'}, cover:'img/bloom-1.jpg', small:'img/bloom-4.jpg', tone:'#E6CFC6',
     name:{en:'Femininity in Bloom',ar:'أنوثة تنبض بالأناقة'},
-    story:{en:'A celebration of floral artistry and graceful silhouettes. Rich botanical prints meet fluid pleats, for a look that feels effortless and timeless.',ar:'احتفال بفن الزهور والقصّات الانسيابية. طبعات نباتية غنية تلتقي بالكسرات الناعمة، لإطلالة بسيطة وخالدة.'},
-    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Botanical, soft',ar:'نباتي وناعم'}},{k:{en:'Signature',ar:'التوقيع'},v:{en:'Knife pleats',ar:'كسرات دقيقة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Location',ar:'مكان التصوير'},v:{en:'Rose courtyard',ar:'فناء وردي'}}],
+    story:{en:'A celebration of floral artistry and graceful silhouettes. Rich botanical prints meet fluid pleats, for a look that feels effortless and timeless.',ar:'احتفاء بفن الزهور والقصّات الانسيابية. طبعات نباتية غنية تلتقي بطيّات ناعمة، لإطلالة بسيطة وخالدة.'},
+    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Botanical, soft',ar:'نباتي وناعم'}},{k:{en:'Signature',ar:'توقيع الدار'},v:{en:'Knife pleats',ar:'كسرات دقيقة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Location',ar:'مكان التصوير'},v:{en:'Rose courtyard',ar:'فناء وردي'}}],
     album:['img/bloom-1.jpg','img/bloom-4.jpg','img/front-dew.webp','img/bloom-2.jpg','img/front-magnolia.webp','img/bloom-5.jpg','img/bloom-3.jpg','img/rk-dew-back.webp','img/side-magnolia.webp'] },
   { id:'desert', season:{en:'Spring/Summer 2026',ar:'ربيع وصيف ٢٠٢٦'}, cover:'img/desert-1.jpg', small:'img/desert-3.jpg', tone:'#E3C9BB',
     name:{en:'Timeless Desert Elegance',ar:'أناقة الصحراء الخالدة'},
-    story:{en:'Inspired by the light of the dunes at golden hour. Full skirts that sweep the stone, long sleeves and a quiet, sculpted waist.',ar:'مستوحاة من ضوء الكثبان وقت الغروب. تنانير واسعة تلامس الحجر، أكمام طويلة وخصر منحوت بهدوء.'},
-    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Sunlit, sculptural',ar:'مشمس ومنحوت'}},{k:{en:'Signature',ar:'التوقيع'},v:{en:'Full circle skirt',ar:'تنورة دائرية كاملة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Location',ar:'مكان التصوير'},v:{en:'Stone courtyard',ar:'فناء حجري'}}],
+    story:{en:'Inspired by the light of the dunes at golden hour. Full skirts that sweep the stone, long sleeves and a quiet, sculpted waist.',ar:'مستوحاة من ضوء الكثبان عند الغروب. تنانير واسعة تلامس الحجر، وأكمام طويلة، وخصر منحوت بهدوء.'},
+    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Sunlit, sculptural',ar:'مشمس ومنحوت'}},{k:{en:'Signature',ar:'توقيع الدار'},v:{en:'Full circle skirt',ar:'تنورة دائرية كاملة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Location',ar:'مكان التصوير'},v:{en:'Stone courtyard',ar:'فناء حجري'}}],
     album:['img/desert-1.jpg','img/front-sienna.webp','img/desert-3.jpg','img/rose-wall.jpg','img/side-sienna.webp','img/desert-2.jpg','img/rk-rose-back.webp'] },
   { id:'drape', season:{en:'Autumn/Winter 2026',ar:'خريف وشتاء ٢٠٢٦'}, cut:['img/front-azure.webp','img/front-olive.webp'], tone:'#DCD8D2',
     name:{en:'The Drape Edit',ar:'كولكشن الطيّات'},
-    story:{en:'Solid crepe in quiet colours, shaped by one gesture: a fold of fabric that falls from the waist and moves when you walk.',ar:'كريب سادة بألوان هادية، تشكّله حركة وحدة: طيّة قماش تنزل من الخصر وتتحرك مع كل خطوة.'},
-    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Sculpted, calm',ar:'منحوت وهادي'}},{k:{en:'Signature',ar:'التوقيع'},v:{en:'Waterfall drape',ar:'طيّة منسدلة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Colours',ar:'الألوان'},v:{en:'Calm, solid shades',ar:'ألوان هادية'}}],
+    story:{en:'Solid crepe in quiet colours, shaped by one gesture: a fold of fabric that falls from the waist and moves when you walk.',ar:'كريب سادة بألوان هادئة، تشكّله حركة واحدة: طيّة قماش تنسدل من الخصر وتتحرك مع كل خطوة.'},
+    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Sculpted, calm',ar:'منحوت وهادي'}},{k:{en:'Signature',ar:'توقيع الدار'},v:{en:'Waterfall drape',ar:'طيّة منسدلة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Colours',ar:'الألوان'},v:{en:'Calm, solid shades',ar:'ألوان هادئة'}}],
     album:['img/front-azure.webp','img/side-azure.webp','img/rk-azure-back.webp','img/front-olive.webp','img/side-olive.webp','img/rk-olive-back.webp'] },
   { id:'essentials', season:{en:'The archive',ar:'الأرشيف'}, cover:'img/n04.jpg', small:'img/n07.jpg', tone:'#DDDBD8',
     name:{en:'Everyday Essentials',ar:'أساسيات كل يوم'},
-    story:{en:'The pieces that started NMH: easy dresses, an under-abaya slip and a belted jumpsuit.',ar:'القطع اللي بدت فيها NMH: فساتين مريحة، فستان تحت العباية، وجمبسوت بحزام.'},
-    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Calm, versatile',ar:'هادي ومتعدد'}},{k:{en:'Pieces',ar:'القطع'},v:{en:'Six designs',ar:'٦ تصميمات'}},{k:{en:'Colours',ar:'الألوان'},v:{en:'Calm, versatile shades',ar:'ألوان هادية'}},{k:{en:'Location',ar:'مكان التصوير'},v:{en:'Studio',ar:'استوديو'}}],
+    story:{en:'The pieces that started NMH: easy dresses, an under-abaya slip and a belted jumpsuit.',ar:'القطع التي بدأت بها NMH: فساتين مريحة، وفستان لما تحت العباية، وجمبسوت بحزام.'},
+    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Calm, versatile',ar:'هادئ ومتعدد'}},{k:{en:'Pieces',ar:'القطع'},v:{en:'Six designs',ar:'٦ تصميمات'}},{k:{en:'Colours',ar:'الألوان'},v:{en:'Calm, versatile shades',ar:'ألوان هادئة'}},{k:{en:'Location',ar:'مكان التصوير'},v:{en:'Studio',ar:'استوديو'}}],
     album:['img/n07.jpg','img/n04.jpg','img/n01.jpg','img/navy.jpg','img/n09.jpg','img/n06.jpg'] }
 ];
 var PRODUCTS = [
   {code:'B01', col:'bloom', style:'evening', tone:'#E6CFC6', price:520, name:{en:'Layla Pleated Maxi',ar:'فستان ليلى المكسّر'}, imgs:['img/bloom-1.jpg','img/bloom-2.jpg','img/bloom-3.jpg','img/bloom-5.jpg'],
-    desc:{en:'Long-sleeve floral maxi with fine knife pleats from the yoke down and a softly gathered waist.',ar:'فستان طويل بطبعة زهور وأكمام طويلة، بكسرات دقيقة من الصدر لين تحت وخصر ناعم.'},
-    story:{en:'Drawn for the hour after sunset, when the courtyard walls turn rose. Fine pleats fall from the yoke and open like a fan with every step.',ar:'تصمّم لساعة ما بعد الغروب، لين تتلوّن حيطان الفناء بالوردي. كسرات دقيقة تنزل من الصدر وتنفتح مثل المروحة مع كل خطوة.'}},
+    desc:{en:'Long-sleeve floral maxi with fine knife pleats from the yoke down and a softly gathered waist.',ar:'فستان طويل بطبعة زهور وأكمام طويلة، بطيّات دقيقة من الصدر إلى الأسفل وخصر ناعم.'},
+    story:{en:'Drawn for the hour after sunset, when the courtyard walls turn rose. Fine pleats fall from the yoke and open like a fan with every step.',ar:'صُمّم لساعة ما بعد الغروب، حين تتلوّن جدران الفناء بالوردي. طيّات دقيقة تنسدل من الصدر وتتفتح كالمروحة مع كل خطوة.'}},
   {code:'D01', col:'desert', style:'evening', tone:'#EAD9D3', price:560, name:{en:'Noor Circle Maxi',ar:'فستان نور الدائري'}, imgs:['img/front-rose.webp','img/side-rose.webp','img/rk-rose-back.webp','img/desert-1.jpg','img/desert-3.jpg','img/desert-2.jpg'],
-    desc:{en:'Fitted floral bodice, long cuffed sleeves and a full circle skirt that sweeps the floor.',ar:'صدر محدد بطبعة زهور، أكمام طويلة بأساور، وتنورة دائرية واسعة تلامس الأرض.'},
-    story:{en:'Noor means light. A fitted floral bodice gives way to a full circle skirt that catches the late sun and sweeps the stone floor.',ar:'نور يعني ضوء. صدر محدد بطبعة زهور يكمّل بتنورة دائرية كاملة تلقط ضوء الشمس وتلامس أرضية الحجر.'}},
+    desc:{en:'Fitted floral bodice, long cuffed sleeves and a full circle skirt that sweeps the floor.',ar:'صدر محدد بطبعة زهور، وأكمام طويلة بأساور، وتنورة دائرية واسعة تلامس الأرض.'},
+    story:{en:'Noor means light. A fitted floral bodice gives way to a full circle skirt that catches the late sun and sweeps the stone floor.',ar:'نور تعني الضوء. صدر محدد بطبعة زهور يكتمل بتنورة دائرية كاملة تلتقط ضوء الشمس وتلامس أرض الحجر.'}},
   {code:'D02', col:'desert', style:'evening', tone:'#E3C9BB', price:480, name:{en:'Rose Wall Gathered Maxi',ar:'فستان روز المجمّع'}, imgs:['img/rose-wall.jpg','img/desert-4.jpg'],
-    desc:{en:'Floral maxi with a gathered waist and long sleeves, cut to move.',ar:'فستان طويل بطبعة زهور، بخصر مجمّع وأكمام طويلة، متفصّل عشان يتحرك وياج.'},
-    story:{en:'Made for long evenings outdoors. A gathered waist and soft sleeves keep it easy, while the print does the talking.',ar:'مسوّى للسهرات الطويلة برّا. خصر مجمّع وأكمام ناعمة تخلّيه مريح، والطبعة هي اللي تتكلم.'}},
+    desc:{en:'Floral maxi with a gathered waist and long sleeves, cut to move.',ar:'فستان طويل بطبعة زهور، بخصر مجمّع وأكمام طويلة، مفصّل ليتحرك معك.'},
+    story:{en:'Made for long evenings outdoors. A gathered waist and soft sleeves keep it easy, while the print does the talking.',ar:'صُنع للأمسيات الطويلة في الهواء الطلق. خصر مجمّع وأكمام ناعمة تمنحه الراحة، والطبعة تتحدث عنه.'}},
   {code:'D03', col:'desert', style:'evening', tone:'#EBD8CC', price:540, name:{en:'Sienna Leaf Maxi',ar:'فستان سيينا'}, imgs:['img/front-sienna.webp','img/side-sienna.webp','img/rk-sienna-back.webp'],
-    desc:{en:'Painterly terracotta leaf print on a fitted bodice with a full pleated skirt and cuffed long sleeves.',ar:'طبعة أوراق بلون التراكوتا على صدر محدد وتنورة واسعة بكسرات وأكمام طويلة بأساور.'},
-    story:{en:'A painterly leaf print in terracotta and cream, inspired by desert stone at golden hour. The skirt is full enough to turn in.',ar:'طبعة أوراق كأنها مرسومة بالفرشاة بلون التراكوتا والكريمي، مستوحاة من حجر الصحراء وقت الغروب. التنورة واسعة بما يكفي إنج تدورين فيها.'}},
+    desc:{en:'Painterly terracotta leaf print on a fitted bodice with a full pleated skirt and cuffed long sleeves.',ar:'طبعة أوراق بلون التيراكوتا على صدر محدد، وتنورة واسعة بطيّات، وأكمام طويلة بأساور.'},
+    story:{en:'A painterly leaf print in terracotta and cream, inspired by desert stone at golden hour. The skirt is full enough to turn in.',ar:'طبعة أوراق كأنها مرسومة بالفرشاة بلون التيراكوتا والكريمي، مستوحاة من حجر الصحراء عند الغروب. التنورة واسعة بما يكفي لتدوري بها.'}},
   {code:'B02', col:'bloom', style:'evening', tone:'#DCE2E6', price:520, name:{en:'Dew Blossom Maxi',ar:'فستان ندى'}, imgs:['img/front-dew.webp','img/side-dew.webp','img/rk-dew-back.webp'],
-    desc:{en:'Dusty-blue ground with ivory blossoms, a softly gathered waist and a floor-sweeping skirt.',ar:'أرضية زرقاء هادية بزهور عاجية، خصر مجمّع بنعومة وتنورة طويلة للأرض.'},
-    story:{en:'Ivory blossoms on a dusty-blue ground, like morning dew on a garden wall. Quiet enough for daytime, full enough for an occasion.',ar:'زهور عاجية على أرضية زرقاء هادية، مثل ندى الصبح على سور حديقة. هادي بما يكفي للنهار، وفخم بما يكفي للمناسبات.'}},
+    desc:{en:'Dusty-blue ground with ivory blossoms, a softly gathered waist and a floor-sweeping skirt.',ar:'أرضية زرقاء هادئة بزهور عاجية، وخصر مجمّع بنعومة، وتنورة طويلة تصل إلى الأرض.'},
+    story:{en:'Ivory blossoms on a dusty-blue ground, like morning dew on a garden wall. Quiet enough for daytime, full enough for an occasion.',ar:'زهور عاجية على أرضية زرقاء هادئة، كندى الصباح على سور حديقة. هادئ بما يكفي للنهار، وفاخر بما يكفي للمناسبات.'}},
   {code:'B03', col:'bloom', style:'evening', tone:'#E4E3D6', price:520, name:{en:'Magnolia Maxi',ar:'فستان ماغنوليا'}, imgs:['img/front-magnolia.webp','img/side-magnolia.webp','img/rk-magnolia-back.webp'],
-    desc:{en:'Cream magnolias and sage leaves on a long-sleeve maxi with a fitted bodice and full skirt.',ar:'زهور ماغنوليا كريمي وأوراق سيج على فستان طويل بصدر محدد وتنورة واسعة.'},
-    story:{en:'Cream magnolias and sage leaves, cut into a long-sleeve maxi with a fitted bodice. A garden dress for a formal day.',ar:'زهور ماغنوليا كريمي وأوراق سيج على فستان طويل بأكمام وصدر محدد. فستان حديقة ليوم رسمي.'}},
+    desc:{en:'Cream magnolias and sage leaves on a long-sleeve maxi with a fitted bodice and full skirt.',ar:'زهور ماغنوليا كريمية وأوراق بلون المريمية على فستان طويل بصدر محدد وتنورة واسعة.'},
+    story:{en:'Cream magnolias and sage leaves, cut into a long-sleeve maxi with a fitted bodice. A garden dress for a formal day.',ar:'زهور ماغنوليا كريمية وأوراق بلون المريمية على فستان طويل بأكمام وصدر محدد. فستان حديقة ليوم رسمي.'}},
   {code:'S01', col:'drape', style:'everyday', tone:'#DCE0E6', price:460, dye:'azure', name:{en:'Azure Cascade Midi',ar:'فستان أزور'}, imgs:['img/front-azure.webp','img/side-azure.webp','img/rk-azure-back.webp'],
-    desc:{en:'Steel-blue crepe with bishop sleeves, a tied sash and a cascading side drape.',ar:'كريب أزرق رصاصي بأكمام منفوخة، حزام معقود وطيّة جانبية متدرجة.'},
-    story:{en:'One gesture shapes this dress: a sash tied at the waist that falls into a cascade.',ar:'حركة وحدة تشكّل هالفستان: حزام معقود على الخصر ينزل بطيّات متدرجة.'}},
+    desc:{en:'Steel-blue crepe with bishop sleeves, a tied sash and a cascading side drape.',ar:'كريب أزرق رمادي بأكمام منفوخة، وحزام معقود، وطيّة جانبية متدرجة.'},
+    story:{en:'One gesture shapes this dress: a sash tied at the waist that falls into a cascade.',ar:'حركة واحدة تشكّل هذا الفستان: حزام معقود على الخصر ينسدل بطيّات متدرجة.'}},
   {code:'S02', col:'drape', style:'evening', tone:'#E2E0D4', price:590, dye:'olive', name:{en:'Olive Drape Gown',ar:'فستان أوليف درايب'}, imgs:['img/front-olive.webp','img/side-olive.webp','img/rk-olive-back.webp'],
-    desc:{en:'Olive crepe gown with a wrapped bodice, flutter sleeves and a long waterfall drape.',ar:'فستان كريب زيتوني بصدر ملفوف، أكمام متموجة وطيّة طويلة منسدلة.'},
-    story:{en:'A wrapped bodice and a long waterfall drape that moves when you walk.',ar:'صدر ملفوف وطيّة طويلة منسدلة تتحرك مع خطوتج.'}},
+    desc:{en:'Olive crepe gown with a wrapped bodice, flutter sleeves and a long waterfall drape.',ar:'فستان من الكريب الزيتوني بصدر ملفوف، وأكمام متموجة، وطيّة طويلة منسدلة.'},
+    story:{en:'A wrapped bodice and a long waterfall drape that moves when you walk.',ar:'صدر ملفوف وطيّة طويلة منسدلة تتحرك مع خطواتك.'}},
   {code:'N07', col:'essentials', style:'everyday', price:350, name:{en:'Sage Tier Dress',ar:'فستان سيج'}, imgs:['img/n07.jpg'],
     desc:{en:'Relaxed midi with an asymmetric gathered tier and elasticated cuffs.',ar:'فستان ميدي مريح بطبقة مجمّعة غير متماثلة وأساور مطاطية.'},
-    story:{en:'An easy midi for everyday, with an asymmetric tier that adds movement without fuss.',ar:'فستان ميدي مريح لكل يوم، بطبقة غير متماثلة تعطيه حركة بدون تعقيد.'}},
+    story:{en:'An easy midi for everyday, with an asymmetric tier that adds movement without fuss.',ar:'فستان ميدي مريح لكل يوم، بطبقة غير متماثلة تمنحه حركة دون تكلّف.'}},
   {code:'N04', col:'essentials', style:'everyday', price:379, name:{en:'Mist Cascade Dress',ar:'فستان ميست'}, imgs:['img/n04.jpg'],
-    desc:{en:'Linen-look dress with pleated flutter sleeves and a cascading asymmetric hem.',ar:'فستان بملمس الكتان بأكمام مكسّرة وذيل متدرج غير متماثل.'},
-    story:{en:'Soft as morning haze: pleated flutter sleeves and a hem that cascades from one side to the other.',ar:'ناعم مثل ضباب الصبح: أكمام مكسّرة وذيل ينزل متدرج من جنب للثاني.'}},
+    desc:{en:'Linen-look dress with pleated flutter sleeves and a cascading asymmetric hem.',ar:'فستان بملمس الكتان، بأكمام مطوية وذيل متدرج غير متماثل.'},
+    story:{en:'Soft as morning haze: pleated flutter sleeves and a hem that cascades from one side to the other.',ar:'ناعم كضباب الصباح: أكمام مطوية وذيل ينسدل متدرجًا من جانب إلى آخر.'}},
   {code:'N01', col:'essentials', style:'everyday', price:370, name:{en:'Rose Quartz Set Dress',ar:'فستان روز كوارتز'}, imgs:['img/n01.jpg'],
     desc:{en:'Stand-collar blouse top with a soft draped waist over a straight midi skirt.',ar:'جزء علوي بياقة واقفة وخصر منسدل، مع تنورة ميدي مستقيمة.'},
-    story:{en:'A two-piece look in one dress: a stand-collar blouse with a draped waist over a straight midi skirt.',ar:'إطلالة قطعتين في فستان واحد: بلوزة بياقة واقفة وخصر منسدل فوق تنورة ميدي مستقيمة.'}},
+    story:{en:'A two-piece look in one dress: a stand-collar blouse with a draped waist over a straight midi skirt.',ar:'إطلالة من قطعتين في فستان واحد: بلوزة بياقة واقفة وخصر منسدل فوق تنورة ميدي مستقيمة.'}},
   {code:'N09', col:'essentials', style:'everyday', price:299, name:{en:'Olive Pleat Panel',ar:'فستان أوليف'}, imgs:['img/n09.jpg'],
-    desc:{en:'Satin midi with a pleated contrast panel, button side detail and flutter sleeves.',ar:'فستان ساتان بقطعة مكسّرة بلون مختلف، وأزرار جانبية وأكمام قصيرة.'},
-    story:{en:'Satin with a pleated contrast panel that shows when you move, finished with buttons at the side.',ar:'ساتان بقطعة مكسّرة بلون مختلف تبان لين تتحركين، وأزرار على الجنب.'}},
+    desc:{en:'Satin midi with a pleated contrast panel, button side detail and flutter sleeves.',ar:'فستان ساتان بلوحة مطوية بلون مختلف، وأزرار جانبية، وأكمام قصيرة.'},
+    story:{en:'Satin with a pleated contrast panel that shows when you move, finished with buttons at the side.',ar:'ساتان بلوحة مطوية بلون مختلف تظهر مع حركتك، وأزرار على الجانب.'}},
   {code:'N08', col:'essentials', style:'abaya', price:260, name:{en:'Midnight Under-Abaya',ar:'فستان ميدنايت تحت العباية'}, imgs:['img/navy.jpg'],
-    desc:{en:'A simple long-sleeve slip with a stand collar and a clean A-line, made to sit under an abaya.',ar:'فستان بسيط بأكمام طويلة وياقة واقفة وقصّة A، مسوّى عشان ينلبس تحت العباية.'},
-    story:{en:'The dress you reach for under your abaya: long sleeves, a stand collar and a clean A-line that sits quietly underneath.',ar:'الفستان اللي تلبسينه تحت العباية: أكمام طويلة، ياقة واقفة وقصّة A مرتبة تيي بهدوء تحتها.'}},
+    desc:{en:'A simple long-sleeve slip with a stand collar and a clean A-line, made to sit under an abaya.',ar:'فستان بسيط بأكمام طويلة وياقة واقفة وقصّة A، صُمّم ليُلبس تحت العباية.'},
+    story:{en:'The dress you reach for under your abaya: long sleeves, a stand collar and a clean A-line that sits quietly underneath.',ar:'الفستان الذي ترتدينه تحت العباية: أكمام طويلة، وياقة واقفة، وقصّة A أنيقة تنسدل بهدوء.'}},
   {code:'N06', col:'essentials', style:'jumpsuit', price:199, name:{en:'Onyx Belted Jumpsuit',ar:'جمبسوت أونيكس'}, imgs:['img/n06.jpg'],
-    desc:{en:'Wrap-front jumpsuit with a keyhole neckline, tie belt and cuffed ankles.',ar:'جمبسوت بصدر ملفوف وفتحة رقبة، حزام للربط وأساور عند الكاحل.'},
-    story:{en:'A wrap-front jumpsuit with a tie belt, for days that need both ease and polish.',ar:'جمبسوت بصدر ملفوف وحزام للربط، للأيام اللي تبين فيها راحة وأناقة مع بعض.'}}
+    desc:{en:'Wrap-front jumpsuit with a keyhole neckline, tie belt and cuffed ankles.',ar:'جمبسوت بصدر ملفوف وفتحة رقبة، وحزام للربط، وأساور عند الكاحل.'},
+    story:{en:'A wrap-front jumpsuit with a tie belt, for days that need both ease and polish.',ar:'جمبسوت بصدر ملفوف وحزام للربط، للأيام التي تجمع الراحة والأناقة.'}}
 ];
 
 /* ---- The One: a signature line of one-of-one pieces (placeholder photos and prices until the real ones arrive) ---- */
 var ONE = [
   {code:'O01', no:'01', one:true, col:'the-one', style:'evening', tone:'#E6CFC6', price:1450, name:{en:'Amber Dusk',ar:'غسق الكهرمان'}, imgs:['img/bloom-3.jpg','img/bloom-2.jpg'],
-    desc:{en:'A pleated floral gown with a softly gathered waist and long sleeves, made once.',ar:'فستان بطبعة زهور وكسرات، بخصر مجمّع وأكمام طويلة، ينسوى مرة وحدة بس.'},
-    story:{en:'Cut from the last length of a print we will not order again. There is fabric for one dress, and this is it.',ar:'متفصّل من آخر قطعة قماش من هالطبعة، وما بنطلبها مرة ثانية. القماش يكفي فستان واحد بس، وهو هذا.'}},
+    desc:{en:'A pleated floral gown with a softly gathered waist and long sleeves, made once.',ar:'فستان بطبعة زهور وطيّات، بخصر مجمّع وأكمام طويلة، يُصنع مرة واحدة فقط.'},
+    story:{en:'Cut from the last length of a print we will not order again. There is fabric for one dress, and this is it.',ar:'فُصّل من آخر قطعة من هذه الطبعة، ولن نطلبها مجددًا. يكفي القماش لفستان واحد، وهو هذا.'}},
   {code:'O02', no:'02', one:true, col:'the-one', style:'evening', tone:'#E3C9BB', price:1600, name:{en:'Rose Courtyard',ar:'الفناء الوردي'}, imgs:['img/desert-4.jpg','img/rose-wall.jpg'],
-    desc:{en:'A full-skirted maxi in a rose and plum print, with a fitted bodice and cuffed sleeves.',ar:'فستان طويل بتنورة واسعة وطبعة وردي وبرقوقي، بصدر محدد وأكمام بأساور.'},
-    story:{en:'Drawn for one evening in a stone courtyard at sunset. We made the pattern once, and it will not be repeated.',ar:'تصمّم لسهرة وحدة في فناء حجري وقت الغروب. سوّينا الباترون مرة وحدة، وما بيتكرر.'}},
+    desc:{en:'A full-skirted maxi in a rose and plum print, with a fitted bodice and cuffed sleeves.',ar:'فستان طويل بتنورة واسعة وطبعة وردية وبرقوقية، بصدر محدد وأكمام بأساور.'},
+    story:{en:'Drawn for one evening in a stone courtyard at sunset. We made the pattern once, and it will not be repeated.',ar:'صُمّم لأمسية واحدة في فناء حجري عند الغروب. صنعنا الباترون مرة واحدة، ولن يتكرر.'}},
   {code:'O03', no:'03', one:true, col:'the-one', style:'evening', tone:'#EBD8CC', price:1380, name:{en:'Sienna Hour',ar:'ساعة سيينا'}, imgs:['img/desert-3.jpg','img/desert-2.jpg'],
-    desc:{en:'A sculpted maxi in warm terracotta tones with a sweeping hem.',ar:'فستان طويل منحوت بدرجات التراكوتا الدافية وذيل واسع.'},
-    story:{en:'Made for the hour when the desert turns copper. One dress, one owner.',ar:'مسوّى للساعة اللي تصير فيها الصحراء نحاسية. فستان واحد، لصاحبة وحدة.'}},
+    desc:{en:'A sculpted maxi in warm terracotta tones with a sweeping hem.',ar:'فستان طويل منحوت بدرجات التيراكوتا الدافئة وذيل واسع.'},
+    story:{en:'Made for the hour when the desert turns copper. One dress, one owner.',ar:'صُنع للساعة التي تتحول فيها الصحراء إلى النحاسي. فستان واحد، لصاحبة واحدة.'}},
   {code:'O04', no:'04', one:true, col:'the-one', style:'evening', tone:'#E4E3D6', price:1520, name:{en:'Garden Veil',ar:'ستار الجنينة'}, imgs:['img/bloom-4.jpg','img/bloom-5.jpg'],
-    desc:{en:'Fine knife pleats in a soft botanical print, finished by hand.',ar:'كسرات دقيقة بطبعة نباتية ناعمة، متشطّبة باليد.'},
-    story:{en:'Every pleat on this dress was pressed by hand for one woman. When it leaves the atelier, the design leaves with it.',ar:'كل كسرة في هالفستان انكوت باليد لوحدة بس. ولين يطلع من الأتيليه، يطلع التصميم وياه.'}}
+    desc:{en:'Fine knife pleats in a soft botanical print, finished by hand.',ar:'طيّات دقيقة بطبعة نباتية ناعمة، بلمسات نهائية يدوية.'},
+    story:{en:'Every pleat on this dress was pressed by hand for one woman. When it leaves the atelier, the design leaves with it.',ar:'كل طيّة في هذا الفستان كُويت يدويًا لامرأة واحدة. وحين يغادر الأتيليه، يغادر التصميم معه.'}}
 ];
-COLLECTIONS.unshift({id:'the-one', season:{en:'Signature · One of one',ar:'التوقيع · قطعة وحدة'}, cover:'img/bloom-3.jpg', small:'img/desert-4.jpg', tone:'#1C1B1B',
-  name:{en:'The One',ar:'القطعة الوحدة'},
-  story:{en:'One piece. Made once. Never again. Each dress in this line exists as a single piece; when it finds its owner, it is gone for good.',ar:'قطعة وحدة. تنسوى مرة وحدة. وما تنعاد. كل فستان في هالخط موجود نسخة وحدة بس، ولين لقى صاحبته يختفي للأبد.'}});
+COLLECTIONS.unshift({id:'the-one', season:{en:'Signature · One of one',ar:'توقيع الدار · قطعة واحدة'}, cover:'img/bloom-3.jpg', small:'img/desert-4.jpg', tone:'#1C1B1B',
+  name:{en:'The One',ar:'القطعة الواحدة'},
+  story:{en:'One piece. Made once. Never again. Each dress in this line exists as a single piece; when it finds its owner, it is gone for good.',ar:'قطعة واحدة. تُصنع مرة واحدة. ولا تتكرر. كل فستان في هذا الخط قطعة فريدة، وحين يجد صاحبته يختفي إلى الأبد.'}});
 
 /* ---- The Courtyard: autumn/winter 2026 campaign (prices are placeholders, editable in the control room) ---- */
 STYLES.splice(1, 0, {id:'abayas', en:'Abayas', ar:'عبايات'});
-STYLE_INFO.abayas = {title:{en:'Abayas',ar:'عبايات'}, intro:{en:'Open and closed abayas with quiet detail: satin lapels, fine piping and hand-placed embroidery.',ar:'عبايات مفتوحة ومسكّرة بتفاصيل هادية: ياقات ساتان، حواف رفيعة وتطريز موزّع باليد.'}};
+STYLE_INFO.abayas = {title:{en:'Abayas',ar:'عبايات'}, intro:{en:'Open and closed abayas with quiet detail: satin lapels, fine piping and hand-placed embroidery.',ar:'عبايات مفتوحة ومغلقة بتفاصيل هادئة: ياقات من الساتان، وحواف رفيعة، وتطريز يدوي.'}};
 COLLECTIONS.splice(1, 0, {id:'courtyard', season:{en:'Autumn/Winter 2026',ar:'خريف وشتاء ٢٠٢٦'}, cover:'img/c/c06-w.jpg', small:'img/c/c13.jpg', tone:'#D9B8A6',
   name:{en:'The Courtyard',ar:'الفناء'},
-  story:{en:'Shot between terracotta walls in the last hour of light. Abayas with quiet, considered detail and evening dresses that move as you walk.',ar:'انصوّر بين حيطان التيراكوتا في آخر ساعة نور. عبايات بتفاصيل هادية ومدروسة، وفساتين سهرة تتحرك مع خطوتج.'},
+  story:{en:'Shot between terracotta walls in the last hour of light. Abayas with quiet, considered detail and evening dresses that move as you walk.',ar:'صُوّرت بين جدران التيراكوتا في آخر ساعات الضوء. عبايات بتفاصيل هادئة ومدروسة، وفساتين سهرة تتحرك مع خطواتك.'},
   specs:[]});
 var COURTYARD = [
   {code:'C01', col:'courtyard', style:'abayas', isNew:true, tone:'#2A2523', price:780, name:{en:'Noor Satin Lapel Abaya',ar:'عباية نور بياقة ساتان'}, imgs:['img/c/c04.jpg','img/c/c05.jpg','img/c/c02.jpg'],
     desc:{en:'An open black abaya with a wide satin shawl lapel and layered cuffs.',ar:'عباية سوداء مفتوحة بياقة ساتان عريضة وأساور بطبقتين.'},
-    story:{en:'One line of satin, from collar to hem, catches the light as you move. Everything else is kept quiet.',ar:'خط واحد من الساتان، من الياقة لين آخر العباية، يلقط النور مع حركتج. وكل شي ثاني هادي.'}},
+    story:{en:'One line of satin, from collar to hem, catches the light as you move. Everything else is kept quiet.',ar:'خط واحد من الساتان، من الياقة إلى الأطراف، يلتقط الضوء مع حركتك. وكل ما عداه هادئ.'}},
   {code:'C02', col:'courtyard', style:'abayas', isNew:true, tone:'#2A2523', price:850, name:{en:'Sahar Embroidered Abaya',ar:'عباية سحر المطرّزة'}, imgs:['img/c/c13.jpg','img/c/c11.jpg','img/c/c07.jpg'],
-    desc:{en:'A black abaya with a tonal embroidered panel down the front and embroidered cuffs.',ar:'عباية سوداء بشريط تطريز بنفس اللون من قدّام وأساور مطرّزة.'},
-    story:{en:'The embroidery is black on black, so it only shows up close. A detail for you, not for the room.',ar:'التطريز أسود على أسود، فما يبان إلا من قريب. تفصيلة لج إنتي، مب للناس.'}},
+    desc:{en:'A black abaya with a tonal embroidered panel down the front and embroidered cuffs.',ar:'عباية سوداء بشريط تطريز بنفس اللون في الأمام وأساور مطرّزة.'},
+    story:{en:'The embroidery is black on black, so it only shows up close. A detail for you, not for the room.',ar:'التطريز أسود على أسود، فلا يظهر إلا عن قرب. تفصيلة لكِ أنتِ، لا للآخرين.'}},
   {code:'C03', col:'courtyard', style:'abayas', isNew:true, tone:'#2A2523', price:820, name:{en:'Maghrib Piped Abaya',ar:'عباية مغرب'}, imgs:['img/c/c06.jpg','img/c/c08.jpg'],
-    desc:{en:'A flowing black abaya edged with fine copper piping along the front and sleeves.',ar:'عباية سوداء واسعة بحواف رفيعة نحاسية من قدّام وعلى الأكمام.'},
-    story:{en:'Named for the hour the courtyard turns copper. The piping picks up that light and keeps it.',ar:'اسمها من الساعة اللي يصير فيها الفناء نحاسي. والحواف تلقط هالنور وتحتفظ فيه.'}},
+    desc:{en:'A flowing black abaya edged with fine copper piping along the front and sleeves.',ar:'عباية سوداء واسعة بحواف نحاسية رفيعة في الأمام وعلى الأكمام.'},
+    story:{en:'Named for the hour the courtyard turns copper. The piping picks up that light and keeps it.',ar:'سُمّيت على الساعة التي يتحوّل فيها الفناء إلى النحاسي. تلتقط الحواف ذلك الضوء وتحتفظ به.'}},
   {code:'C04', col:'courtyard', style:'abayas', isNew:true, tone:'#2A2523', price:690, name:{en:'Fina Open Abaya',ar:'عباية فناء المفتوحة'}, imgs:['img/c/c12.jpg','img/c/c03.jpg'],
-    desc:{en:'A clean, open abaya with wide sleeves and a soft drape. The everyday essential.',ar:'عباية مفتوحة بسيطة بأكمام واسعة ونزلة ناعمة. أساسية لكل يوم.'},
-    story:{en:'The abaya you reach for every morning: light, easy and cut to fall straight from the shoulder.',ar:'العباية اللي تلبسينها كل صبح: خفيفة، مريحة، ومتفصّلة تنزل مستقيمة من الكتف.'}},
+    desc:{en:'A clean, open abaya with wide sleeves and a soft drape. The everyday essential.',ar:'عباية مفتوحة بسيطة بأكمام واسعة وانسدالة ناعمة. أساسية لكل يوم.'},
+    story:{en:'The abaya you reach for every morning: light, easy and cut to fall straight from the shoulder.',ar:'العباية التي ترتدينها كل صباح: خفيفة، ومريحة، ومفصّلة لتنسدل مستقيمة من الكتف.'}},
   {code:'C05', col:'courtyard', style:'evening', isNew:true, tone:'#E7D7BE', price:720, name:{en:'Mashrabiya Satin Dress',ar:'فستان مشربية الساتان'}, imgs:['img/c/c00.jpg'],
-    desc:{en:'A champagne satin dress with a high neck, bishop sleeves and a draped wrap skirt.',ar:'فستان ساتان شامبين برقبة عالية، أكمام منفوخة وتنورة ملفوفة منسدلة.'},
-    story:{en:'Made for light that falls through a carved screen: satin that shifts from gold to cream with every step.',ar:'مسوّى للنور اللي يعبر من المشربية: ساتان يتحوّل من ذهبي لكريمي مع كل خطوة.'}},
+    desc:{en:'A champagne satin dress with a high neck, bishop sleeves and a draped wrap skirt.',ar:'فستان من الساتان بلون الشامبانيا، برقبة عالية، وأكمام منفوخة، وتنورة ملفوفة منسدلة.'},
+    story:{en:'Made for light that falls through a carved screen: satin that shifts from gold to cream with every step.',ar:'صُنع للضوء الذي يعبر المشربية: ساتان يتحوّل من الذهبي إلى الكريمي مع كل خطوة.'}},
   {code:'C06', col:'courtyard', style:'abayas', isNew:true, tone:'#4A3A4E', price:760, name:{en:'Lavender Panel Abaya',ar:'عباية اللافندر'}, imgs:['img/c/c01.jpg'],
-    desc:{en:'A closed abaya in two shades of violet, with patterned panels on the sleeves.',ar:'عباية مسكّرة بدرجتين من البنفسجي، وقطع منقوشة على الأكمام.'},
-    story:{en:'Colour, kept soft. Two violets meet at the sleeve, where a woven pattern sits like a quiet signature.',ar:'لون، بس هادي. درجتين من البنفسجي يتلاقون عند الكم، وهناك نقشة منسوجة مثل توقيع هادي.'}},
+    desc:{en:'A closed abaya in two shades of violet, with patterned panels on the sleeves.',ar:'عباية مغلقة بدرجتين من البنفسجي، ونقوش منسوجة على الأكمام.'},
+    story:{en:'Colour, kept soft. Two violets meet at the sleeve, where a woven pattern sits like a quiet signature.',ar:'لون، لكن بهدوء. درجتان من البنفسجي تلتقيان عند الكم، حيث نقشة منسوجة كتوقيع هادئ.'}},
   {code:'C07', col:'courtyard', style:'abayas', isNew:true, tone:'#D9D2C2', price:740, name:{en:'Zeitoun Abaya',ar:'عباية زيتون'}, imgs:['img/c/c09.jpg'],
     desc:{en:'An olive abaya with a matching sheer shayla and fine tonal embroidery.',ar:'عباية زيتونية بشيلة شفافة من نفس اللون وتطريز رفيع بنفس الدرجة.'},
-    story:{en:'The green of olive leaves in a white courtyard. Light, layered and made to be worn all day.',ar:'أخضر ورق الزيتون في فناء أبيض. خفيفة، بطبقات، ومسوّاة عشان تنلبس طول اليوم.'}},
+    story:{en:'The green of olive leaves in a white courtyard. Light, layered and made to be worn all day.',ar:'أخضر ورق الزيتون في فناء أبيض. خفيفة، بطبقات، ومصمّمة لتُلبس طوال اليوم.'}},
   {code:'C08', col:'courtyard', style:'evening', isNew:true, tone:'#C98F8F', price:780, name:{en:'Emerald Satin Dress',ar:'فستان الزمرد'}, imgs:['img/c/c10.jpg'],
-    desc:{en:'An emerald satin dress with a tied waist, a full skirt and a matching shayla.',ar:'فستان ساتان زمردي بخصر معقود، تنورة واسعة وشيلة من نفس القماش.'},
-    story:{en:'A colour for celebrations: deep emerald satin that holds its shape and moves like water.',ar:'لون للمناسبات: ساتان زمردي غامق يحافظ على شكله ويتحرك مثل الماي.'}},
+    desc:{en:'An emerald satin dress with a tied waist, a full skirt and a matching shayla.',ar:'فستان من الساتان الزمردي بخصر معقود، وتنورة واسعة، وشيلة من نفس القماش.'},
+    story:{en:'A colour for celebrations: deep emerald satin that holds its shape and moves like water.',ar:'لون للمناسبات: ساتان زمردي داكن يحافظ على شكله ويتحرك كالماء.'}},
   {code:'C09', col:'courtyard', style:'evening', isNew:true, tone:'#E3DBD1', price:890, name:{en:'Taupe Pleated Gown',ar:'فستان التوب المكسّر'}, imgs:['img/c/c15.jpg','img/c/c14.jpg'],
-    desc:{en:'A taupe gown with a crossover draped bodice and a floor-length sunray-pleated skirt.',ar:'فستان بلون التوب بصدر ملفوف ومنسدل، وتنورة طويلة بكسرات شمسية للأرض.'},
-    story:{en:'Hundreds of fine pleats open like a fan when you turn. Quiet in colour, never quiet in movement.',ar:'مئات الكسرات الرفيعة تنفتح مثل المروحة لين تدورين. هادي في اللون، وأبد مب هادي في الحركة.'}},
+    desc:{en:'A taupe gown with a crossover draped bodice and a floor-length sunray-pleated skirt.',ar:'فستان بلون التوب بصدر ملفوف منسدل، وتنورة طويلة بطيّات شمسية تصل إلى الأرض.'},
+    story:{en:'Hundreds of fine pleats open like a fan when you turn. Quiet in colour, never quiet in movement.',ar:'مئات الطيّات الرفيعة تتفتح كالمروحة حين تدورين. هادئ في لونه، وغير هادئ أبدًا في حركته.'}},
   {code:'C10', col:'courtyard', style:'evening', isNew:true, tone:'#CFC9B4', price:920, name:{en:'Burgundy Cape Gown',ar:'فستان العنابي بالكاب'}, imgs:['img/c/c16.jpg','img/c/c18.jpg','img/c/c17.jpg'],
-    desc:{en:'A burgundy gown with a draped wrap bodice and a cape that falls from one shoulder.',ar:'فستان عنابي بصدر ملفوف منسدل وكاب نازل من كتف واحد.'},
-    story:{en:'A gown for the evening you have been waiting for: deep burgundy, a sculpted waist and a cape that follows you.',ar:'فستان للسهرة اللي تنتظرينها: عنابي غامق، خصر منحوت، وكاب يمشي وراج.'}},
+    desc:{en:'A burgundy gown with a draped wrap bodice and a cape that falls from one shoulder.',ar:'فستان عنابي بصدر ملفوف منسدل وكاب ينسدل من كتف واحد.'},
+    story:{en:'A gown for the evening you have been waiting for: deep burgundy, a sculpted waist and a cape that follows you.',ar:'فستان للأمسية التي تنتظرينها: عنابي داكن، وخصر منحوت، وكاب يتبعك.'}},
   {code:'C11', col:'courtyard', style:'everyday', isNew:true, tone:'#D9B9B6', price:760, name:{en:'Sage Drape Dress',ar:'فستان المريمية'}, imgs:['img/c/c19.jpg','img/c/c20.jpg'],
-    desc:{en:'A sage dress with a gathered side drape, long sleeves and a sheer matching shayla.',ar:'فستان بلون المريمية بطيّة مجمّعة على الجنب، أكمام طويلة وشيلة شفافة من نفس اللون.'},
-    story:{en:'Soft green, softer drape. A dress that works from a long lunch to a quiet evening.',ar:'أخضر ناعم وطيّة أنعم. فستان يناسب من غدا طويل لين سهرة هادية.'}}
+    desc:{en:'A sage dress with a gathered side drape, long sleeves and a sheer matching shayla.',ar:'فستان بلون المريمية بطيّة مجمّعة على الجانب، وأكمام طويلة، وشيلة شفافة من نفس اللون.'},
+    story:{en:'Soft green, softer drape. A dress that works from a long lunch to a quiet evening.',ar:'أخضر ناعم وطيّة أنعم. فستان يناسب من غداء طويل إلى أمسية هادئة.'}}
 ];
 PRODUCTS = COURTYARD.concat(PRODUCTS);
 
+/* home hero (default). The control room can replace it: settings/site.slides */
+var SLIDES = [
+  {type:'video', v:'video/behind-the-scenes.mp4', d:'video/behind-the-scenes.jpg', m:'video/behind-the-scenes.jpg', pos:'50% 50%', sub:{en:'Behind the scenes',ar:'خلف الكواليس'}, big:{en:'The making of The Courtyard',ar:'كيف صُنعت The Courtyard'}, href:'#courtyard', cta:{en:'Discover the collection',ar:'اكتشفي المجموعة'}},
+  {d:'img/c/c06-w.jpg', m:'img/c/c06.jpg', pos:'50% 35%', sub:{en:'Autumn / Winter 2026',ar:'خريف وشتاء ٢٠٢٦'}, big:{en:'The Courtyard',ar:'The Courtyard'}, href:'#courtyard', cta:{en:'Discover the collection',ar:'اكتشفي المجموعة'}},
+  {d:'img/c/c00-w.jpg', m:'img/c/c00.jpg', pos:'50% 30%', sub:{en:'Just arrived',ar:'وصل حديثًا'}, big:{en:'Light through the mashrabiya',ar:'ضوء عبر المشربية'}, href:'#p-C05', cta:{en:'Shop the dress',ar:'تسوّقي الفستان'}},
+  {d:'img/c/c16-w.jpg', m:'img/c/c16.jpg', pos:'50% 30%', sub:{en:'Evening',ar:'السهرة'}, big:{en:'For the evenings that matter',ar:'لأمسيات تستحق'}, href:'#s-evening', cta:{en:'Shop evening',ar:'تسوّقي فساتين السهرة'}},
+  {d:'img/c/c15-w.jpg', m:'img/c/c15.jpg', pos:'50% 30%', sub:{en:'Just arrived',ar:'وصل حديثًا'}, big:{en:'Pleats that open as you turn',ar:'طيّات تتفتح مع كل حركة'}, href:'#p-C09', cta:{en:'Shop the gown',ar:'تسوّقي الفستان'}},
+  {d:'img/c/c09-w.jpg', m:'img/c/c09.jpg', pos:'50% 30%', sub:{en:'The abaya edit',ar:'مختارات العبايات'}, big:{en:'Quiet colour, every day',ar:'ألوان هادئة لكل يوم'}, href:'#s-abayas', cta:{en:'Shop abayas',ar:'تسوّقي العبايات'}}
+];
+
 PRODUCTS = PRODUCTS.concat(ONE);
 STYLES.splice(1, 0, {id:'new', en:'New in', ar:'وصل حديثًا'});
-STYLE_INFO['new'] = {title:{en:'New in',ar:'وصل حديثًا'}, intro:{en:'The latest pieces from the atelier.',ar:'أحدث القطع من الأتيليه.'}};
+STYLE_INFO['new'] = {title:{en:'New in',ar:'وصل حديثًا'}, intro:{en:'The latest pieces from the atelier.',ar:'أحدث القطع من دار NMH.'}};
 /* ---- catalogue: built-in pieces, overridden and extended from the control room (Firestore "products") ---- */
 var BASE = PRODUCTS.slice(), ALLP = BASE.slice(), CATALOG = {}, SITE = {};
 function visible(p){ return !!(p && !p.hidden && !p.removed); }
@@ -879,7 +908,7 @@ function isOut(p){ return !!(p && (p.soldOut || !visible(p))); }
 var SOLD = {};
 function isSold(p){ return !!(p && ((p.one && SOLD[p.code]) || isOut(p))); }
 function claimed(p){ return !!(p && p.one && SOLD[p.code] && !p.soldOut); }
-function soldText(p, long){ return claimed(p) ? (long ? tr('Sold, never to be made again', 'انباعت، وما بتنعاد مرة ثانية') : tr('Sold', 'انباعت')) : tr('Sold out', 'خلصت الكمية'); }
+function soldText(p, long){ return claimed(p) ? (long ? tr('Sold, never to be made again', 'بيعت، ولن تُصنع مرة أخرى') : tr('Sold', 'بيعت')) : tr('Sold out', 'نفدت الكمية'); }
 function applyCatalog(over){
   CATALOG = over || {};
   var seen = {}, list = BASE.map(function(p, i){ seen[p.code] = 1; var q = Object.assign({}, p, CATALOG[p.code] || {}); if(q.sort == null) q.sort = i; return q; });
@@ -887,11 +916,15 @@ function applyCatalog(over){
     var o = CATALOG[c];
     if(!seen[c] && o && o.name && o.imgs && o.imgs.length) list.push(Object.assign({sort:1000, tone:'#F5F0EA', style:'everyday', col:'essentials', desc:{en:'', ar:''}, story:{en:'', ar:''}}, o, {code:c}));
   });
+  /* like Kamin: product names stay in English in both languages */
+  list.forEach(function(q){ if(q.name){ var en = q.name.en || q.name.ar; q.name = {en:en, ar:en}; } });
   list.sort(function(a, b){ return (a.sort || 0) - (b.sort || 0); });
   ALLP = list; PRODUCTS = list.filter(visible); ONE = PRODUCTS.filter(function(p){ return p.one; });
 }
+COLLECTIONS.forEach(function(c){ c.name = {en:c.name.en, ar:c.name.en}; });
 function applySite(site){
   SITE = site || {};
+  applySiteTheme(SITE.theme || (Object.keys(SITE).length ? 'classic' : TH)); if(typeof applyThemeLabel === 'function' && document.getElementById('ftTheme')) applyThemeLabel();
   var a = document.getElementById('ann'); if(!a) return;
   if(SITE.ann && (SITE.ann.en || SITE.ann.ar)){ a.setAttribute('data-en', esc(SITE.ann.en || SITE.ann.ar)); a.setAttribute('data-ar', esc(SITE.ann.ar || SITE.ann.en)); a.innerHTML = a.getAttribute(L === 'ar' ? 'data-ar' : 'data-en'); }
   a.hidden = SITE.annOff === true;
@@ -900,7 +933,7 @@ function inCart(code){ return CART.some(function(it){ return it.code === code; }
 var SIZES = [
   {id:'XS', en:'X-Small', ar:'إكس سمول'}, {id:'S', en:'Small', ar:'سمول'}, {id:'M', en:'Medium', ar:'ميديم'},
   {id:'L', en:'Large', ar:'لارج'}, {id:'XL', en:'X-Large', ar:'إكس لارج'}, {id:'XXL', en:'XX-Large', ar:'دبل إكس لارج'},
-  {id:'custom', en:'Custom, my measurements', ar:'تفصيل على مقاساتي'}
+  {id:'custom', en:'Custom, my measurements', ar:'تفصيل حسب مقاساتي'}
 ];
 var LENGTHS = ['52','54','56','57','58','59','60','61','62'];
 var CHART = [['XS',80,62,88],['S',84,66,92],['M',88,70,96],['L',94,76,102],['XL',100,82,108],['XXL',106,88,114]];
@@ -908,24 +941,18 @@ var COUNTRIES = [
   {id:'AE', en:'United Arab Emirates', ar:'الإمارات', zone:'ae'}, {id:'SA', en:'Saudi Arabia', ar:'السعودية', zone:'gcc'},
   {id:'KW', en:'Kuwait', ar:'الكويت', zone:'gcc'}, {id:'QA', en:'Qatar', ar:'قطر', zone:'gcc'}, {id:'BH', en:'Bahrain', ar:'البحرين', zone:'gcc'},
   {id:'OM', en:'Oman', ar:'عُمان', zone:'gcc'}, {id:'EG', en:'Egypt', ar:'مصر', zone:'intl'}, {id:'GB', en:'United Kingdom', ar:'المملكة المتحدة', zone:'intl'},
-  {id:'US', en:'United States', ar:'الولايات المتحدة', zone:'intl'}, {id:'XX', en:'Other country', ar:'دولة ثانية', zone:'intl'}
+  {id:'US', en:'United States', ar:'الولايات المتحدة', zone:'intl'}, {id:'XX', en:'Other country', ar:'دولة أخرى', zone:'intl'}
 ];
 var EMIRATES = [
   {id:'DU', en:'Dubai', ar:'دبي'}, {id:'AZ', en:'Abu Dhabi', ar:'أبوظبي'}, {id:'SH', en:'Sharjah', ar:'الشارقة'}, {id:'AJ', en:'Ajman', ar:'عجمان'},
   {id:'UQ', en:'Umm Al Quwain', ar:'أم القيوين'}, {id:'RK', en:'Ras Al Khaimah', ar:'رأس الخيمة'}, {id:'FU', en:'Fujairah', ar:'الفجيرة'}
 ];
-var SLIDES = [
-  {d:'img/c/c06-w.jpg', m:'img/c/c06.jpg', pos:'50% 35%', sub:{en:'Autumn / Winter 2026',ar:'خريف وشتاء ٢٠٢٦'}, big:{en:'The Courtyard',ar:'الفناء'}, href:'#courtyard', cta:{en:'Discover the collection',ar:'اكتشفي الكولكشن'}},
-  {d:'img/c/c00-w.jpg', m:'img/c/c00.jpg', pos:'50% 30%', sub:{en:'Just arrived',ar:'وصل حديثًا'}, big:{en:'Light through the mashrabiya',ar:'نور من ورا المشربية'}, href:'#p-C05', cta:{en:'Shop the dress',ar:'تسوّقي الفستان'}},
-  {d:'img/c/c16-w.jpg', m:'img/c/c16.jpg', pos:'50% 30%', sub:{en:'Evening',ar:'سهرة'}, big:{en:'For the evenings that matter',ar:'للسهرات اللي تستاهل'}, href:'#s-evening', cta:{en:'Shop evening',ar:'تسوّقي السهرة'}},
-  {d:'img/c/c15-w.jpg', m:'img/c/c15.jpg', pos:'50% 30%', sub:{en:'Just arrived',ar:'وصل حديثًا'}, big:{en:'Pleats that open as you turn',ar:'كسرات تنفتح وياج لين تدورين'}, href:'#p-C09', cta:{en:'Shop the gown',ar:'تسوّقي الفستان'}},
-  {d:'img/c/c09-w.jpg', m:'img/c/c09.jpg', pos:'50% 30%', sub:{en:'The abaya edit',ar:'مختارات العبايات'}, big:{en:'Quiet colour, every day',ar:'لون هادي لكل يوم'}, href:'#s-abayas', cta:{en:'Shop abayas',ar:'تسوّقي العبايات'}}
-];
+
 function prod(c){ for(var i = 0; i < ALLP.length; i++) if(ALLP[i].code === c) return ALLP[i]; }
 function col(id){ for(var i = 0; i < COLLECTIONS.length; i++) if(COLLECTIONS[i].id === id) return COLLECTIONS[i]; }
 function find(list, id){ for(var i = 0; i < list.length; i++) if(list[i].id === id) return list[i]; }
-function money(n){ n = Math.round(n * 100) / 100; var s = n.toLocaleString('en', {minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits:2}); return L === 'ar' ? s + ' درهم' : s + ' AED'; }
-function count(n){ return L === 'ar' ? (n === 1 ? 'قطعة وحدة' : n === 2 ? 'قطعتين' : n + ' قطع') : n + (n === 1 ? ' product' : ' products'); }
+function money(n){ n = Math.round(n * 100) / 100; var s = n.toLocaleString('en', {minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits:2}); return L === 'ar' ? s + ' د.إ' : s + ' AED'; }
+function count(n){ return L === 'ar' ? (n === 1 ? 'قطعة واحدة' : n === 2 ? 'قطعتين' : n + ' قطع') : n + (n === 1 ? ' product' : ' products'); }
 function isCut(src){ return /\.webp$/.test(src); }
 function cover(c){ return c.cover || (c.album && c.album[0]); }
 function toast(msg){ var el = $('toast'); el.querySelector('p').textContent = msg; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function(){ el.classList.remove('on'); }, 4000); }
@@ -944,7 +971,7 @@ function pruneSold(){
   var gone = CART.filter(function(it){ return isSold(prod(it.code)); });
   if(!gone.length) return false;
   CART = CART.filter(function(it){ return !isSold(prod(it.code)); }); saveCart();
-  toast(tr('Sorry, ', 'للأسف، ') + gone.map(function(it){ return t(prod(it.code).name); }).join(', ') + tr(' is no longer available and was removed from your cart.', ' ما صارت متوفرة وانشالت من حقيبتج.'));
+  toast(tr('Sorry, ', 'للأسف، ') + gone.map(function(it){ return t(prod(it.code).name); }).join(', ') + tr(' is no longer available and was removed from your cart.', ' لم تعد متوفرة وتمت إزالتها من حقيبتك.'));
   return true;
 }
 
@@ -1047,15 +1074,15 @@ function lineImg(it){
   }
   return '<img' + (isCut(p.imgs[0]) ? ' class="cut"' : '') + ' src="' + p.imgs[0] + '" alt="" loading="lazy">';
 }
-function shadeName(it){ return it.hex == null ? tr('As shown', 'مثل الصورة') : it.shade === -1 ? tr('Custom colour ', 'لون خاص ') + it.hex.toUpperCase() : t(SHADES[it.shade]); }
-function sizeName(z){ var s = find(SIZES, z); return s ? (z === 'custom' ? tr('Custom fit', 'تفصيل على المقاس') : t(s)) : z; }
-function variant(it){ return [it.hex ? shadeName(it) : '', sizeName(it.size), it.len ? (it.len === 'unsure' ? tr('Length to confirm', 'الطول بنأكده وياج') : it.len + '″') : ''].filter(Boolean).join(' / '); }
+function shadeName(it){ return it.hex == null ? tr('As shown', 'كما في الصورة') : it.shade === -1 ? tr('Custom colour ', 'لون خاص ') + it.hex.toUpperCase() : t(SHADES[it.shade]); }
+function sizeName(z){ var s = find(SIZES, z); return s ? (z === 'custom' ? tr('Custom fit', 'تفصيل حسب المقاس') : t(s)) : z; }
+function variant(it){ return [it.hex ? shadeName(it) : '', sizeName(it.size), it.len ? (it.len === 'unsure' ? tr('Length to confirm', 'سيتم تأكيد الطول معك') : it.len + '″') : ''].filter(Boolean).join(' / '); }
 
 /* ================= cards and grids ================= */
 function card(p, i){
   var a = p.imgs[0], b = p.imgs[1], sold = isSold(p);
   var lcls = sold ? ' out' : (p.labels && p.labels.length) ? '' : p.isNew ? ' new' : p.one ? ' one' : '';
-  var lbl = sold ? soldText(p) : (p.labels && p.labels.length) ? t(p.labels[0]) : p.isNew ? tr('New', 'جديد') : p.one ? tr('1 of 1', 'قطعة وحدة') : '';
+  var lbl = sold ? soldText(p) : (p.labels && p.labels.length) ? t(p.labels[0]) : p.isNew ? tr('New', 'جديد') : p.one ? tr('1 of 1', 'قطعة واحدة') : '';
   return '<a class="card' + (sold ? ' sold' : '') + '" href="#p-' + p.code + '" data-rv style="--d:' + (i % 4) + '">' +
     '<div class="ph" style="--tone:' + (p.tone || '') + '">' + (lbl ? '<span class="lbl' + lcls + '">' + lbl + '</span>' : '') +
     '<img class="a' + (b ? ' has-b' : '') + (isCut(a) ? ' cut' : '') + '" src="' + a + '" alt="' + esc(t(p.name)) + '" loading="lazy">' +
@@ -1076,8 +1103,8 @@ function sortList(list, how){
   return l;
 }
 function sortSel(id, val){
-  return '<label class="sr" for="' + id + '">' + tr('Sort by', 'رتّبي حسب') + '</label><select id="' + id + '" data-sort>' +
-    [['featured', tr('Featured', 'المميز')], ['low', tr('Price, low to high', 'السعر، من الأقل')], ['high', tr('Price, high to low', 'السعر، من الأعلى')], ['az', tr('Alphabetically, A-Z', 'أبجديًا')]]
+  return '<label class="sr" for="' + id + '">' + tr('Sort by', 'ترتيب حسب') + '</label><select id="' + id + '" data-sort>' +
+    [['featured', tr('Featured', 'مميز')], ['low', tr('Price, low to high', 'السعر، من الأقل إلى الأعلى')], ['high', tr('Price, high to low', 'السعر، من الأعلى إلى الأقل')], ['az', tr('Alphabetically, A-Z', 'أبجديًا، من أ إلى ي')]]
     .map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === val ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>';
 }
 
@@ -1090,48 +1117,50 @@ function viewHome(){
   var ess = PRODUCTS.filter(function(p){ return p.col === 'bloom'; }).slice(0, 4);
   app.innerHTML =
     '<section class="hero" id="hero" aria-roledescription="carousel" aria-label="' + tr('New season', 'الموسم الجديد') + '">' +
-      SLIDES.map(function(s, i){
-        return '<div class="slide' + (i ? '' : ' on') + '" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + ' / ' + SLIDES.length + '"' + (i ? ' aria-hidden="true"' : '') + '>' +
-          '<picture><source media="(max-width:700px)" srcset="' + s.m + '"><img src="' + s.d + '" alt="" style="object-position:' + s.pos + '"' + (i ? ' loading="lazy"' : ' fetchpriority="high"') + '></picture>' +
-          '<div class="slide-t"><p class="u-h7">' + esc(t(s.sub)) + '</p><' + (i ? 'p' : 'h1') + ' class="big">' + esc(t(s.big)) + '</' + (i ? 'p' : 'h1') + '><a class="btn light" href="' + s.href + '"' + (i ? ' tabindex="-1"' : '') + '>' + esc(t(s.cta)) + '</a></div></div>';
+      heroSlides().map(function(s, i, all){
+        var media = s.type === 'video' && s.v
+          ? '<video muted playsinline loop preload="' + (i ? 'none' : 'auto') + '" poster="' + esc(s.d || '') + '" style="object-position:' + esc(s.pos || '50% 50%') + '"' + (i || reduce ? '' : ' autoplay') + ' aria-hidden="true"><source src="' + esc(s.v) + '" type="video/mp4"></video>'
+          : '<picture><source media="(max-width:700px)" srcset="' + esc(s.m || s.d) + '"><img src="' + esc(s.d) + '" alt="" style="object-position:' + esc(s.pos || '50% 30%') + '"' + (i ? ' loading="lazy"' : ' fetchpriority="high"') + '></picture>';
+        return '<div class="slide' + (i ? '' : ' on') + (s.type === 'video' ? ' is-video' : '') + '" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + ' / ' + all.length + '"' + (i ? ' aria-hidden="true"' : '') + '>' + media +
+          '<div class="slide-t">' + (t(s.sub) ? '<p class="u-h7">' + esc(t(s.sub)) + '</p>' : '') + (t(s.big) ? '<' + (i ? 'p' : 'h1') + ' class="big">' + esc(t(s.big)) + '</' + (i ? 'p' : 'h1') + '>' : '') + (t(s.cta) && s.href ? '<a class="btn light" href="' + esc(s.href) + '"' + (i ? ' tabindex="-1"' : '') + '>' + esc(t(s.cta)) + '</a>' : '') + '</div></div>';
       }).join('') +
-      '<div class="dots" role="group" aria-label="' + tr('Choose slide', 'اختاري الصورة') + '">' + SLIDES.map(function(s, i){ return '<button type="button" data-slide="' + i + '" aria-label="' + tr('Slide ', 'صورة ') + (i + 1) + '"' + (i ? '' : ' aria-current="true"') + '></button>'; }).join('') + '</div>' +
+      (heroSlides().length > 1 ? '<div class="dots" role="group" aria-label="' + tr('Choose slide', 'اختيار الصورة') + '">' + heroSlides().map(function(s, i){ return '<button type="button" data-slide="' + i + '" aria-label="' + tr('Slide ', 'صورة ') + (i + 1) + '"' + (i ? '' : ' aria-current="true"') + '></button>'; }).join('') + '</div>' : '') +
     '</section>' +
 
     (ONE.length ? '<section class="one-band" aria-labelledby="oneT"><div class="wrap one-in">' +
-      '<div class="one-copy" data-rv><p class="u-h7">' + tr('Signature', 'التوقيع') + '</p><h2 class="one-title" id="oneT">' + tr('The One', 'القطعة الوحدة') + '</h2>' +
-        '<p class="one-line">' + tr('One piece. Made once. Never again.', 'قطعة وحدة. تنسوى مرة وحدة. وما تنعاد.') + '</p>' +
-        '<div class="rte"><p>' + tr('Each dress in this line exists as a single piece. When it finds its owner, it is gone for good.', 'كل فستان في هالخط موجود نسخة وحدة بس. ولين لقى صاحبته، يختفي للأبد.') + '</p></div>' +
-        '<a class="btn light" href="#the-one">' + tr('Discover The One', 'اكتشفي القطعة الوحدة') + '</a></div>' +
+      '<div class="one-copy" data-rv><p class="u-h7">' + tr('Signature', 'توقيع الدار') + '</p><h2 class="one-title" id="oneT">' + tr('The One', 'القطعة الواحدة') + '</h2>' +
+        '<p class="one-line">' + tr('One piece. Made once. Never again.', 'قطعة واحدة. تُصنع مرة واحدة. ولا تتكرر.') + '</p>' +
+        '<div class="rte"><p>' + tr('Each dress in this line exists as a single piece. When it finds its owner, it is gone for good.', 'كل فستان في هذا الخط قطعة فريدة. وحين يجد صاحبته، يختفي إلى الأبد.') + '</p></div>' +
+        '<a class="btn light" href="#the-one">' + tr('Discover The One', 'اكتشفي القطعة الواحدة') + '</a></div>' +
       '<div class="one-grid">' + ONE.slice(0, 4).map(oneTile).join('') + '</div>' +
     '</div></section>' : '') +
 
     '<section class="sec"><div class="wrap">' +
-      '<header class="sec-h" data-rv><p class="u-h7">' + (fresh.length ? tr('Just arrived', 'وصل حديثًا') : tr('Featured collection', 'كولكشن مميز')) + '</p><h2 class="u-h2">' + (fresh.length ? tr('New arrivals', 'الجديد') : tr('The new season', 'الموسم الجديد')) + '</h2><span class="dash"></span></header>' +
+      '<header class="sec-h" data-rv><p class="u-h7">' + (fresh.length ? tr('Just arrived', 'وصل حديثًا') : tr('Featured collection', 'مجموعة مميزة')) + '</p><h2 class="u-h2">' + (fresh.length ? tr('New arrivals', 'وصل حديثًا') : tr('The new season', 'الموسم الجديد')) + '</h2><span class="dash"></span></header>' +
       grid(feat) +
-      '<div class="center mt" data-rv><a class="btn" href="#s-' + (fresh.length ? 'new' : 'all') + '">' + tr('View all products', 'شوفي كل القطع') + '</a></div>' +
+      '<div class="center mt" data-rv><a class="btn" href="#s-' + (fresh.length ? 'new' : 'all') + '">' + tr('View all products', 'عرض جميع المنتجات') + '</a></div>' +
     '</div></section>' +
 
     '<section class="sec line"><div class="wrap">' +
-      '<header class="sec-h" data-rv><p class="u-h7">' + tr('Shop by style', 'تسوّقي حسب الاستايل') + '</p><h2 class="u-h2">' + tr('Find your piece', 'لاقي قطعتج') + '</h2><span class="dash"></span></header>' +
+      '<header class="sec-h" data-rv><p class="u-h7">' + tr('Shop by style', 'تسوّقي حسب الفئة') + '</p><h2 class="u-h2">' + tr('Find your piece', 'اكتشفي قطعتك') + '</h2><span class="dash"></span></header>' +
       '<div class="tiles">' + [['abayas', 'img/c/c13.jpg'], ['evening', 'img/c/c15.jpg'], ['everyday', 'img/c/c19.jpg']].map(function(x, i){
         return '<a class="tile" href="#s-' + x[0] + '" data-rv style="--d:' + i + '"><img src="' + x[1] + '" alt="" loading="lazy"><span><span class="link">' + esc(t(find(STYLES, x[0]))) + '</span></span></a>';
       }).join('') + '</div>' +
     '</div></section>' +
 
-    '<section class="banner ed-banner" id="edBanner"><img src="img/c/c13-w.jpg" alt="" loading="lazy" style="object-position:50% 30%"><div><p class="u-h7">' + tr('The abaya edit', 'مختارات العبايات') + '</p><h2 class="u-h1" style="margin-top:8px">' + tr('Details you find up close', 'تفاصيل تبان من قريب') + '</h2>' +
-      '<div class="rte"><p>' + tr('Black-on-black embroidery, satin lapels and fine copper piping. Abayas that stay quiet from across the room and reward a closer look.', 'تطريز أسود على أسود، ياقات ساتان وحواف نحاسية رفيعة. عبايات هادية من بعيد، وتبين حلاتها من قريب.') + '</p></div>' +
+    '<section class="banner ed-banner" id="edBanner"><img src="img/c/c13-w.jpg" alt="" loading="lazy" style="object-position:50% 30%"><div><p class="u-h7">' + tr('The abaya edit', 'مختارات العبايات') + '</p><h2 class="u-h1" style="margin-top:8px">' + tr('Details you find up close', 'تفاصيل تُرى عن قرب') + '</h2>' +
+      '<div class="rte"><p>' + tr('Black-on-black embroidery, satin lapels and fine copper piping. Abayas that stay quiet from across the room and reward a closer look.', 'تطريز أسود على أسود، وياقات من الساتان، وحواف نحاسية رفيعة. عبايات هادئة من بعيد، تكشف جمالها عن قرب.') + '</p></div>' +
       '<a class="btn light" href="#s-abayas" style="margin-top:24px">' + tr('Shop abayas', 'تسوّقي العبايات') + '</a></div></section>' +
 
     '<section class="sec line"><div class="wrap">' +
-      '<header class="sec-h" data-rv><p class="u-h7">' + tr('Featured collection', 'كولكشن مميز') + '</p><h2 class="u-h2">' + esc(t(col('bloom').name)) + '</h2><span class="dash"></span></header>' +
+      '<header class="sec-h" data-rv><p class="u-h7">' + tr('Featured collection', 'مجموعة مميزة') + '</p><h2 class="u-h2">' + esc(t(col('bloom').name)) + '</h2><span class="dash"></span></header>' +
       grid(ess, ess.length === 3 ? 'c3' : '') +
-      '<div class="center mt" data-rv><a class="btn" href="#bloom">' + tr('View the collection', 'شوفي الكولكشن') + '</a></div>' +
+      '<div class="center mt" data-rv><a class="btn" href="#bloom">' + tr('View the collection', 'عرض المجموعة') + '</a></div>' +
     '</div></section>' +
 
     '<section class="sec line"><div class="wrap brand" data-rv>' +
-      '<p class="u-h7 muted">NMH · ' + tr('Dubai', 'دبي') + '</p><h2 class="u-h2" style="margin-top:10px">' + tr('Made for you alone', 'مفصّلة لج إنتي وبس') + '</h2>' +
-      '<div class="rte"><p>' + tr('NMH designs modest dresses and abayas in Dubai, and cuts each piece only after you order it, in your size and your length. Before anything is cut, we confirm every detail with you.', 'في NMH نصمّم فساتين وعبايات محتشمة في دبي، وما نفصّل القطعة إلا عقب ما تطلبينها، على مقاسج وطولج. وقبل أي تفصيل، نأكد وياج كل التفاصيل.') + '</p></div>' +
+      '<p class="u-h7 muted">NMH · ' + tr('Dubai', 'دبي') + '</p><h2 class="u-h2" style="margin-top:10px">' + tr('Made for you alone', 'صُنعت لكِ وحدك') + '</h2>' +
+      '<div class="rte"><p>' + tr('NMH designs modest dresses and abayas in Dubai, and cuts each piece only after you order it, in your size and your length. Before anything is cut, we confirm every detail with you.', 'تصمّم NMH الفساتين والعبايات المحتشمة في دبي، ولا تُفصَّل أي قطعة إلا بعد طلبها، وفق مقاسك وطولك. وقبل التفصيل، نؤكد معك جميع التفاصيل.') + '</p></div>' +
       '<div class="social"><a class="link" href="https://www.instagram.com/_bynmh/" target="_blank" rel="noopener">Instagram</a><a class="link" href="#page-how">' + tr('How ordering works', 'طريقة الطلب') + '</a></div>' +
     '</div></section>';
   startSlides();
@@ -1141,18 +1170,33 @@ var ST = 0;
 function studioDress(){ return dressHTML('olive', 0, 'dyeS'); }
 
 /* hero slideshow */
+function heroSlides(){ return (SITE.slides && SITE.slides.length) ? SITE.slides : SLIDES; }
+/* slideshow: photos stay 6.5s; a video slide plays through once (up to 30s) before moving on */
 var SL = {i:0, timer:null};
+function slideDelay(el){ var v = el && el.querySelector('video'); if(!v) return 6500; var d = v.duration; return isFinite(d) && d > 0 ? Math.min(30000, Math.max(6500, d * 1000)) : 15000; }
+function scheduleSlide(){
+  clearTimeout(SL.timer);
+  var h = $('hero'); if(!h || reduce) return;
+  var cur = h.querySelectorAll('.slide')[SL.i];
+  SL.timer = setTimeout(function(){ if(!$('hero')) return; if(document.hidden){ scheduleSlide(); return; } goSlide(SL.i + 1); }, slideDelay(cur));
+}
 function startSlides(){
-  clearInterval(SL.timer); SL.i = 0;
-  if(reduce) return;
-  SL.timer = setInterval(function(){ if(!document.hidden && $('hero')) goSlide(SL.i + 1); }, 6500);
+  SL.i = 0; var h = $('hero'); if(!h) return;
+  var v = h.querySelector('.slide.on video');
+  if(v && !reduce){ v.play().catch(function(){}); if(!isFinite(v.duration)) v.addEventListener('loadedmetadata', scheduleSlide, {once:true}); }
+  if(h.querySelectorAll('.slide').length > 1) scheduleSlide();
 }
 function goSlide(n){
-  var h = $('hero'); if(!h) return clearInterval(SL.timer);
+  var h = $('hero'); if(!h) return clearTimeout(SL.timer);
   var s = h.querySelectorAll('.slide'), d = h.querySelectorAll('[data-slide]');
   SL.i = (n + s.length) % s.length;
-  s.forEach(function(el, i){ var on = i === SL.i; el.classList.toggle('on', on); el.setAttribute('aria-hidden', on ? 'false' : 'true'); var a = el.querySelector('a'); if(a) a.tabIndex = on ? 0 : -1; });
+  s.forEach(function(el, i){
+    var on = i === SL.i, v = el.querySelector('video');
+    el.classList.toggle('on', on); el.setAttribute('aria-hidden', on ? 'false' : 'true'); var a = el.querySelector('a'); if(a) a.tabIndex = on ? 0 : -1;
+    if(v){ if(on && !reduce){ v.preload = 'auto'; try{ v.currentTime = 0; }catch(e){} v.play().catch(function(){}); } else v.pause(); }
+  });
   d.forEach(function(b, i){ if(i === SL.i) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); });
+  scheduleSlide();
 }
 
 function viewCollection(id){
@@ -1167,16 +1211,16 @@ function viewCollection(id){
 function viewOne(){
   var c = col('the-one'), avail = ONE.filter(function(p){ return !isSold(p); }), gone = ONE.filter(isSold);
   app.innerHTML =
-    '<section class="one-band one-head"><div class="wrap"><p class="u-h7">' + esc(t(c.season)) + '</p><h1 class="one-title">' + esc(t(c.name)) + '</h1><p class="one-line">' + tr('One piece. Made once. Never again.', 'قطعة وحدة. تنسوى مرة وحدة. وما تنعاد.') + '</p>' +
+    '<section class="one-band one-head"><div class="wrap"><p class="u-h7">' + esc(t(c.season)) + '</p><h1 class="one-title">' + esc(t(c.name)) + '</h1><p class="one-line">' + tr('One piece. Made once. Never again.', 'قطعة واحدة. تُصنع مرة واحدة. ولا تتكرر.') + '</p>' +
       '<div class="one-rules">' +
-        '<div><b class="num">1/1</b><span>' + tr('Each design is made a single time, from a single length of fabric.', 'كل تصميم ينسوى مرة وحدة، من قطعة قماش وحدة.') + '</span></div>' +
-        '<div><b>' + tr('Yours', 'لج') + '</b><span>' + tr('Cut to your size and length once you claim it.', 'يتفصّل على مقاسج وطولج أول ما تحجزينه.') + '</span></div>' +
-        '<div><b>' + tr('Never again', 'ما ينعاد') + '</b><span>' + tr('When it finds its owner, the design goes into our archive.', 'لين لقى صاحبته، يدخل التصميم الأرشيف.') + '</span></div>' +
+        '<div><b class="num">1/1</b><span>' + tr('Each design is made a single time, from a single length of fabric.', 'يُصنع كل تصميم مرة واحدة، من قطعة قماش واحدة.') + '</span></div>' +
+        '<div><b>' + tr('Yours', 'لكِ') + '</b><span>' + tr('Cut to your size and length once you claim it.', 'تُفصَّل وفق مقاسك وطولك فور حجزها.') + '</span></div>' +
+        '<div><b>' + tr('Never again', 'لن تتكرر') + '</b><span>' + tr('When it finds its owner, the design goes into our archive.', 'حين تجد القطعة صاحبتها، ينتقل التصميم إلى الأرشيف.') + '</span></div>' +
       '</div></div></section>' +
-    '<section class="sec"><div class="wrap"><header class="sec-h" data-rv><p class="u-h7">' + (avail.length ? count(avail.length) : '') + '</p><h2 class="u-h2">' + tr('Available now', 'متوفرة الحين') + '</h2><span class="dash"></span></header>' +
-      (avail.length ? grid(avail) : '<p class="center muted">' + tr('Every piece has found its owner. The next pieces are announced on Instagram first.', 'كل القطع لقت أصحابها. القطع الياية نعلن عنها في إنستغرام أول.') + '</p>') + '</div></section>' +
-    '<section class="sec line"><div class="wrap"><header class="sec-h" data-rv><p class="u-h7">' + tr('The archive', 'الأرشيف') + '</p><h2 class="u-h2">' + tr('Found their owners', 'لقت أصحابها') + '</h2><span class="dash"></span></header>' +
-      (gone.length ? grid(gone) : '<p class="center muted" data-rv>' + tr('Nothing has left the atelier yet. When a piece is claimed, it rests here, never to be made again.', 'للحين ما طلعت أي قطعة من الأتيليه. أول ما تنحجز قطعة، بتظهر هني، وما تنسوى مرة ثانية.') + '</p>') + '</div></section>';
+    '<section class="sec"><div class="wrap"><header class="sec-h" data-rv><p class="u-h7">' + (avail.length ? count(avail.length) : '') + '</p><h2 class="u-h2">' + tr('Available now', 'متوفرة الآن') + '</h2><span class="dash"></span></header>' +
+      (avail.length ? grid(avail) : '<p class="center muted">' + tr('Every piece has found its owner. The next pieces are announced on Instagram first.', 'وجدت جميع القطع صاحباتها. نعلن عن القطع القادمة عبر إنستغرام أولًا.') + '</p>') + '</div></section>' +
+    '<section class="sec line"><div class="wrap"><header class="sec-h" data-rv><p class="u-h7">' + tr('The archive', 'الأرشيف') + '</p><h2 class="u-h2">' + tr('Found their owners', 'وجدت صاحباتها') + '</h2><span class="dash"></span></header>' +
+      (gone.length ? grid(gone) : '<p class="center muted" data-rv>' + tr('Nothing has left the atelier yet. When a piece is claimed, it rests here, never to be made again.', 'لم تغادر أي قطعة الأتيليه بعد. حين تُحجز قطعة، تبقى هنا ولا تُصنع مرة أخرى.') + '</p>') + '</div></section>';
   fbLoadSold();
 }
 function viewStyle(id){
@@ -1184,7 +1228,7 @@ function viewStyle(id){
   app.innerHTML =
     '<header class="ph-head wrap"><h1 class="u-h1">' + esc(t(info.title)) + '</h1><div class="rte"><p>' + esc(t(info.intro)) + '</p></div></header>' +
     '<div class="bar"><div class="chips u-h7">' + STYLES.map(function(s){ return '<a href="#s-' + s.id + '"' + (s.id === id ? ' aria-current="page"' : '') + '>' + esc(t(s)) + '</a>'; }).join('') + '</div><div>' + sortSel('sortS', SORT) + '</div></div>' +
-    '<div class="wrap" style="padding-bottom:90px"><p class="u-h7 muted" style="margin:-16px 0 28px">' + count(list.length) + '</p>' + (list.length ? grid(list) : '<p class="center muted" style="padding:40px 0">' + tr('Nothing here yet. New pieces are announced on Instagram first.', 'للحين ما في قطع هني. القطع الجديدة نعلن عنها في إنستغرام أول.') + '</p>') + '</div>';
+    '<div class="wrap" style="padding-bottom:90px"><p class="u-h7 muted" style="margin:-16px 0 28px">' + count(list.length) + '</p>' + (list.length ? grid(list) : '<p class="center muted" style="padding:40px 0">' + tr('Nothing here yet. New pieces are announced on Instagram first.', 'لا توجد قطع هنا حاليًا. نعلن عن القطع الجديدة عبر إنستغرام أولًا.') + '</p>') + '</div>';
 }
 
 /* ---------- product page ---------- */
@@ -1200,32 +1244,32 @@ function viewProduct(code){
       '<div class="pp-th" id="ppTh" aria-label="' + tr('Photos', 'الصور') + '"></div>' +
       '<div><div class="pp-media" id="ppMedia"></div><div class="pp-dots" id="ppDots"></div></div>' +
       '<div class="pp-info">' +
-        '<nav class="crumb u-h7" style="justify-content:flex-start" aria-label="' + tr('Breadcrumb', 'المسار') + '"><a href="#" data-home>' + tr('Home', 'الرئيسية') + '</a><span>/</span><a href="#' + c.id + '">' + esc(t(c.name)) + '</a></nav>' +
-        (one ? '<p class="one-badge"><span class="num">N° ' + p.no + '</span>' + (sold ? soldText(p, true) : tr('One of one', 'قطعة وحدة بس')) + '</p>' : '') +
+        '<nav class="crumb u-h7" style="justify-content:flex-start" aria-label="' + tr('Breadcrumb', 'المسار') + '"><a href="#" data-home>' + tr('Home', 'الصفحة الرئيسية') + '</a><span>/</span><a href="#' + c.id + '">' + esc(t(c.name)) + '</a></nav>' +
+        (one ? '<p class="one-badge"><span class="num">N° ' + p.no + '</span>' + (sold ? soldText(p, true) : tr('One of one', 'قطعة واحدة فقط')) + '</p>' : '') +
         ((p.labels && p.labels.length) || p.isNew ? '<p class="pp-lbls">' + (p.isNew ? '<span class="new">' + tr('New', 'جديد') + '</span>' : '') + (p.labels || []).map(function(l){ return '<span>' + esc(t(l)) + '</span>'; }).join('') + '</p>' : '') +
         '<h1 class="u-h1">' + esc(t(p.name)) + '</h1><p class="pp-pr num">' + (sold ? soldText(p) : money(p.price)) + '</p><hr>' +
-        '<div class="rte"><p>' + esc(t(p.desc)) + '</p>' + (one ? '<p>' + tr('This dress exists as a single piece. Once claimed, it is cut to your size and the design is never made again.', 'هالفستان موجود نسخة وحدة بس. أول ما تحجزينه، يتفصّل على مقاسج، والتصميم ما ينعاد مرة ثانية.') + '</p>' : '<p>' + tr('Collection: ', 'الكولكشن: ') + esc(t(c.name)) + '</p>') + '<p>' + (one ? tr('Made once in Dubai. Code ', 'ينسوى مرة وحدة في دبي. الكود ') : tr('Made to order in Dubai. Code ', 'يتفصّل حسب الطلب في دبي. الكود ')) + p.code + '</p></div>' +
+        '<div class="rte"><p>' + esc(t(p.desc)) + '</p>' + (one ? '<p>' + tr('This dress exists as a single piece. Once claimed, it is cut to your size and the design is never made again.', 'هذا الفستان قطعة فريدة. فور حجزه يُفصَّل وفق مقاسك، ولا يتكرر التصميم بعدها.') + '</p>' : '<p>' + tr('Collection: ', 'المجموعة:') + esc(t(c.name)) + '</p>') + '<p>' + (one ? tr('Made once in Dubai. Code ', 'يُصنع مرة واحدة في دبي. الرمز') : tr('Made to order in Dubai. Code ', 'يُفصَّل حسب الطلب في دبي. الرمز')) + p.code + '</p></div>' +
         '<button class="size-link" type="button" id="sizeChart"><svg viewBox="0 0 18 12" fill="none" stroke="currentColor"><rect x=".5" y=".5" width="17" height="11"/><path d="M4 1v4M7 1v6M10 1v4M13 1v6"/></svg>' + tr('Size chart', 'جدول المقاسات') + '</button>' +
-        (sold ? '<div class="buy"><button class="btn full" type="button" disabled><span>' + soldText(p, true) + '</span></button><a class="link" href="#' + (one ? 'the-one' : p.col) + '" style="justify-self:center;margin-top:8px">' + tr('See the pieces still available', 'شوفي القطع المتوفرة') + '</a></div>' : '<form id="buy" novalidate>' +
+        (sold ? '<div class="buy"><button class="btn full" type="button" disabled><span>' + soldText(p, true) + '</span></button><a class="link" href="#' + (one ? 'the-one' : p.col) + '" style="justify-self:center;margin-top:8px">' + tr('See the pieces still available', 'عرض القطع المتوفرة') + '</a></div>' : '<form id="buy" novalidate>' +
           (true ? '' : '<div class="opt"><div class="opt-l"><span class="u-h7">' + tr('Colour', 'اللون') + '</span><span class="muted" id="ppShadeN"></span></div>' +
-            '<ul class="sw" id="ppSw" aria-label="' + tr('Colour', 'اللون') + '"><li><button type="button" class="orig" data-sh="o" aria-label="' + tr('As shown', 'مثل الصورة') + '"></button></li>' +
+            '<ul class="sw" id="ppSw" aria-label="' + tr('Colour', 'اللون') + '"><li><button type="button" class="orig" data-sh="o" aria-label="' + tr('As shown', 'كما في الصورة') + '"></button></li>' +
             SHADES.map(function(s, i){ return '<li><button type="button" data-sh="' + i + '" style="--c:' + s.c + '" aria-label="' + esc(t(s)) + '"></button></li>'; }).join('') +
             '<li><label class="pick" id="ppPickL" title="' + tr('Any colour', 'أي لون') + '"><span class="sr">' + tr('Pick any colour', 'اختاري أي لون') + '</span><input type="color" id="ppPick" value="#8a4a47"></label></li></ul>' +
-            '<p class="dye-note">' + (p.dye ? tr('The photo changes to preview your colour. Before cutting we send you a photo of the real fabric.', 'الصورة تتغيّر عشان تشوفين لونج. وقبل التفصيل نرسل لج صورة القماش الأصلي.') : tr('Made in the colour you choose. Before cutting we send you a photo of the real fabric.', 'يتفصّل باللون اللي تختارينه. وقبل التفصيل نرسل لج صورة القماش الأصلي.')) + '</p></div>') +
-          '<div class="opt"><label class="sr" for="ppSize">' + tr('Size', 'المقاس') + '</label><div class="sel"><select id="ppSize"><option value="">' + tr('Size', 'المقاس') + '</option>' + SIZES.map(function(s){ return '<option value="' + s.id + '">' + tr('Size: ', 'المقاس: ') + esc(t(s)) + '</option>'; }).join('') + '</select></div><p class="dye-note" id="ppSizeE" style="color:var(--err)" hidden>' + tr('Choose a size.', 'اختاري المقاس.') + '</p></div>' +
-          '<div class="opt"><p class="help">' + tr('Length of the piece, from shoulder to where you want it to end. Not your height.', 'طول القطعة من الكتف لين المكان اللي تبينها توصل له. مب طولج إنتي.') + '</p><label class="sr" for="ppLen">' + tr('Length', 'الطول') + '</label><div class="sel"><select id="ppLen"><option value="">' + tr('Length', 'الطول') + '</option>' + LENGTHS.map(function(l){ return '<option value="' + l + '">' + tr('Length: ', 'الطول: ') + l + '″</option>'; }).join('') + '<option value="unsure">' + tr('Not sure? We will help', 'مب متأكدة؟ بنساعدج') + '</option></select></div><p class="dye-note" id="ppLenE" style="color:var(--err)" hidden>' + tr('Choose a length.', 'اختاري الطول.') + '</p></div>' +
+            '<p class="dye-note">' + (p.dye ? tr('The photo changes to preview your colour. Before cutting we send you a photo of the real fabric.', 'تتغيّر الصورة لتعرض اللون. وقبل التفصيل نرسل لكِ صورة القماش الفعلي.') : tr('Made in the colour you choose. Before cutting we send you a photo of the real fabric.', 'يُفصَّل باللون الذي تختارينه. وقبل التفصيل نرسل لكِ صورة القماش الفعلي.')) + '</p></div>') +
+          '<div class="opt"><label class="sr" for="ppSize">' + tr('Size', 'المقاس') + '</label><div class="sel"><select id="ppSize"><option value="">' + tr('Size', 'المقاس') + '</option>' + SIZES.map(function(s){ return '<option value="' + s.id + '">' + tr('Size: ', 'المقاس: ') + esc(t(s)) + '</option>'; }).join('') + '</select></div><p class="dye-note" id="ppSizeE" style="color:var(--err)" hidden>' + tr('Choose a size.', 'يرجى اختيار المقاس.') + '</p></div>' +
+          '<div class="opt"><p class="help">' + tr('Length of the piece, from shoulder to where you want it to end. Not your height.', 'طول القطعة من الكتف إلى حيث ترغبين أن تنتهي، وليس طولك.') + '</p><label class="sr" for="ppLen">' + tr('Length', 'الطول') + '</label><div class="sel"><select id="ppLen"><option value="">' + tr('Length', 'الطول') + '</option>' + LENGTHS.map(function(l){ return '<option value="' + l + '">' + tr('Length: ', 'الطول: ') + l + '″</option>'; }).join('') + '<option value="unsure">' + tr('Not sure? We will help', 'غير متأكدة؟ سنساعدك') + '</option></select></div><p class="dye-note" id="ppLenE" style="color:var(--err)" hidden>' + tr('Choose a length.', 'يرجى اختيار الطول.') + '</p></div>' +
           '<div class="buy"><div class="qty"' + (one ? ' hidden' : '') + ' role="group" aria-label="' + tr('Quantity', 'الكمية') + '"><button type="button" data-q="-1" aria-label="' + tr('Less', 'أقل') + '">−</button><output id="ppQty" class="num">1</output><button type="button" data-q="1" aria-label="' + tr('More', 'أكثر') + '">+</button></div>' +
-            '<button class="btn full" type="submit" id="ppAdd"><span>' + (one && inCart(code) ? tr('In your cart', 'في حقيبتج') : one ? tr('Claim this piece', 'احجزي هالقطعة') : tr('Add to cart', 'أضيفي للحقيبة')) + '</span></button></div>' +
+            '<button class="btn full" type="submit" id="ppAdd"><span>' + (one && inCart(code) ? tr('In your cart', 'في الحقيبة') : one ? tr('Claim this piece', 'احجزي هذه القطعة') : tr('Add to cart', 'أضيفي إلى الحقيبة')) + '</span></button></div>' +
         '</form>') +
         '<div class="acc">' +
-          (p.story && t(p.story) ? acc(tr('The story', 'الحكاية'), '<p>' + esc(t(p.story)) + '</p>', true) : '') +
-          (one ? acc(tr('Why only one', 'ليش قطعة وحدة'), '<p>' + tr('Some fabrics come in a single length and some designs deserve a single owner. Pieces in The One are made once; after that the pattern is retired and the dress is shown in our archive.', 'في أقمشة توصلنا قطعة وحدة بس، وفي تصاميم تستاهل صاحبة وحدة. قطع القطعة الوحدة تنسوى مرة وحدة، وعقبها يتسكّر الباترون ويظهر الفستان في الأرشيف.') + '</p>') : '') +
-          acc(tr('Fabric and care', 'القماش والعناية'), '<p>' + (p.fabric && t(p.fabric) ? esc(t(p.fabric)) : tr('[Fabric to confirm]. Dry clean or hand wash cold. Steam on low; do not tumble dry.', '[نوع القماش بنأكده]. تنظيف جاف أو غسيل يدوي بماي بارد. كوي بالبخار على حرارة خفيفة، وبدون نشّافة.')) + '</p>') +
-          acc(tr('Delivery and returns', 'التوصيل والاسترجاع'), '<p>' + tr('Each piece is cut after you order. Free UAE delivery over 500 AED. Because pieces are made for you, see our refund policy before ordering.', 'كل قطعة تتفصّل عقب طلبج. التوصيل مجاني داخل الإمارات للطلبات فوق ٥٠٠ درهم. ولأن القطعة تنسوى لج بالذات، شوفي سياسة الاسترجاع قبل الطلب.') + ' <a href="#page-refund" style="text-decoration:underline">' + tr('Refund policy', 'سياسة الاسترجاع') + '</a></p>') +
+          (p.story && t(p.story) ? acc(tr('The story', 'القصة'), '<p>' + esc(t(p.story)) + '</p>', true) : '') +
+          (one ? acc(tr('Why only one', 'لماذا قطعة واحدة'), '<p>' + tr('Some fabrics come in a single length and some designs deserve a single owner. Pieces in The One are made once; after that the pattern is retired and the dress is shown in our archive.', 'بعض الأقمشة تصلنا بقطعة واحدة فقط، وبعض التصاميم تستحق صاحبة واحدة. تُصنع قطع هذا الخط مرة واحدة، ثم يُغلق الباترون ويُعرض الفستان في الأرشيف.') + '</p>') : '') +
+          acc(tr('Fabric and care', 'القماش والعناية'), '<p>' + (p.fabric && t(p.fabric) ? esc(t(p.fabric)) : tr('[Fabric to confirm]. Dry clean or hand wash cold. Steam on low; do not tumble dry.', '[سيتم تأكيد نوع القماش]. تنظيف جاف أو غسيل يدوي بماء بارد. كيّ بالبخار على حرارة منخفضة، دون استخدام المجفف.')) + '</p>') +
+          acc(tr('Delivery and returns', 'التوصيل والاسترجاع'), '<p>' + tr('Each piece is cut after you order. Free UAE delivery over 500 AED. Because pieces are made for you, see our refund policy before ordering.', 'تُفصَّل كل قطعة بعد طلبها. التوصيل مجاني داخل الإمارات للطلبات التي تتجاوز ٥٠٠ د.إ. ولأن القطعة تُصنع لكِ خصيصًا، يرجى مراجعة سياسة الاسترجاع قبل الطلب.') + ' <a href="#page-refund" style="text-decoration:underline">' + tr('Refund policy', 'سياسة الاسترجاع') + '</a></p>') +
         '</div>' +
       '</div>' +
     '</div></div>' +
-    (related.length ? '<section class="sec line"><div class="wrap"><header class="sec-h" data-rv><h2 class="u-h2">' + (one ? tr('More from The One', 'قطع ثانية من القطعة الوحدة') : tr('You may also like', 'يمكن يعجبج بعد')) + '</h2><span class="dash"></span></header>' + grid(related) + '</div></section>' : '');
+    (related.length ? '<section class="sec line"><div class="wrap"><header class="sec-h" data-rv><h2 class="u-h2">' + (one ? tr('More from The One', 'المزيد من القطعة الواحدة') : tr('You may also like', 'قد يعجبك أيضًا')) + '</h2><span class="dash"></span></header>' + grid(related) + '</div></section>' : '');
   paintPP(true);
   var m = $('ppMedia');
   m.addEventListener('scroll', function(){ var i = Math.round(Math.abs(m.scrollLeft) / m.clientWidth); $('ppDots').querySelectorAll('i').forEach(function(d, k){ d.classList.toggle('on', k === i); }); }, {passive:true});
@@ -1247,7 +1291,7 @@ function paintPP(first){
   if(!$('ppSw')){ if($('ppSize')){ $('ppSize').value = PP.size; $('ppLen').value = PP.len; } return; }
   $('ppSw').querySelectorAll('[data-sh]').forEach(function(b){ var v = b.getAttribute('data-sh'); b.setAttribute('aria-pressed', String(v === 'o' ? PP.shade === null : +v === PP.shade)); });
   $('ppPickL').classList.toggle('on', PP.shade === -1);
-  $('ppShadeN').textContent = PP.shade === null ? tr('As shown', 'مثل الصورة') : PP.shade === -1 ? PP.custom.toUpperCase() : t(SHADES[PP.shade]);
+  $('ppShadeN').textContent = PP.shade === null ? tr('As shown', 'كما في الصورة') : PP.shade === -1 ? PP.custom.toUpperCase() : t(SHADES[PP.shade]);
   $('ppSize').value = PP.size; $('ppLen').value = PP.len; $('ppQty').textContent = PP.qty;
 }
 function addToCart(){
@@ -1261,15 +1305,15 @@ function addToCart(){
     if(isSold(pr)) return;
     if(inCart(pr.code)){ openDrawer(); return; }
     CART.push({key:pr.code, code:pr.code, shade:null, hex:null, size:PP.size, len:PP.len, qty:1}); saveCart();
-    $('ppAdd').querySelector('span').textContent = tr('In your cart', 'في حقيبتج');
+    $('ppAdd').querySelector('span').textContent = tr('In your cart', 'في الحقيبة');
     setTimeout(openDrawer, 250); return;
   }
   var hex = ppHex(), key = PP.code + '|' + (hex || 'orig') + '|' + PP.size + '|' + PP.len;
   var ex = CART.filter(function(it){ return it.key === key; })[0];
   if(ex) ex.qty += PP.qty; else CART.push({key:key, code:PP.code, shade:PP.shade, hex:hex, size:PP.size, len:PP.len, qty:PP.qty});
   saveCart();
-  var b = $('ppAdd').querySelector('span'); b.textContent = tr('Added', 'انضافت');
-  setTimeout(function(){ if($('ppAdd')) $('ppAdd').querySelector('span').textContent = tr('Add to cart', 'أضيفي للحقيبة'); }, 1800);
+  var b = $('ppAdd').querySelector('span'); b.textContent = tr('Added', 'تمت الإضافة');
+  setTimeout(function(){ if($('ppAdd')) $('ppAdd').querySelector('span').textContent = tr('Add to cart', 'أضيفي إلى الحقيبة'); }, 1800);
   setTimeout(openDrawer, 250);
 }
 
@@ -1280,17 +1324,17 @@ function updateCount(){ var n = cartCount(); $('cartN').textContent = n; $('cart
 function renderDrawer(){
   thumbN = 0;
   var s = cartSub(), left = 500 - s, P = $('drw').querySelector('.drw-p');
-  P.innerHTML = '<div class="drw-h"><h2 class="u-h6" id="drwT">' + tr('Cart', 'الحقيبة') + '</h2><button type="button" data-close-drw aria-label="' + tr('Close cart', 'سكّري الحقيبة') + '">' + X + '</button></div>' +
+  P.innerHTML = '<div class="drw-h"><h2 class="u-h6" id="drwT">' + tr('Cart', 'الحقيبة') + '</h2><button type="button" data-close-drw aria-label="' + tr('Close cart', 'إغلاق الحقيبة') + '">' + X + '</button></div>' +
     (CART.length ?
-      '<div class="ship-bar">' + (left > 0 ? tr('Spend ', 'باقي ') + money(left) + tr(' more for free UAE delivery', ' وتحصلين توصيل مجاني داخل الإمارات') : tr('You have free UAE delivery', 'التوصيل داخل الإمارات مجاني')) + '<i style="--p:' + clamp(s / 500, 0, 1) + '"></i></div>' +
+      '<div class="ship-bar">' + (left > 0 ? tr('Spend ', 'أضيفي') + money(left) + tr(' more for free UAE delivery', ' للحصول على توصيل مجاني داخل الإمارات') : tr('You have free UAE delivery', 'حصلتِ على توصيل مجاني داخل الإمارات')) + '<i style="--p:' + clamp(s / 500, 0, 1) + '"></i></div>' +
       '<div class="drw-b">' + CART.map(function(it, i){
         var p = prod(it.code); if(!p) return '';
         return '<div class="li"><a class="im" href="#p-' + p.code + '" data-close-drw style="--tone:' + (p.tone || '') + '">' + lineImg(it) + '</a><div><a class="ttl" href="#p-' + p.code + '" data-close-drw>' + esc(t(p.name)) + '</a>' +
           '<span class="meta">' + (it.hex ? '<i class="dot" style="background:' + it.hex + '"></i>' : '') + esc(variant(it)) + '</span><span class="pr num">' + money(p.price * it.qty) + '</span>' +
-          '<div class="acts">' + (p.one ? '<span class="one-badge sm">N° ' + p.no + ' · ' + tr('1 of 1', 'قطعة وحدة') + '</span>' : '<div class="qty sm" role="group" aria-label="' + tr('Quantity', 'الكمية') + '"><button type="button" data-cq="' + i + '" data-d="-1" aria-label="' + tr('Less', 'أقل') + '">−</button><output class="num">' + it.qty + '</output><button type="button" data-cq="' + i + '" data-d="1" aria-label="' + tr('More', 'أكثر') + '">+</button></div>') + '<button class="rm" type="button" data-rm="' + i + '">' + tr('Remove', 'شيلي') + '</button></div></div></div>';
+          '<div class="acts">' + (p.one ? '<span class="one-badge sm">N° ' + p.no + ' · ' + tr('1 of 1', 'قطعة واحدة') + '</span>' : '<div class="qty sm" role="group" aria-label="' + tr('Quantity', 'الكمية') + '"><button type="button" data-cq="' + i + '" data-d="-1" aria-label="' + tr('Less', 'أقل') + '">−</button><output class="num">' + it.qty + '</output><button type="button" data-cq="' + i + '" data-d="1" aria-label="' + tr('More', 'أكثر') + '">+</button></div>') + '<button class="rm" type="button" data-rm="' + i + '">' + tr('Remove', 'إزالة') + '</button></div></div></div>';
       }).join('') + '</div>' +
-      '<div class="drw-f"><p class="note">' + tr('Delivery is calculated at checkout. Prices include VAT.', 'رسوم التوصيل تنحسب في صفحة الدفع. الأسعار شاملة الضريبة.') + '</p><a class="btn full" href="#checkout" data-close-drw><span>' + tr('Checkout', 'إتمام الطلب') + ' · <span class="num">' + money(s) + '</span></span></a></div>'
-    : '<div class="drw-empty"><p class="u-h6">' + tr('Your cart is empty', 'حقيبتج فاضية') + '</p><a class="btn" href="#s-all" data-close-drw>' + tr('Shop the collection', 'تسوّقي الكولكشن') + '</a></div>');
+      '<div class="drw-f"><p class="note">' + tr('Delivery is calculated at checkout. Prices include VAT.', 'تُحتسب رسوم التوصيل عند الدفع. الأسعار شاملة الضريبة.') + '</p><a class="btn full" href="#checkout" data-close-drw><span>' + tr('Checkout', 'إتمام الطلب') + ' · <span class="num">' + money(s) + '</span></span></a></div>'
+    : '<div class="drw-empty"><p class="u-h6">' + tr('Your cart is empty', 'حقيبتك فارغة') + '</p><a class="btn" href="#s-all" data-close-drw>' + tr('Shop the collection', 'تسوّقي المجموعة') + '</a></div>');
 }
 
 /* ---------- panels: drawer, side menu, search, modal, lightbox ---------- */
@@ -1314,25 +1358,25 @@ function trap(e, box){
   if(e.shiftKey && document.activeElement === a){ e.preventDefault(); z.focus(); } else if(!e.shiftKey && document.activeElement === z){ e.preventDefault(); a.focus(); }
 }
 function sizeChartHTML(){
-  return '<h2 class="u-h6" id="mdlT">' + tr('Size chart', 'جدول المقاسات') + '</h2><p class="muted" style="margin:10px 0 0">' + tr('Body measurements in centimetres. Between two sizes? Choose the larger one, or choose “Custom” and send us your measurements at checkout.', 'مقاسات الجسم بالسنتيمتر. إذا كنتي بين مقاسين اختاري الأكبر، أو اختاري «تفصيل على مقاساتي» وأرسلي لنا مقاساتج في صفحة الدفع.') + '</p>' +
+  return '<h2 class="u-h6" id="mdlT">' + tr('Size chart', 'جدول المقاسات') + '</h2><p class="muted" style="margin:10px 0 0">' + tr('Body measurements in centimetres. Between two sizes? Choose the larger one, or choose “Custom” and send us your measurements at checkout.', 'مقاسات الجسم بالسنتيمتر. إذا كنتِ بين مقاسين فاختاري الأكبر، أو اختاري «تفصيل حسب مقاساتي» وأرسلي مقاساتك عند الدفع.') + '</p>' +
     '<table class="tbl num"><thead><tr><th>' + tr('Size', 'المقاس') + '</th><th>' + tr('Bust', 'الصدر') + '</th><th>' + tr('Waist', 'الوسط') + '</th><th>' + tr('Hips', 'الأرداف') + '</th></tr></thead><tbody>' +
     CHART.map(function(r){ return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td></tr>'; }).join('') + '</tbody></table>' +
-    '<p class="muted" style="margin:18px 0 0;font-size:13px">' + tr('Length: measure from the top of your shoulder down to where you want the piece to end, in inches.', 'الطول: قيسي من أعلى الكتف لين المكان اللي تبين القطعة توصل له، بالإنش.') + '</p>';
+    '<p class="muted" style="margin:18px 0 0;font-size:13px">' + tr('Length: measure from the top of your shoulder down to where you want the piece to end, in inches.', 'الطول: قيسي من أعلى الكتف إلى حيث ترغبين أن تنتهي القطعة، بالإنش.') + '</p>';
 }
 
 /* side menu + mega menu */
 function renderSide(){
   $('sideNav').innerHTML =
-    '<details open><summary>' + tr('Collections', 'الكولكشنز') + '<i></i></summary><ul>' + COLLECTIONS.map(function(c){ return '<li><a href="#' + c.id + '" data-close-side>' + esc(t(c.name)) + '</a></li>'; }).join('') + '</ul></details>' +
-    '<details><summary>' + tr('Shop', 'تسوّقي') + '<i></i></summary><ul>' + STYLES.map(function(s){ return '<li><a href="#s-' + s.id + '" data-close-side>' + esc(t(s.id === 'all' ? {en:'All products', ar:'كل القطع'} : s)) + '</a></li>'; }).join('') + '</ul></details>' +
-    '<a class="s-l" href="#the-one" data-close-side>' + tr('The One', 'القطعة الوحدة') + '</a>' +
+    '<details open><summary>' + tr('Collections', 'المجموعات') + '<i></i></summary><ul>' + COLLECTIONS.map(function(c){ return '<li><a href="#' + c.id + '" data-close-side>' + esc(t(c.name)) + '</a></li>'; }).join('') + '</ul></details>' +
+    '<details><summary>' + tr('Shop', 'تسوّقي') + '<i></i></summary><ul>' + STYLES.map(function(s){ return '<li><a href="#s-' + s.id + '" data-close-side>' + esc(t(s.id === 'all' ? {en:'All products', ar:'جميع المنتجات'} : s)) + '</a></li>'; }).join('') + '</ul></details>' +
+    '<a class="s-l" href="#the-one" data-close-side>' + tr('The One', 'القطعة الواحدة') + '</a>' +
     '<a class="s-l" href="#page-how" data-close-side>' + tr('How ordering works', 'طريقة الطلب') + '</a>';
 }
 function renderMenus(){
   $('megaCols').innerHTML = COLLECTIONS.map(function(c){ return '<li><a href="#' + c.id + '">' + esc(t(c.name)) + '</a></li>'; }).join('');
-  $('megaStyles').innerHTML = STYLES.map(function(s){ return '<li><a href="#s-' + s.id + '">' + esc(t(s.id === 'all' ? {en:'All products', ar:'كل القطع'} : s)) + '</a></li>'; }).join('');
+  $('megaStyles').innerHTML = STYLES.map(function(s){ return '<li><a href="#s-' + s.id + '">' + esc(t(s.id === 'all' ? {en:'All products', ar:'جميع المنتجات'} : s)) + '</a></li>'; }).join('');
   $('megaPics').innerHTML = ['courtyard', 'bloom'].map(function(id){ var c = col(id); return '<a href="#' + id + '"><div class="ph" style="aspect-ratio:3/4"><img src="' + c.small + '" alt="" loading="lazy"></div><span class="u-h7">' + esc(t(c.name)) + '</span></a>'; }).join('');
-  $('ftShop').innerHTML = STYLES.map(function(s){ return '<li><a href="#s-' + s.id + '">' + esc(t(s.id === 'all' ? {en:'All products', ar:'كل القطع'} : s)) + '</a></li>'; }).join('');
+  $('ftShop').innerHTML = STYLES.map(function(s){ return '<li><a href="#s-' + s.id + '">' + esc(t(s.id === 'all' ? {en:'All products', ar:'جميع المنتجات'} : s)) + '</a></li>'; }).join('');
   $('ftCols').innerHTML = COLLECTIONS.map(function(c){ return '<li><a href="#' + c.id + '">' + esc(t(c.name)) + '</a></li>'; }).join('');
 }
 function setMega(on){ var m = $('mega'); m.classList.toggle('open', on); $('hd').classList.toggle('menu-on', on); $('megaBtn').setAttribute('aria-expanded', String(on)); }
@@ -1342,7 +1386,7 @@ function runSearch(q){
   q = q.trim().toLowerCase(); var box = $('srchRes');
   if(!q){ box.innerHTML = ''; return; }
   var hits = PRODUCTS.filter(function(p){ var c = col(p.col); return [p.name.en, p.name.ar, (p.desc || {}).en, (p.desc || {}).ar, c ? c.name.en : '', c ? c.name.ar : '', p.code].join(' ').toLowerCase().indexOf(q) > -1; });
-  box.innerHTML = hits.length ? '<p class="u-h7 muted" style="margin-bottom:24px">' + count(hits.length) + '</p>' + grid(hits.slice(0, 8)) : '<p class="muted">' + tr('No results for “', 'ما في نتائج لـ «') + esc(q) + tr('”. Try a collection, a dress or an abaya name.', '». جرّبي اسم كولكشن أو فستان أو عباية.') + '</p>';
+  box.innerHTML = hits.length ? '<p class="u-h7 muted" style="margin-bottom:24px">' + count(hits.length) + '</p>' + grid(hits.slice(0, 8)) : '<p class="muted">' + tr('No results for “', 'لا توجد نتائج لـ «') + esc(q) + tr('”. Try a collection, a dress or an abaya name.', '». جرّبي اسم مجموعة أو فستان أو عباية.') + '</p>';
   box.querySelectorAll('[data-rv]').forEach(function(el){ el.classList.add('in'); });
 }
 
@@ -1360,7 +1404,7 @@ function flSel(name, label, options, val){
   return '<div class="fl s" data-f="' + name + '"><select id="f-' + name + '" name="' + name + '" aria-describedby="e-' + name + '">' + options.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === val ? ' selected' : '') + (o[2] ? ' disabled' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select><label for="f-' + name + '">' + label + '</label><p class="err" id="e-' + name + '"></p></div>';
 }
 function regionField(country, val){
-  if(country === 'AE') return flSel('region', tr('Emirate', 'الإمارة'), [['', tr('Select', 'اختاري'), true]].concat(EMIRATES.map(function(e){ return [e.id, t(e)]; })), val || '');
+  if(country === 'AE') return flSel('region', tr('Emirate', 'الإمارة'), [['', tr('Select', 'اختيار'), true]].concat(EMIRATES.map(function(e){ return [e.id, t(e)]; })), val || '');
   return fl('region', tr('State / province (optional)', 'المنطقة أو الولاية (اختياري)'), 'text', val, 'autocomplete="address-level1"', true);
 }
 function summaryHTML(items, sub, ship, total, editable){
@@ -1371,10 +1415,10 @@ function summaryHTML(items, sub, ship, total, editable){
       return '<div class="sline"><span class="im" style="--tone:' + (p.tone || '') + '"><span class="clip">' + lineImg(it) + '</span><em class="num">' + it.qty + '</em></span><span><b>' + esc(t(p.name)) + '</b><small>' + esc(variant(it)) + '</small></span><span class="p num">' + money(p.price * it.qty) + '</span></div>';
     }).join('') +
     (editable ? '<form class="disc" id="discForm" novalidate>' + fl('disc', tr('Discount code', 'كود الخصم'), 'text', '', 'autocomplete="off"', true) + '<button type="submit" id="discBtn">' + tr('Apply', 'تطبيق') + '</button></form>' : '') +
-    '<div class="tot"><div class="sum-row"><span>' + tr('Subtotal', 'المجموع') + ' · ' + cartQty(items) + '</span><span class="num">' + money(sub) + '</span></div>' +
+    '<div class="tot"><div class="sum-row"><span>' + tr('Subtotal', 'المجموع الفرعي') + ' · ' + cartQty(items) + '</span><span class="num">' + money(sub) + '</span></div>' +
     '<div class="sum-row"><span>' + tr('Shipping', 'الشحن') + '</span><span class="num" id="coShip">' + (ship ? money(ship) : tr('Free', 'مجاني')) + '</span></div>' +
     '<div class="sum-row grand"><span>' + tr('Total', 'الإجمالي') + '</span><span><span class="num" id="coTot">' + money(total) + '</span></span></div>' +
-    '<p class="tax" id="coTax">' + tr('Including ', 'شامل ') + '<span class="num">' + money(tax) + '</span>' + tr(' in taxes', ' ضريبة') + '</p></div>';
+    '<p class="tax" id="coTax">' + tr('Including ', 'تشمل') + '<span class="num">' + money(tax) + '</span>' + tr(' in taxes', ' ضريبة') + '</p></div>';
 }
 function cartQty(items){ var n = items.reduce(function(a, it){ return a + it.qty; }, 0); return L === 'ar' ? count(n) : n + (n === 1 ? ' item' : ' items'); }
 function coShell(left, items, sub, ship, total, editable){
@@ -1388,7 +1432,7 @@ function coShell(left, items, sub, ship, total, editable){
 }
 function viewCheckout(){
   if(!CART.length){
-    app.innerHTML = '<header class="ph-head wrap"><h1 class="u-h1">' + tr('Checkout', 'إتمام الطلب') + '</h1></header><div class="empty"><p>' + tr('Your cart is empty.', 'حقيبتج فاضية.') + '</p><a class="btn" href="#s-all">' + tr('Shop the collection', 'تسوّقي الكولكشن') + '</a></div>';
+    app.innerHTML = '<header class="ph-head wrap"><h1 class="u-h1">' + tr('Checkout', 'إتمام الطلب') + '</h1></header><div class="empty"><p>' + tr('Your cart is empty.', 'حقيبتك فارغة.') + '</p><a class="btn" href="#s-all">' + tr('Shop the collection', 'تسوّقي المجموعة') + '</a></div>';
     document.body.classList.remove('is-co');
     return;
   }
@@ -1397,34 +1441,34 @@ function viewCheckout(){
   var sub = cartSub(), ship = shipFor(CO.country, CO.method, sub);
   var left =
     '<form id="coForm" novalidate>' +
-      '<section class="co-sec"><h2>' + tr('Contact', 'التواصل') + '</h2>' +
-        fl('email', tr('Email', 'الإيميل'), 'email', d.email, 'autocomplete="email" dir="ltr" inputmode="email"') +
-        '<label class="chk"><input type="checkbox" name="news"' + (d.news ? ' checked' : '') + '>' + tr('Email me with news and offers', 'أرسلوا لي جديد الكولكشنز والعروض') + '</label></section>' +
+      '<section class="co-sec"><h2>' + tr('Contact', 'معلومات الاتصال') + '</h2>' +
+        fl('email', tr('Email', 'البريد الإلكتروني'), 'email', d.email, 'autocomplete="email" dir="ltr" inputmode="email"') +
+        '<label class="chk"><input type="checkbox" name="news"' + (d.news ? ' checked' : '') + '>' + tr('Email me with news and offers', 'أرسلوا لي آخر المجموعات والعروض') + '</label></section>' +
       '<section class="co-sec"><h2>' + tr('Delivery', 'التوصيل') + '</h2>' +
         flSel('country', tr('Country / region', 'الدولة'), COUNTRIES.map(function(c){ return [c.id, t(c)]; }), CO.country) +
         '<div class="g2">' + fl('first', tr('First name', 'الاسم الأول'), 'text', d.first, 'autocomplete="given-name"') + fl('last', tr('Last name', 'اسم العائلة'), 'text', d.last, 'autocomplete="family-name"') + '</div>' +
         fl('addr', tr('Address', 'العنوان'), 'text', d.addr, 'autocomplete="address-line1"') +
-        fl('apt', tr('Apartment, villa, building (optional)', 'الشقة أو الفيلا أو المبنى (اختياري)'), 'text', d.apt, 'autocomplete="address-line2"', true) +
+        fl('apt', tr('Apartment, villa, building (optional)', 'الشقة، الفيلا، المبنى (اختياري)'), 'text', d.apt, 'autocomplete="address-line2"', true) +
         '<div class="g3">' + fl('city', tr('City / area', 'المدينة أو المنطقة'), 'text', d.city, 'autocomplete="address-level2"') + '<div id="regionBox">' + regionField(CO.country, d.region) + '</div>' + fl('zip', tr('Postal code (optional)', 'الرمز البريدي (اختياري)'), 'text', d.zip, 'autocomplete="postal-code" dir="ltr"', true) + '</div>' +
-        fl('phone', tr('Phone, for delivery and WhatsApp', 'رقم الموبايل، للتوصيل والواتساب'), 'tel', d.phone, 'autocomplete="tel" dir="ltr" inputmode="tel"') +
-        '<label class="chk"><input type="checkbox" name="save"' + (SAVED ? ' checked' : '') + '>' + tr('Save this information for next time', 'احفظي بياناتي للمرة الياية') + '</label></section>' +
-      (custom ? '<section class="co-sec"><h2>' + tr('Your measurements', 'مقاساتج') + ' <small>cm</small></h2><p class="sub">' + tr('At least one piece is cut to your measurements.', 'في قطعة على الأقل بتتفصّل على مقاساتج.') + '</p><div class="g3">' +
+        fl('phone', tr('Phone, for delivery and WhatsApp', 'رقم الهاتف، للتوصيل وواتساب'), 'tel', d.phone, 'autocomplete="tel" dir="ltr" inputmode="tel"') +
+        '<label class="chk"><input type="checkbox" name="save"' + (SAVED ? ' checked' : '') + '>' + tr('Save this information for next time', 'حفظ هذه المعلومات للمرة القادمة') + '</label></section>' +
+      (custom ? '<section class="co-sec"><h2>' + tr('Your measurements', 'مقاساتك') + ' <small>cm</small></h2><p class="sub">' + tr('At least one piece is cut to your measurements.', 'سيتم تفصيل قطعة واحدة على الأقل وفق مقاساتك.') + '</p><div class="g3">' +
         [['height', tr('Height', 'الطول')], ['bust', tr('Bust', 'الصدر')], ['waist', tr('Waist', 'الوسط')], ['hips', tr('Hips', 'الأرداف')], ['sleeve', tr('Sleeve (optional)', 'الكم (اختياري)')], ['shoulder', tr('Shoulder (optional)', 'الكتف (اختياري)')]].map(function(f, i){
           return fl('m_' + f[0], f[1], 'number', (d.measure || {})[f[0]], 'inputmode="decimal" min="0" max="250" dir="ltr"', i > 3);
         }).join('') + '</div></section>' : '') +
       '<section class="co-sec"><h2>' + tr('Shipping method', 'طريقة الشحن') + '</h2><div class="opts" id="shipOpts">' +
-        '<label' + (CO.method === 'standard' ? ' class="on"' : '') + '><input type="radio" name="method" value="standard"' + (CO.method === 'standard' ? ' checked' : '') + '><span><b>' + tr('Standard', 'عادي') + '</b><small>' + tr('Shipped when your piece is ready', 'ينشحن أول ما تخلص القطعة') + '</small></span><em class="num" id="shipStd"></em></label>' +
-        '<label' + (CO.method === 'express' ? ' class="on"' : '') + '><input type="radio" name="method" value="express"' + (CO.method === 'express' ? ' checked' : '') + '><span><b>' + tr('Express', 'سريع') + '</b><small>' + tr('Priority cutting and courier', 'أولوية في التفصيل وتوصيل سريع') + '</small></span><em class="num" id="shipExp"></em></label></div></section>' +
-      '<section class="co-sec"><h2>' + tr('Payment', 'الدفع') + '</h2><p class="sub">' + tr('All transactions are secure. Nothing is charged until we confirm your order.', 'كل المعاملات آمنة. ما ينخصم أي مبلغ قبل ما نأكد طلبج.') + '</p><div class="opts" id="payOpts">' +
-        '<label' + (CO.pay === 'link' ? ' class="on"' : '') + '><input type="radio" name="pay" value="link"' + (CO.pay === 'link' ? ' checked' : '') + '><span><b>' + tr('Card payment link', 'رابط دفع بالبطاقة') + '</b><small>Visa · Mastercard · Apple Pay</small></span><span></span><p class="more">' + tr('After you complete your order, we confirm the fabric and fit with you, then send a secure card payment link by WhatsApp and email.', 'عقب ما تكمّلين الطلب، نأكد وياج القماش والمقاس، وبعدها نرسل لج رابط دفع آمن على الواتساب والإيميل.') + '</p></label>' +
-        '<label id="codOpt"' + (CO.pay === 'cod' ? ' class="on"' : '') + '><input type="radio" name="pay" value="cod"' + (CO.pay === 'cod' ? ' checked' : '') + '><span><b>' + tr('Cash on delivery', 'الدفع عند الاستلام') + '</b><small>' + tr('UAE only', 'داخل الإمارات فقط') + '</small></span><span></span><p class="more">' + tr('Pay in cash or by card when your piece arrives.', 'ادفعي كاش أو بالبطاقة لين توصلج القطعة.') + '</p></label></div></section>' +
+        '<label' + (CO.method === 'standard' ? ' class="on"' : '') + '><input type="radio" name="method" value="standard"' + (CO.method === 'standard' ? ' checked' : '') + '><span><b>' + tr('Standard', 'قياسي') + '</b><small>' + tr('Shipped when your piece is ready', 'يُشحن فور اكتمال القطعة') + '</small></span><em class="num" id="shipStd"></em></label>' +
+        '<label' + (CO.method === 'express' ? ' class="on"' : '') + '><input type="radio" name="method" value="express"' + (CO.method === 'express' ? ' checked' : '') + '><span><b>' + tr('Express', 'سريع') + '</b><small>' + tr('Priority cutting and courier', 'أولوية في التفصيل وشحن سريع') + '</small></span><em class="num" id="shipExp"></em></label></div></section>' +
+      '<section class="co-sec"><h2>' + tr('Payment', 'الدفع') + '</h2><p class="sub">' + tr('All transactions are secure. Nothing is charged until we confirm your order.', 'جميع المعاملات آمنة. لن يُخصم أي مبلغ قبل تأكيد طلبك.') + '</p><div class="opts" id="payOpts">' +
+        '<label' + (CO.pay === 'link' ? ' class="on"' : '') + '><input type="radio" name="pay" value="link"' + (CO.pay === 'link' ? ' checked' : '') + '><span><b>' + tr('Card payment link', 'رابط دفع بالبطاقة') + '</b><small>Visa · Mastercard · Apple Pay</small></span><span></span><p class="more">' + tr('After you complete your order, we confirm the fabric and fit with you, then send a secure card payment link by WhatsApp and email.', 'بعد إتمام الطلب، نؤكد معك القماش والمقاس، ثم نرسل لكِ رابط دفع آمنًا عبر واتساب والبريد الإلكتروني.') + '</p></label>' +
+        '<label id="codOpt"' + (CO.pay === 'cod' ? ' class="on"' : '') + '><input type="radio" name="pay" value="cod"' + (CO.pay === 'cod' ? ' checked' : '') + '><span><b>' + tr('Cash on delivery', 'الدفع عند الاستلام') + '</b><small>' + tr('UAE only', 'داخل الإمارات فقط') + '</small></span><span></span><p class="more">' + tr('Pay in cash or by card when your piece arrives.', 'ادفعي نقدًا أو بالبطاقة عند استلام القطعة.') + '</p></label></div></section>' +
       '<section class="co-sec"><h2>' + tr('Billing address', 'عنوان الفاتورة') + '</h2><div class="opts" id="billOpts">' +
         '<label' + (CO.bill === 'same' ? ' class="on"' : '') + '><input type="radio" name="bill" value="same"' + (CO.bill === 'same' ? ' checked' : '') + '><span><b style="font-weight:400">' + tr('Same as shipping address', 'نفس عنوان التوصيل') + '</b></span></label>' +
         '<label' + (CO.bill === 'diff' ? ' class="on"' : '') + '><input type="radio" name="bill" value="diff"' + (CO.bill === 'diff' ? ' checked' : '') + '><span><b style="font-weight:400">' + tr('Use a different billing address', 'عنوان فاتورة مختلف') + '</b></span></label></div>' +
-        '<div id="billBox" style="margin-top:14px"' + (CO.bill === 'diff' ? '' : ' hidden') + '>' + fl('b_name', tr('Full name', 'الاسم بالكامل'), 'text', '', 'autocomplete="billing name"') + fl('b_addr', tr('Address', 'العنوان'), 'text', '', 'autocomplete="billing street-address"') + fl('b_city', tr('City and country', 'المدينة والدولة'), 'text', '', 'autocomplete="billing address-level2"') + '</div></section>' +
+        '<div id="billBox" style="margin-top:14px"' + (CO.bill === 'diff' ? '' : ' hidden') + '>' + fl('b_name', tr('Full name', 'الاسم الكامل'), 'text', '', 'autocomplete="billing name"') + fl('b_addr', tr('Address', 'العنوان'), 'text', '', 'autocomplete="billing street-address"') + fl('b_city', tr('City and country', 'المدينة والدولة'), 'text', '', 'autocomplete="billing address-level2"') + '</div></section>' +
       '<div class="fl" data-f="note" style="margin-bottom:24px"><textarea id="f-note" name="note" rows="3" placeholder=" "></textarea><label for="f-note">' + tr('Notes for the atelier (optional)', 'ملاحظات للأتيليه (اختياري)') + '</label></div>' +
       '<p class="co-err" id="coErr" role="alert"></p>' +
-      '<div class="co-btn"><button class="btn" type="submit" id="coSubmit"><span>' + tr('Complete order', 'تأكيد الطلب') + '</span></button><a href="#s-all">' + tr('Return to shop', 'ارجعي للتسوّق') + '</a></div>' +
+      '<div class="co-btn"><button class="btn" type="submit" id="coSubmit"><span>' + tr('Complete order', 'إتمام الطلب') + '</span></button><a href="#s-all">' + tr('Return to shop', 'العودة إلى المتجر') + '</a></div>' +
     '</form>' +
     '<nav class="co-pol" aria-label="' + tr('Policies', 'السياسات') + '"><a href="#page-refund">' + tr('Refund policy', 'سياسة الاسترجاع') + '</a><a href="#page-shipping">' + tr('Shipping policy', 'سياسة الشحن') + '</a><a href="#page-privacy">' + tr('Privacy policy', 'سياسة الخصوصية') + '</a><a href="#page-terms">' + tr('Terms of service', 'الشروط والأحكام') + '</a></nav>';
   app.innerHTML = coShell(left, CART, sub, ship, sub + ship, true);
@@ -1440,7 +1484,7 @@ function coTotals(){
   var sub = cartSub(), sh = shipFor(CO.country, CO.method, sub), tot = sub + sh;
   $('coShip').textContent = sh ? money(sh) : tr('Free', 'مجاني');
   $('coTot').textContent = money(tot); $('coTotM').textContent = money(tot);
-  $('coTax').innerHTML = tr('Including ', 'شامل ') + '<span class="num">' + money(tot * 5 / 105) + '</span>' + tr(' in taxes', ' ضريبة');
+  $('coTax').innerHTML = tr('Including ', 'تشمل') + '<span class="num">' + money(tot * 5 / 105) + '</span>' + tr(' in taxes', ' ضريبة');
   var s1 = shipFor(CO.country, 'standard', sub), s2 = shipFor(CO.country, 'express', sub);
   $('shipStd').textContent = s1 ? money(s1) : tr('Free', 'مجاني'); $('shipExp').textContent = money(s2);
 }
@@ -1449,15 +1493,15 @@ function checkField(inp){
   var f = inp.closest('.fl'); if(!f) return true;
   var n = inp.name, v = String(inp.value || '').trim(), msg = '';
   var custom = CART.some(function(it){ return it.size === 'custom'; });
-  if(n === 'email') msg = !v ? tr('Enter an email', 'اكتبي الإيميل') : !EMAIL_RE.test(v) ? tr('Enter a valid email, like name@example.com', 'اكتبي إيميل صحيح، مثل name@example.com') : '';
-  else if(n === 'first') msg = !v ? tr('Enter a first name', 'اكتبي الاسم الأول') : '';
-  else if(n === 'last') msg = !v ? tr('Enter a last name', 'اكتبي اسم العائلة') : '';
-  else if(n === 'addr') msg = v.length < 4 ? tr('Enter an address', 'اكتبي العنوان') : '';
-  else if(n === 'city') msg = !v ? tr('Enter a city', 'اكتبي المدينة') : '';
-  else if(n === 'region' && inp.tagName === 'SELECT') msg = !v ? tr('Select an emirate', 'اختاري الإمارة') : '';
-  else if(n === 'phone') msg = v.replace(/\D/g, '').length < 7 ? tr('Enter a phone number we can reach you on', 'اكتبي رقم نقدر نتواصل وياج عليه') : '';
-  else if(/^m_(height|bust|waist|hips)$/.test(n) && custom) msg = !(+v > 0) ? tr('Needed for your custom fit', 'مطلوب عشان التفصيل على مقاسج') : '';
-  else if(/^b_/.test(n) && CO.bill === 'diff') msg = !v ? tr('Enter your billing details', 'اكتبي بيانات الفاتورة') : '';
+  if(n === 'email') msg = !v ? tr('Enter an email', 'يرجى إدخال البريد الإلكتروني') : !EMAIL_RE.test(v) ? tr('Enter a valid email, like name@example.com', 'يرجى إدخال بريد إلكتروني صحيح، مثل name@example.com') : '';
+  else if(n === 'first') msg = !v ? tr('Enter a first name', 'يرجى إدخال الاسم الأول') : '';
+  else if(n === 'last') msg = !v ? tr('Enter a last name', 'يرجى إدخال اسم العائلة') : '';
+  else if(n === 'addr') msg = v.length < 4 ? tr('Enter an address', 'يرجى إدخال العنوان') : '';
+  else if(n === 'city') msg = !v ? tr('Enter a city', 'يرجى إدخال المدينة') : '';
+  else if(n === 'region' && inp.tagName === 'SELECT') msg = !v ? tr('Select an emirate', 'يرجى اختيار الإمارة') : '';
+  else if(n === 'phone') msg = v.replace(/\D/g, '').length < 7 ? tr('Enter a phone number we can reach you on', 'يرجى إدخال رقم هاتف يمكننا التواصل معك عليه') : '';
+  else if(/^m_(height|bust|waist|hips)$/.test(n) && custom) msg = !(+v > 0) ? tr('Needed for your custom fit', 'مطلوب للتفصيل حسب مقاسك') : '';
+  else if(/^b_/.test(n) && CO.bill === 'diff') msg = !v ? tr('Enter your billing details', 'يرجى إدخال بيانات الفاتورة') : '';
   f.classList.toggle('bad', !!msg); var e = f.querySelector('.err'); if(e) e.textContent = msg;
   inp.setAttribute('aria-invalid', msg ? 'true' : 'false');
   return !msg;
@@ -1465,7 +1509,7 @@ function checkField(inp){
 function placeOrder(f){
   var ok = true, first = null;
   f.querySelectorAll('.fl input,.fl select').forEach(function(inp){ if(inp.closest('[hidden]')) return; if(!checkField(inp)){ ok = false; if(!first) first = inp; } });
-  if(!ok){ $('coErr').textContent = tr('Some details are missing. Check the highlighted fields.', 'في بيانات ناقصة. راجعي الخانات المحددة.'); first.focus(); first.scrollIntoView({block:'center', behavior:reduce ? 'auto' : 'smooth'}); return; }
+  if(!ok){ $('coErr').textContent = tr('Some details are missing. Check the highlighted fields.', 'بعض البيانات ناقصة. يرجى مراجعة الحقول المحددة.'); first.focus(); first.scrollIntoView({block:'center', behavior:reduce ? 'auto' : 'smooth'}); return; }
   $('coErr').textContent = '';
   var g = function(n){ var el = f.elements[n]; return el ? String(el.value || '').trim() : ''; };
   var custom = CART.some(function(it){ return it.size === 'custom'; }), meas = null;
@@ -1482,15 +1526,15 @@ function placeOrder(f){
     note:g('note'), measure:meas};
   var btn = $('coSubmit'), lab = btn.querySelector('span'), was = lab.textContent;
   if(pruneSold()){ viewCheckout(); return; }
-  btn.disabled = true; lab.textContent = tr('Placing your order…', 'قاعدين نسجّل طلبج…');
+  btn.disabled = true; lab.textContent = tr('Placing your order…', 'جارٍ تسجيل طلبك…');
   commitOrder(o).then(function(){ finishOrder(f, o, regionEl, meas); }, function(err){
     btn.disabled = false; lab.textContent = was;
     if(err && /permission|denied/i.test(err.code || err.message || '')){
       o.items.forEach(function(it){ var p = prod(it.code); if(p && p.one) SOLD[p.code] = 1; });
       fbLoadSold(); pruneSold(); viewCheckout();
-      if($('coErr')) $('coErr').textContent = tr('Someone claimed that piece a moment before you, so it was removed from your cart. Nothing was charged.', 'في حد حجز هالقطعة قبلج بلحظة، فانشالت من حقيبتج. وما انخصم أي مبلغ.');
+      if($('coErr')) $('coErr').textContent = tr('Someone claimed that piece a moment before you, so it was removed from your cart. Nothing was charged.', 'حُجزت هذه القطعة قبلك بلحظات، لذا أُزيلت من حقيبتك. لم يُخصم أي مبلغ.');
     } else {
-      $('coErr').textContent = tr('We could not reach our server. Check your connection and try again.', 'ما قدرنا نوصل للسيرفر. تأكدي من الإنترنت وجرّبي مرة ثانية.');
+      $('coErr').textContent = tr('We could not reach our server. Check your connection and try again.', 'تعذّر الاتصال بالخادم. تحققي من الإنترنت وحاولي مرة أخرى.');
     }
   });
 }
@@ -1505,19 +1549,19 @@ function finishOrder(f, o, regionEl, meas){
 }
 function viewOrder(id){
   var o = ORDERS.filter(function(x){ return x.id === id; })[0];
-  if(!o){ document.body.classList.remove('is-co'); app.innerHTML = '<header class="ph-head wrap"><h1 class="u-h1">' + tr('Order not found', 'الطلب مب موجود') + '</h1><div class="rte"><p>' + tr('This order was placed on another device or browser. Message us on Instagram with the order number and we will help.', 'هالطلب انسوى من جهاز أو متصفح ثاني. أرسلي لنا رقم الطلب في إنستغرام وبنساعدج.') + '</p></div></header><div class="empty"><a class="btn" href="#s-all">' + tr('Continue shopping', 'كمّلي التسوّق') + '</a></div>'; return; }
+  if(!o){ document.body.classList.remove('is-co'); app.innerHTML = '<header class="ph-head wrap"><h1 class="u-h1">' + tr('Order not found', 'الطلب غير موجود') + '</h1><div class="rte"><p>' + tr('This order was placed on another device or browser. Message us on Instagram with the order number and we will help.', 'تم هذا الطلب من جهاز أو متصفح آخر. أرسلي لنا رقم الطلب عبر إنستغرام وسنساعدك.') + '</p></div></header><div class="empty"><a class="btn" href="#s-all">' + tr('Continue shopping', 'متابعة التسوّق') + '</a></div>'; return; }
   var c = find(COUNTRIES, o.address.country) || COUNTRIES[0];
   var left =
-    '<div class="ty-h"><svg viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="25" cy="25" r="22"/><path d="M15 25.5l7 7 13-14"/></svg><div><small>' + tr('Order ', 'طلب ') + '<span dir="ltr">' + o.id + '</span></small><b>' + tr('Thank you, ', 'شكرًا ') + esc(o.contact.first || o.contact.name) + '!</b></div></div>' +
-    '<div class="box"><h3>' + tr('We have your order', 'طلبج وصلنا') + '</h3><p>' + tr('We will message you on WhatsApp within one working day to confirm the fabric and fit. Nothing is cut or charged until you agree.', 'بنتواصل وياج على الواتساب خلال يوم عمل عشان نأكد القماش والمقاس. ما في تفصيل ولا دفع قبل موافقتج.') + '</p></div>' +
+    '<div class="ty-h"><svg viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="25" cy="25" r="22"/><path d="M15 25.5l7 7 13-14"/></svg><div><small>' + tr('Order ', 'طلب ') + '<span dir="ltr">' + o.id + '</span></small><b>' + tr('Thank you, ', 'شكرًا لكِ،') + esc(o.contact.first || o.contact.name) + '!</b></div></div>' +
+    '<div class="box"><h3>' + tr('We have your order', 'استلمنا طلبك') + '</h3><p>' + tr('We will message you on WhatsApp within one working day to confirm the fabric and fit. Nothing is cut or charged until you agree.', 'سنتواصل معك عبر واتساب خلال يوم عمل لتأكيد القماش والمقاس. لا تفصيل ولا دفع قبل موافقتك.') + '</p></div>' +
     '<div class="box"><h3 style="margin-bottom:16px">' + tr('Order details', 'تفاصيل الطلب') + '</h3><div class="cols">' +
-      '<div><h4>' + tr('Contact information', 'بيانات التواصل') + '</h4><p dir="ltr" style="text-align:start">' + esc(o.contact.email) + '<br>' + esc(o.contact.phone) + '</p></div>' +
-      '<div><h4>' + tr('Payment method', 'طريقة الدفع') + '</h4><p>' + (o.pay === 'cod' ? tr('Cash on delivery', 'الدفع عند الاستلام') : tr('Card payment link, sent after confirmation', 'رابط دفع بالبطاقة عقب التأكيد')) + ' · <span class="num">' + money(o.total) + '</span></p></div>' +
-      '<div><h4>' + tr('Shipping address', 'عنوان التوصيل') + '</h4><p>' + esc(o.contact.name) + '<br>' + esc(o.address.line) + (o.address.apt ? ', ' + esc(o.address.apt) : '') + '<br>' + esc(o.address.city) + (o.address.region ? ', ' + esc(o.address.region) : '') + '<br>' + esc(t(c)) + '</p></div>' +
+      '<div><h4>' + tr('Contact information', 'معلومات الاتصال') + '</h4><p dir="ltr" style="text-align:start">' + esc(o.contact.email) + '<br>' + esc(o.contact.phone) + '</p></div>' +
+      '<div><h4>' + tr('Payment method', 'طريقة الدفع') + '</h4><p>' + (o.pay === 'cod' ? tr('Cash on delivery', 'الدفع عند الاستلام') : tr('Card payment link, sent after confirmation', 'رابط دفع بالبطاقة بعد التأكيد')) + ' · <span class="num">' + money(o.total) + '</span></p></div>' +
+      '<div><h4>' + tr('Shipping address', 'عنوان الشحن') + '</h4><p>' + esc(o.contact.name) + '<br>' + esc(o.address.line) + (o.address.apt ? ', ' + esc(o.address.apt) : '') + '<br>' + esc(o.address.city) + (o.address.region ? ', ' + esc(o.address.region) : '') + '<br>' + esc(t(c)) + '</p></div>' +
       '<div><h4>' + tr('Billing address', 'عنوان الفاتورة') + '</h4><p>' + (o.billing === 'same' ? tr('Same as shipping address', 'نفس عنوان التوصيل') : esc(o.billing.name) + '<br>' + esc(o.billing.line) + '<br>' + esc(o.billing.city)) + '</p></div>' +
-      '<div><h4>' + tr('Shipping method', 'طريقة الشحن') + '</h4><p>' + (o.method === 'express' ? tr('Express', 'سريع') : tr('Standard', 'عادي')) + '</p></div>' +
+      '<div><h4>' + tr('Shipping method', 'طريقة الشحن') + '</h4><p>' + (o.method === 'express' ? tr('Express', 'سريع') : tr('Standard', 'قياسي')) + '</p></div>' +
     '</div></div>' +
-    '<div class="co-btn" style="margin-top:20px"><p style="margin:0;font-size:14px">' + tr('Need help? ', 'تحتاجين مساعدة؟ ') + '<a href="https://www.instagram.com/_bynmh/" target="_blank" rel="noopener">' + tr('Contact us', 'تواصلي ويانا') + '</a></p><a class="btn" href="#s-all" style="text-decoration:none"><span>' + tr('Continue shopping', 'كمّلي التسوّق') + '</span></a></div>';
+    '<div class="co-btn" style="margin-top:20px"><p style="margin:0;font-size:14px">' + tr('Need help? ', 'هل تحتاجين مساعدة؟') + '<a href="https://www.instagram.com/_bynmh/" target="_blank" rel="noopener">' + tr('Contact us', 'تواصلي معنا') + '</a></p><a class="btn" href="#s-all" style="text-decoration:none"><span>' + tr('Continue shopping', 'متابعة التسوّق') + '</span></a></div>';
   app.innerHTML = coShell(left, o.items, o.sub, o.ship, o.total, false);
 }
 
@@ -1525,20 +1569,20 @@ function viewOrder(id){
 var PAGES = {
   how:{t:{en:'How ordering works',ar:'طريقة الطلب'}, b:{
     en:'<h2>1. Choose your piece</h2><p>Choose a dress or an abaya, then your size and length.</p><h2>2. Complete your order</h2><p>Check out with your contact and delivery details. Nothing is charged at this step.</p><h2>3. We confirm with you</h2><p>Within one working day we message you on WhatsApp to confirm the fabric and fit, and send a photo of the real fabric.</p><h2>4. Cut and delivered</h2><p>We cut your piece in Dubai and deliver it to your door. Pay by card link or, in the UAE, cash on delivery.</p>',
-    ar:'<h2>١. اختاري القطعة</h2><p>اختاري الفستان أو العباية، والمقاس والطول اللي يناسبونج.</p><h2>٢. كمّلي الطلب</h2><p>اكتبي بيانات التواصل والتوصيل. ما في أي دفع في هالخطوة.</p><h2>٣. نأكد وياج</h2><p>خلال يوم عمل نتواصل وياج على الواتساب عشان نأكد القماش والمقاس، ونرسل لج صورة القماش الأصلي.</p><h2>٤. التفصيل والتوصيل</h2><p>نفصّل القطعة في دبي ونوصلها لين باب بيتج. الدفع برابط بطاقة، أو كاش عند الاستلام داخل الإمارات.</p>'}},
+    ar:'<h2>١. اختاري القطعة</h2><p>اختاري الفستان أو العباية، والمقاس والطول المناسبين لكِ.</p><h2>٢. أتمّي الطلب</h2><p>أدخلي بيانات الاتصال والتوصيل. لا يوجد أي دفع في هذه الخطوة.</p><h2>٣. نؤكد معك</h2><p>خلال يوم عمل نتواصل معك عبر واتساب لتأكيد القماش والمقاس، ونرسل لكِ صورة القماش الفعلي.</p><h2>٤. التفصيل والتوصيل</h2><p>نفصّل القطعة في دبي ونوصلها إلى باب بيتك. الدفع عبر رابط بطاقة، أو نقدًا عند الاستلام داخل الإمارات.</p>'}},
   size:{t:{en:'Size guide',ar:'دليل المقاسات'}, b:null},
   shipping:{t:{en:'Shipping policy',ar:'سياسة الشحن'}, b:{
     en:'<p>Every piece is made to order in Dubai. Production time starts once we confirm your fabric and fit: [X] working days.</p><h2>United Arab Emirates</h2><p>Standard delivery 25 AED, free on orders over 500 AED. Express adds 40 AED.</p><h2>GCC</h2><p>60 AED. Express adds 40 AED.</p><h2>Rest of the world</h2><p>95 AED. Express adds 40 AED. Import duties, if any, are paid on arrival.</p>',
-    ar:'<p>كل قطعة تتفصّل حسب الطلب في دبي. مدة التفصيل تبدأ عقب ما نأكد القماش والمقاس: [X] يوم عمل.</p><h2>الإمارات</h2><p>التوصيل العادي ٢٥ درهم، ومجاني للطلبات فوق ٥٠٠ درهم. التوصيل السريع يزيد ٤٠ درهم.</p><h2>دول الخليج</h2><p>٦٠ درهم. التوصيل السريع يزيد ٤٠ درهم.</p><h2>باقي الدول</h2><p>٩٥ درهم. التوصيل السريع يزيد ٤٠ درهم. الجمارك، إن وُجدت، تندفع عند الاستلام.</p>'}},
+    ar:'<p>تُفصَّل كل قطعة حسب الطلب في دبي. تبدأ مدة التفصيل بعد تأكيد القماش والمقاس: [X] يوم عمل.</p><h2>الإمارات</h2><p>التوصيل القياسي ٢٥ د.إ، ومجاني للطلبات التي تتجاوز ٥٠٠ د.إ. يضاف ٤٠ د.إ للتوصيل السريع.</p><h2>دول الخليج</h2><p>٦٠ د.إ. يضاف ٤٠ د.إ للتوصيل السريع.</p><h2>باقي الدول</h2><p>٩٥ د.إ. يضاف ٤٠ د.إ للتوصيل السريع. تُدفع الرسوم الجمركية، إن وُجدت، عند الاستلام.</p>'}},
   refund:{t:{en:'Refund policy',ar:'سياسة الاسترجاع'}, b:{
     en:'<p>[Draft for NMH to confirm.]</p><p>Because each piece is cut for you in the size and length you choose, we cannot accept returns for a change of mind.</p><h2>Fit</h2><p>If a piece made in a standard size does not fit, message us within 3 days of delivery and we will alter it.</p><h2>Faults</h2><p>If your piece arrives damaged or not as ordered, message us within 3 days with photos and we will repair, remake or refund it.</p>',
-    ar:'<p>[مسودة تحتاج تأكيد من NMH.]</p><p>لأن كل قطعة تتفصّل لج بالمقاس والطول اللي اخترتينه، ما نقبل الاسترجاع إذا غيّرتي رايج.</p><h2>المقاس</h2><p>إذا كانت القطعة بمقاس عادي وما ضبطت عليج، تواصلي ويانا خلال ٣ أيام من الاستلام ونعدّلها لج.</p><h2>العيوب</h2><p>إذا وصلتج القطعة وفيها عيب أو مب مثل الطلب، أرسلي لنا صور خلال ٣ أيام ونصلّحها، أو نعيد تفصيلها، أو نرجّع لج المبلغ.</p>'}},
+    ar:'<p>[مسودة بانتظار تأكيد NMH.]</p><p>لأن كل قطعة تُفصَّل لكِ وفق المقاس والطول الذي اخترتِه، لا نقبل الاسترجاع في حال تغيير الرأي.</p><h2>المقاس</h2><p>إذا كانت القطعة بمقاس قياسي ولم تناسبك، تواصلي معنا خلال ٣ أيام من الاستلام وسنعدّلها لكِ.</p><h2>العيوب</h2><p>إذا وصلتك القطعة بعيب أو بخلاف ما طلبتِ، أرسلي لنا صورًا خلال ٣ أيام وسنصلحها أو نعيد تفصيلها أو نعيد لكِ المبلغ.</p>'}},
   privacy:{t:{en:'Privacy policy',ar:'سياسة الخصوصية'}, b:{
     en:'<p>[Draft for NMH to confirm.]</p><h2>What we collect</h2><p>When you order: your name, email, phone number, delivery address and, for custom pieces, your measurements. When you subscribe: your email.</p><h2>Why</h2><p>To make and deliver your order, contact you about it, and, if you agree, send news about new collections.</p><h2>Where it is kept</h2><p>Orders are stored securely with Google Firebase. We never sell your details. Card payments are handled by our payment provider; we never see your card number.</p><h2>Your choices</h2><p>To see, change or delete your details, or to unsubscribe, message us on Instagram @_bynmh.</p>',
-    ar:'<p>[مسودة تحتاج تأكيد من NMH.]</p><h2>شو نجمع</h2><p>لين تطلبين: اسمج وإيميلج ورقم موبايلج وعنوان التوصيل، ومقاساتج إذا كانت القطعة تفصيل. ولين تشتركين: إيميلج.</p><h2>ليش</h2><p>عشان نفصّل طلبج ونوصله لج ونتواصل وياج بخصوصه، وإذا وافقتي، نرسل لج جديد الكولكشنز.</p><h2>وين تنحفظ</h2><p>الطلبات محفوظة بأمان في Google Firebase. وما نبيع بياناتج أبدًا. الدفع بالبطاقة يتم عن طريق شركة الدفع، ونحن ما نشوف رقم البطاقة.</p><h2>اختياراتج</h2><p>إذا تبين تشوفين بياناتج أو تعدّلينها أو تمسحينها، أو تلغين الاشتراك، تواصلي ويانا في إنستغرام ‎@_bynmh.</p>'}},
+    ar:'<p>[مسودة بانتظار تأكيد NMH.]</p><h2>ما الذي نجمعه</h2><p>عند الطلب: اسمك وبريدك الإلكتروني ورقم هاتفك وعنوان التوصيل، ومقاساتك إن كانت القطعة تفصيلًا. وعند الاشتراك: بريدك الإلكتروني.</p><h2>لماذا</h2><p>لتفصيل طلبك وتوصيله والتواصل معك بشأنه، وإن وافقتِ، لنرسل لكِ آخر المجموعات.</p><h2>أين تُحفظ</h2><p>تُحفظ الطلبات بأمان في Google Firebase. لا نبيع بياناتك أبدًا. يتم الدفع بالبطاقة عبر شركة الدفع، ولا نطّلع على رقم بطاقتك.</p><h2>خياراتك</h2><p>لعرض بياناتك أو تعديلها أو حذفها، أو لإلغاء الاشتراك، تواصلي معنا عبر إنستغرام ‎@_bynmh.</p>'}},
   terms:{t:{en:'Terms of service',ar:'الشروط والأحكام'}, b:{
     en:'<p>[Draft for NMH to confirm.]</p><p>Prices are in UAE dirhams and include VAT. An order is accepted once we confirm the fabric and fit with you. Colours on screen can differ slightly from the real fabric; the fabric photo we send before cutting is the reference.</p>',
-    ar:'<p>[مسودة تحتاج تأكيد من NMH.]</p><p>الأسعار بالدرهم الإماراتي وشاملة الضريبة. الطلب يتأكد عقب ما نتفق وياج على القماش والمقاس. الألوان على الشاشة ممكن تختلف شوي عن القماش الأصلي، وصورة القماش اللي نرسلها قبل التفصيل هي المرجع.</p>'}}
+    ar:'<p>[مسودة بانتظار تأكيد NMH.]</p><p>الأسعار بالدرهم الإماراتي وشاملة الضريبة. يُعتمد الطلب بعد الاتفاق معك على القماش والمقاس. قد تختلف الألوان على الشاشة قليلًا عن القماش الفعلي، وصورة القماش التي نرسلها قبل التفصيل هي المرجع.</p>'}}
 };
 function viewPage(id){
   var pg = PAGES[id]; if(!pg){ location.hash = ''; return; }
@@ -1602,15 +1646,15 @@ function applyLang(){
   staticNodes.forEach(function(n){ n.innerHTML = n.getAttribute(L === 'ar' ? 'data-ar' : 'data-en'); });
   document.querySelectorAll('[data-ph-ar]').forEach(function(n){ if(!n.dataset.phEn) n.dataset.phEn = n.placeholder; n.placeholder = L === 'ar' ? n.dataset.phAr : n.dataset.phEn; });
   ['lang', 'sideLang', 'ftLang'].forEach(function(id){ var b = $(id); b.textContent = L === 'ar' ? 'English' : 'عربي'; b.lang = L === 'ar' ? 'en' : 'ar'; });
-  $('burger').setAttribute('aria-label', tr('Open menu', 'افتحي القائمة'));
+  $('burger').setAttribute('aria-label', tr('Open menu', 'فتح القائمة'));
   $('searchIco').setAttribute('aria-label', tr('Search', 'بحث'));
   applyThemeLabel(); renderMenus(); updateCount();
 }
-function applyTheme(){ document.documentElement.classList.toggle('dark', DARK); applyThemeLabel(); }
+function applyTheme(){ document.documentElement.classList.toggle('dark', DARK); var m = document.querySelector('meta[name=theme-color]'); if(m) m.content = DARK ? '#141312' : THEMES[TH]; applyThemeLabel(); }
 function applyThemeLabel(){ ['sideTheme', 'ftTheme'].forEach(function(id){ $(id).textContent = DARK ? tr('Light mode', 'الوضع الفاتح') : tr('Dark mode', 'الوضع الداكن'); }); }
 function rerender(){ var y = window.scrollY, fn = resolve(curKey || ''); if(!fn) return; fn(); afterRender(); headerState(); document.title = titleFor(curKey || ''); window.scrollTo(0, y); }
 function toggleLang(){ L = L === 'ar' ? 'en' : 'ar'; try{ localStorage.setItem('nmh-lang', L); }catch(e){} applyLang(); rerender(); if(drwOpen()) renderDrawer(); }
-function toggleTheme(){ DARK = !DARK; try{ localStorage.setItem('nmh-theme', DARK ? 'dark' : 'light'); }catch(e){} if(document.startViewTransition && !reduce) document.startViewTransition(applyTheme); else applyTheme(); }
+function toggleTheme(){ DARK = !DARK; THEME_PREF = DARK ? 'dark' : 'light'; try{ localStorage.setItem('nmh-theme', THEME_PREF); }catch(e){} if(document.startViewTransition && !reduce) document.startViewTransition(applyTheme); else applyTheme(); }
 function drwOpen(){ return $('drw').classList.contains('open'); }
 
 /* ================= events ================= */
@@ -1635,7 +1679,7 @@ document.addEventListener('click', function(e){
   if(id === 'sizeChart'){ openModal(sizeChartHTML()); return; }
   if(id === 'coToggle'){ CO.sumOpen = !CO.sumOpen; a.setAttribute('aria-expanded', String(CO.sumOpen)); $('coSum').classList.toggle('open', CO.sumOpen); return; }
   var v;
-  if((v = a.getAttribute('data-slide')) != null){ goSlide(+v); startSlides(); return; }
+  if((v = a.getAttribute('data-slide')) != null){ goSlide(+v); return; }
   if((v = a.getAttribute('data-st')) != null){ ST = +v; dyeTo('dyeSFlood', SHADES[ST].c); $('stSw').querySelectorAll('[data-st]').forEach(function(b){ b.setAttribute('aria-pressed', String(+b.getAttribute('data-st') === ST)); }); $('stName').textContent = t(SHADES[ST]); return; }
   if((v = a.getAttribute('data-sh')) != null && PP){ PP.shade = v === 'o' ? null : +v; paintPP(); return; }
   if((v = a.getAttribute('data-th')) != null && PP){ PP.img = +v; var fig = $('ppMedia').querySelectorAll('figure')[+v]; $('ppTh').querySelectorAll('button').forEach(function(b, i){ if(i === +v) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); }); if(fig) fig.scrollIntoView({behavior:reduce ? 'auto' : 'smooth', block:'start'}); return; }
@@ -1654,8 +1698,8 @@ document.addEventListener('submit', function(e){
   if(f.id === 'buy'){ e.preventDefault(); addToCart(); }
   if(f.id === 'coForm'){ e.preventDefault(); placeOrder(f); }
   if(f.id === 'srchForm'){ e.preventDefault(); runSearch($('srchIn').value); }
-  if(f.id === 'discForm'){ e.preventDefault(); var inp = $('f-disc'), fl2 = inp.closest('.fl'); if(!inp.value.trim()) return; fl2.classList.add('bad'); fl2.querySelector('.err').textContent = tr('Enter a valid discount code', 'اكتبي كود خصم صحيح'); }
-  if(f.id === 'newsForm'){ e.preventDefault(); var em = $('newsIn').value.trim(); if(!EMAIL_RE.test(em)){ $('newsOk').style.color = 'var(--err)'; $('newsOk').textContent = tr('Enter a valid email.', 'اكتبي إيميل صحيح.'); $('newsIn').focus(); return; } subscribe(em, 'footer'); $('newsOk').style.color = ''; $('newsOk').textContent = tr('Thanks for subscribing.', 'شكرًا على اشتراكج.'); $('newsIn').value = ''; }
+  if(f.id === 'discForm'){ e.preventDefault(); var inp = $('f-disc'), fl2 = inp.closest('.fl'); if(!inp.value.trim()) return; fl2.classList.add('bad'); fl2.querySelector('.err').textContent = tr('Enter a valid discount code', 'يرجى إدخال رمز خصم صحيح'); }
+  if(f.id === 'newsForm'){ e.preventDefault(); var em = $('newsIn').value.trim(); if(!EMAIL_RE.test(em)){ $('newsOk').style.color = 'var(--err)'; $('newsOk').textContent = tr('Enter a valid email.', 'يرجى إدخال بريد إلكتروني صحيح.'); $('newsIn').focus(); return; } subscribe(em, 'footer'); $('newsOk').style.color = ''; $('newsOk').textContent = tr('Thanks for subscribing.', 'شكرًا لاشتراكك.'); $('newsIn').value = ''; }
 });
 document.addEventListener('change', function(e){
   var el = e.target;

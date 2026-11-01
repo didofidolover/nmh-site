@@ -204,6 +204,33 @@ dialog .r{display:flex;justify-content:flex-end;gap:8px}
   .tbl td[style*="text-align:end"]{text-align:start!important}
   .tbl .det{margin-top:-14px;border-top:0;border-radius:0 0 8px 8px}
 }
+
+.lnk{background:none;border:0;padding:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit}
+.hlist{display:grid;gap:16px;max-width:1100px}
+.hcard{grid-template-columns:minmax(0,380px) minmax(0,1fr);align-items:start}
+.hprev{position:relative;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:#222}
+.hprev img,.hprev video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hov{position:absolute;inset:auto 0 0 0;padding:14px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.55));display:grid;gap:3px;font-family:var(--head);text-transform:uppercase;letter-spacing:.14em}
+.hov small{font-size:9px}.hov b{font-weight:500;font-size:14px}.hov u{font-size:9px;margin-top:4px}
+.hnum{position:absolute;top:10px;left:10px}
+.hbody{display:grid;gap:12px;min-width:0}
+.hact{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:820px){.hcard{grid-template-columns:1fr}.g2{grid-template-columns:1fr}}
+
+.themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.th{display:grid;align-content:start;gap:6px;text-align:start;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);cursor:pointer;transition:border-color .2s,box-shadow .2s;font:inherit;color:inherit}
+.th:hover{border-color:var(--line-2)}
+.th.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.th:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.th-mock{position:relative;display:block;height:120px;border:1px solid;border-radius:5px;overflow:hidden}
+.th-mock i{position:absolute;inset:0 0 auto;height:20px;border-bottom:1px solid;display:flex;align-items:center;justify-content:center;font-style:normal}
+.th-mock i b{font:600 8px var(--head);letter-spacing:.25em}
+.th-mock em{position:absolute;top:20px;left:0;right:0;height:46px;opacity:.9}
+.th-mock span{position:absolute;left:8px;right:8px;bottom:26px;display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.th-mock u{display:block;height:18px;border-radius:2px;text-decoration:none}
+.th-mock s{position:absolute;left:8px;bottom:7px;padding:2px 8px;border-radius:2px;font:600 7px/1.4 var(--head);letter-spacing:.15em;text-transform:uppercase;text-decoration:none}
+.th-n{font:600 12px var(--head);letter-spacing:.1em;text-transform:uppercase;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.th-d{font-size:12.5px;color:var(--muted);line-height:1.45}
 </style>
 </head>
 <body>
@@ -250,15 +277,15 @@ function fdate(ts){ try{ return new Date(ts).toLocaleString('en-GB', {day:'numer
 
 /* ================= catalogue data (same source as the shop) ================= */
 var STYLES = [
-  {id:'all', en:'All', ar:'الكل'}, {id:'evening', en:'Evening', ar:'سهرة'}, {id:'everyday', en:'Everyday', ar:'يومي'},
+  {id:'all', en:'All', ar:'الكل'}, {id:'evening', en:'Evening', ar:'السهرة'}, {id:'everyday', en:'Everyday', ar:'يومي'},
   {id:'abaya', en:'Under-abaya', ar:'تحت العباية'}, {id:'jumpsuit', en:'Jumpsuits', ar:'جمبسوت'}
 ];
 var STYLE_INFO = {
-  all:{title:{en:'All pieces',ar:'كل القطع'}, intro:{en:'Every piece we make, across every collection. Each one is cut to order in your size and length.',ar:'كل قطعنا من كل الكولكشنز. كل قطعة تتفصّل حسب الطلب على مقاسج وطولج.'}, imgs:['img/bloom-1.jpg','img/front-olive.webp','img/n04.jpg']},
-  evening:{title:{en:'Evening',ar:'سهرة'}, intro:{en:'Full skirts, long sleeves and prints that hold the light. Dresses for weddings, Eid and the evenings you plan for.',ar:'تنانير واسعة، أكمام طويلة وطبعات تلمع مع الضوء. فساتين للأعراس والعيد والسهرات اللي تستعدين لها.'}, imgs:['img/desert-1.jpg','img/front-dew.webp','img/rose-wall.jpg']},
-  everyday:{title:{en:'Everyday',ar:'يومي'}, intro:{en:'Easy shapes in calm colours, for work, errands and long days out.',ar:'قصّات مريحة بألوان هادية، للدوام والمشاوير والأيام الطويلة برّا البيت.'}, imgs:['img/n07.jpg','img/front-azure.webp','img/n01.jpg']},
-  abaya:{title:{en:'Under-abaya',ar:'تحت العباية'}, intro:{en:'Simple, light layers cut to sit cleanly under your abaya.',ar:'طبقات بسيطة وخفيفة متفصّلة عشان تيي مضبوطة تحت العباية.'}, imgs:['img/navy.jpg','img/n04.jpg','img/n09.jpg']},
-  jumpsuit:{title:{en:'Jumpsuits',ar:'جمبسوت'}, intro:{en:'One piece, belted and ready. Modest cover with the ease of trousers.',ar:'قطعة وحدة بحزام وجاهزة. محتشمة ومريحة مثل البنطلون.'}, imgs:['img/n06.jpg','img/n07.jpg','img/n01.jpg']}
+  all:{title:{en:'All pieces',ar:'جميع المنتجات'}, intro:{en:'Every piece we make, across every collection. Each one is cut to order in your size and length.',ar:'جميع قطعنا من كل المجموعات. تُفصَّل كل قطعة حسب الطلب وفق مقاسك وطولك.'}, imgs:['img/bloom-1.jpg','img/front-olive.webp','img/n04.jpg']},
+  evening:{title:{en:'Evening',ar:'السهرة'}, intro:{en:'Full skirts, long sleeves and prints that hold the light. Dresses for weddings, Eid and the evenings you plan for.',ar:'تنانير واسعة، وأكمام طويلة، وطبعات تلتقط الضوء. فساتين للأعراس والأعياد والأمسيات المنتظرة.'}, imgs:['img/desert-1.jpg','img/front-dew.webp','img/rose-wall.jpg']},
+  everyday:{title:{en:'Everyday',ar:'يومي'}, intro:{en:'Easy shapes in calm colours, for work, errands and long days out.',ar:'قصّات مريحة بألوان هادئة، للعمل والمشاوير والأيام الطويلة.'}, imgs:['img/n07.jpg','img/front-azure.webp','img/n01.jpg']},
+  abaya:{title:{en:'Under-abaya',ar:'تحت العباية'}, intro:{en:'Simple, light layers cut to sit cleanly under your abaya.',ar:'طبقات بسيطة وخفيفة، مفصّلة لتنسدل بانسيابية تحت العباية.'}, imgs:['img/navy.jpg','img/n04.jpg','img/n09.jpg']},
+  jumpsuit:{title:{en:'Jumpsuits',ar:'جمبسوت'}, intro:{en:'One piece, belted and ready. Modest cover with the ease of trousers.',ar:'قطعة واحدة بحزام. محتشمة ومريحة كالبنطال.'}, imgs:['img/n06.jpg','img/n07.jpg','img/n01.jpg']}
 };
 var SHADES = [
   {c:'#8A4A47', en:'Rosewood', ar:'خشب الورد'}, {c:'#24304F', en:'Midnight', ar:'كحلي ليلي'}, {c:'#C9A98A', en:'Sand', ar:'رملي'},
@@ -272,132 +299,142 @@ var DYES = {
 var COLLECTIONS = [
   { id:'bloom', season:{en:'Spring/Summer 2026',ar:'ربيع وصيف ٢٠٢٦'}, cover:'img/bloom-1.jpg', small:'img/bloom-4.jpg', tone:'#E6CFC6',
     name:{en:'Femininity in Bloom',ar:'أنوثة تنبض بالأناقة'},
-    story:{en:'A celebration of floral artistry and graceful silhouettes. Rich botanical prints meet fluid pleats, for a look that feels effortless and timeless.',ar:'احتفال بفن الزهور والقصّات الانسيابية. طبعات نباتية غنية تلتقي بالكسرات الناعمة، لإطلالة بسيطة وخالدة.'},
-    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Botanical, soft',ar:'نباتي وناعم'}},{k:{en:'Signature',ar:'التوقيع'},v:{en:'Knife pleats',ar:'كسرات دقيقة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Location',ar:'مكان التصوير'},v:{en:'Rose courtyard',ar:'فناء وردي'}}],
+    story:{en:'A celebration of floral artistry and graceful silhouettes. Rich botanical prints meet fluid pleats, for a look that feels effortless and timeless.',ar:'احتفاء بفن الزهور والقصّات الانسيابية. طبعات نباتية غنية تلتقي بطيّات ناعمة، لإطلالة بسيطة وخالدة.'},
+    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Botanical, soft',ar:'نباتي وناعم'}},{k:{en:'Signature',ar:'توقيع الدار'},v:{en:'Knife pleats',ar:'كسرات دقيقة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Location',ar:'مكان التصوير'},v:{en:'Rose courtyard',ar:'فناء وردي'}}],
     album:['img/bloom-1.jpg','img/bloom-4.jpg','img/front-dew.webp','img/bloom-2.jpg','img/front-magnolia.webp','img/bloom-5.jpg','img/bloom-3.jpg','img/rk-dew-back.webp','img/side-magnolia.webp'] },
   { id:'desert', season:{en:'Spring/Summer 2026',ar:'ربيع وصيف ٢٠٢٦'}, cover:'img/desert-1.jpg', small:'img/desert-3.jpg', tone:'#E3C9BB',
     name:{en:'Timeless Desert Elegance',ar:'أناقة الصحراء الخالدة'},
-    story:{en:'Inspired by the light of the dunes at golden hour. Full skirts that sweep the stone, long sleeves and a quiet, sculpted waist.',ar:'مستوحاة من ضوء الكثبان وقت الغروب. تنانير واسعة تلامس الحجر، أكمام طويلة وخصر منحوت بهدوء.'},
-    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Sunlit, sculptural',ar:'مشمس ومنحوت'}},{k:{en:'Signature',ar:'التوقيع'},v:{en:'Full circle skirt',ar:'تنورة دائرية كاملة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Location',ar:'مكان التصوير'},v:{en:'Stone courtyard',ar:'فناء حجري'}}],
+    story:{en:'Inspired by the light of the dunes at golden hour. Full skirts that sweep the stone, long sleeves and a quiet, sculpted waist.',ar:'مستوحاة من ضوء الكثبان عند الغروب. تنانير واسعة تلامس الحجر، وأكمام طويلة، وخصر منحوت بهدوء.'},
+    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Sunlit, sculptural',ar:'مشمس ومنحوت'}},{k:{en:'Signature',ar:'توقيع الدار'},v:{en:'Full circle skirt',ar:'تنورة دائرية كاملة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Location',ar:'مكان التصوير'},v:{en:'Stone courtyard',ar:'فناء حجري'}}],
     album:['img/desert-1.jpg','img/front-sienna.webp','img/desert-3.jpg','img/rose-wall.jpg','img/side-sienna.webp','img/desert-2.jpg','img/rk-rose-back.webp'] },
   { id:'drape', season:{en:'Autumn/Winter 2026',ar:'خريف وشتاء ٢٠٢٦'}, cut:['img/front-azure.webp','img/front-olive.webp'], tone:'#DCD8D2',
     name:{en:'The Drape Edit',ar:'كولكشن الطيّات'},
-    story:{en:'Solid crepe in quiet colours, shaped by one gesture: a fold of fabric that falls from the waist and moves when you walk.',ar:'كريب سادة بألوان هادية، تشكّله حركة وحدة: طيّة قماش تنزل من الخصر وتتحرك مع كل خطوة.'},
-    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Sculpted, calm',ar:'منحوت وهادي'}},{k:{en:'Signature',ar:'التوقيع'},v:{en:'Waterfall drape',ar:'طيّة منسدلة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Colours',ar:'الألوان'},v:{en:'Calm, solid shades',ar:'ألوان هادية'}}],
+    story:{en:'Solid crepe in quiet colours, shaped by one gesture: a fold of fabric that falls from the waist and moves when you walk.',ar:'كريب سادة بألوان هادئة، تشكّله حركة واحدة: طيّة قماش تنسدل من الخصر وتتحرك مع كل خطوة.'},
+    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Sculpted, calm',ar:'منحوت وهادي'}},{k:{en:'Signature',ar:'توقيع الدار'},v:{en:'Waterfall drape',ar:'طيّة منسدلة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Colours',ar:'الألوان'},v:{en:'Calm, solid shades',ar:'ألوان هادئة'}}],
     album:['img/front-azure.webp','img/side-azure.webp','img/rk-azure-back.webp','img/front-olive.webp','img/side-olive.webp','img/rk-olive-back.webp'] },
   { id:'essentials', season:{en:'The archive',ar:'الأرشيف'}, cover:'img/n04.jpg', small:'img/n07.jpg', tone:'#DDDBD8',
     name:{en:'Everyday Essentials',ar:'أساسيات كل يوم'},
-    story:{en:'The pieces that started NMH: easy dresses, an under-abaya slip and a belted jumpsuit.',ar:'القطع اللي بدت فيها NMH: فساتين مريحة، فستان تحت العباية، وجمبسوت بحزام.'},
-    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Calm, versatile',ar:'هادي ومتعدد'}},{k:{en:'Pieces',ar:'القطع'},v:{en:'Six designs',ar:'٦ تصميمات'}},{k:{en:'Colours',ar:'الألوان'},v:{en:'Calm, versatile shades',ar:'ألوان هادية'}},{k:{en:'Location',ar:'مكان التصوير'},v:{en:'Studio',ar:'استوديو'}}],
+    story:{en:'The pieces that started NMH: easy dresses, an under-abaya slip and a belted jumpsuit.',ar:'القطع التي بدأت بها NMH: فساتين مريحة، وفستان لما تحت العباية، وجمبسوت بحزام.'},
+    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Calm, versatile',ar:'هادئ ومتعدد'}},{k:{en:'Pieces',ar:'القطع'},v:{en:'Six designs',ar:'٦ تصميمات'}},{k:{en:'Colours',ar:'الألوان'},v:{en:'Calm, versatile shades',ar:'ألوان هادئة'}},{k:{en:'Location',ar:'مكان التصوير'},v:{en:'Studio',ar:'استوديو'}}],
     album:['img/n07.jpg','img/n04.jpg','img/n01.jpg','img/navy.jpg','img/n09.jpg','img/n06.jpg'] }
 ];
 var PRODUCTS = [
   {code:'B01', col:'bloom', style:'evening', tone:'#E6CFC6', price:520, name:{en:'Layla Pleated Maxi',ar:'فستان ليلى المكسّر'}, imgs:['img/bloom-1.jpg','img/bloom-2.jpg','img/bloom-3.jpg','img/bloom-5.jpg'],
-    desc:{en:'Long-sleeve floral maxi with fine knife pleats from the yoke down and a softly gathered waist.',ar:'فستان طويل بطبعة زهور وأكمام طويلة، بكسرات دقيقة من الصدر لين تحت وخصر ناعم.'},
-    story:{en:'Drawn for the hour after sunset, when the courtyard walls turn rose. Fine pleats fall from the yoke and open like a fan with every step.',ar:'تصمّم لساعة ما بعد الغروب، لين تتلوّن حيطان الفناء بالوردي. كسرات دقيقة تنزل من الصدر وتنفتح مثل المروحة مع كل خطوة.'}},
+    desc:{en:'Long-sleeve floral maxi with fine knife pleats from the yoke down and a softly gathered waist.',ar:'فستان طويل بطبعة زهور وأكمام طويلة، بطيّات دقيقة من الصدر إلى الأسفل وخصر ناعم.'},
+    story:{en:'Drawn for the hour after sunset, when the courtyard walls turn rose. Fine pleats fall from the yoke and open like a fan with every step.',ar:'صُمّم لساعة ما بعد الغروب، حين تتلوّن جدران الفناء بالوردي. طيّات دقيقة تنسدل من الصدر وتتفتح كالمروحة مع كل خطوة.'}},
   {code:'D01', col:'desert', style:'evening', tone:'#EAD9D3', price:560, name:{en:'Noor Circle Maxi',ar:'فستان نور الدائري'}, imgs:['img/front-rose.webp','img/side-rose.webp','img/rk-rose-back.webp','img/desert-1.jpg','img/desert-3.jpg','img/desert-2.jpg'],
-    desc:{en:'Fitted floral bodice, long cuffed sleeves and a full circle skirt that sweeps the floor.',ar:'صدر محدد بطبعة زهور، أكمام طويلة بأساور، وتنورة دائرية واسعة تلامس الأرض.'},
-    story:{en:'Noor means light. A fitted floral bodice gives way to a full circle skirt that catches the late sun and sweeps the stone floor.',ar:'نور يعني ضوء. صدر محدد بطبعة زهور يكمّل بتنورة دائرية كاملة تلقط ضوء الشمس وتلامس أرضية الحجر.'}},
+    desc:{en:'Fitted floral bodice, long cuffed sleeves and a full circle skirt that sweeps the floor.',ar:'صدر محدد بطبعة زهور، وأكمام طويلة بأساور، وتنورة دائرية واسعة تلامس الأرض.'},
+    story:{en:'Noor means light. A fitted floral bodice gives way to a full circle skirt that catches the late sun and sweeps the stone floor.',ar:'نور تعني الضوء. صدر محدد بطبعة زهور يكتمل بتنورة دائرية كاملة تلتقط ضوء الشمس وتلامس أرض الحجر.'}},
   {code:'D02', col:'desert', style:'evening', tone:'#E3C9BB', price:480, name:{en:'Rose Wall Gathered Maxi',ar:'فستان روز المجمّع'}, imgs:['img/rose-wall.jpg','img/desert-4.jpg'],
-    desc:{en:'Floral maxi with a gathered waist and long sleeves, cut to move.',ar:'فستان طويل بطبعة زهور، بخصر مجمّع وأكمام طويلة، متفصّل عشان يتحرك وياج.'},
-    story:{en:'Made for long evenings outdoors. A gathered waist and soft sleeves keep it easy, while the print does the talking.',ar:'مسوّى للسهرات الطويلة برّا. خصر مجمّع وأكمام ناعمة تخلّيه مريح، والطبعة هي اللي تتكلم.'}},
+    desc:{en:'Floral maxi with a gathered waist and long sleeves, cut to move.',ar:'فستان طويل بطبعة زهور، بخصر مجمّع وأكمام طويلة، مفصّل ليتحرك معك.'},
+    story:{en:'Made for long evenings outdoors. A gathered waist and soft sleeves keep it easy, while the print does the talking.',ar:'صُنع للأمسيات الطويلة في الهواء الطلق. خصر مجمّع وأكمام ناعمة تمنحه الراحة، والطبعة تتحدث عنه.'}},
   {code:'D03', col:'desert', style:'evening', tone:'#EBD8CC', price:540, name:{en:'Sienna Leaf Maxi',ar:'فستان سيينا'}, imgs:['img/front-sienna.webp','img/side-sienna.webp','img/rk-sienna-back.webp'],
-    desc:{en:'Painterly terracotta leaf print on a fitted bodice with a full pleated skirt and cuffed long sleeves.',ar:'طبعة أوراق بلون التراكوتا على صدر محدد وتنورة واسعة بكسرات وأكمام طويلة بأساور.'},
-    story:{en:'A painterly leaf print in terracotta and cream, inspired by desert stone at golden hour. The skirt is full enough to turn in.',ar:'طبعة أوراق كأنها مرسومة بالفرشاة بلون التراكوتا والكريمي، مستوحاة من حجر الصحراء وقت الغروب. التنورة واسعة بما يكفي إنج تدورين فيها.'}},
+    desc:{en:'Painterly terracotta leaf print on a fitted bodice with a full pleated skirt and cuffed long sleeves.',ar:'طبعة أوراق بلون التيراكوتا على صدر محدد، وتنورة واسعة بطيّات، وأكمام طويلة بأساور.'},
+    story:{en:'A painterly leaf print in terracotta and cream, inspired by desert stone at golden hour. The skirt is full enough to turn in.',ar:'طبعة أوراق كأنها مرسومة بالفرشاة بلون التيراكوتا والكريمي، مستوحاة من حجر الصحراء عند الغروب. التنورة واسعة بما يكفي لتدوري بها.'}},
   {code:'B02', col:'bloom', style:'evening', tone:'#DCE2E6', price:520, name:{en:'Dew Blossom Maxi',ar:'فستان ندى'}, imgs:['img/front-dew.webp','img/side-dew.webp','img/rk-dew-back.webp'],
-    desc:{en:'Dusty-blue ground with ivory blossoms, a softly gathered waist and a floor-sweeping skirt.',ar:'أرضية زرقاء هادية بزهور عاجية، خصر مجمّع بنعومة وتنورة طويلة للأرض.'},
-    story:{en:'Ivory blossoms on a dusty-blue ground, like morning dew on a garden wall. Quiet enough for daytime, full enough for an occasion.',ar:'زهور عاجية على أرضية زرقاء هادية، مثل ندى الصبح على سور حديقة. هادي بما يكفي للنهار، وفخم بما يكفي للمناسبات.'}},
+    desc:{en:'Dusty-blue ground with ivory blossoms, a softly gathered waist and a floor-sweeping skirt.',ar:'أرضية زرقاء هادئة بزهور عاجية، وخصر مجمّع بنعومة، وتنورة طويلة تصل إلى الأرض.'},
+    story:{en:'Ivory blossoms on a dusty-blue ground, like morning dew on a garden wall. Quiet enough for daytime, full enough for an occasion.',ar:'زهور عاجية على أرضية زرقاء هادئة، كندى الصباح على سور حديقة. هادئ بما يكفي للنهار، وفاخر بما يكفي للمناسبات.'}},
   {code:'B03', col:'bloom', style:'evening', tone:'#E4E3D6', price:520, name:{en:'Magnolia Maxi',ar:'فستان ماغنوليا'}, imgs:['img/front-magnolia.webp','img/side-magnolia.webp','img/rk-magnolia-back.webp'],
-    desc:{en:'Cream magnolias and sage leaves on a long-sleeve maxi with a fitted bodice and full skirt.',ar:'زهور ماغنوليا كريمي وأوراق سيج على فستان طويل بصدر محدد وتنورة واسعة.'},
-    story:{en:'Cream magnolias and sage leaves, cut into a long-sleeve maxi with a fitted bodice. A garden dress for a formal day.',ar:'زهور ماغنوليا كريمي وأوراق سيج على فستان طويل بأكمام وصدر محدد. فستان حديقة ليوم رسمي.'}},
+    desc:{en:'Cream magnolias and sage leaves on a long-sleeve maxi with a fitted bodice and full skirt.',ar:'زهور ماغنوليا كريمية وأوراق بلون المريمية على فستان طويل بصدر محدد وتنورة واسعة.'},
+    story:{en:'Cream magnolias and sage leaves, cut into a long-sleeve maxi with a fitted bodice. A garden dress for a formal day.',ar:'زهور ماغنوليا كريمية وأوراق بلون المريمية على فستان طويل بأكمام وصدر محدد. فستان حديقة ليوم رسمي.'}},
   {code:'S01', col:'drape', style:'everyday', tone:'#DCE0E6', price:460, dye:'azure', name:{en:'Azure Cascade Midi',ar:'فستان أزور'}, imgs:['img/front-azure.webp','img/side-azure.webp','img/rk-azure-back.webp'],
-    desc:{en:'Steel-blue crepe with bishop sleeves, a tied sash and a cascading side drape.',ar:'كريب أزرق رصاصي بأكمام منفوخة، حزام معقود وطيّة جانبية متدرجة.'},
-    story:{en:'One gesture shapes this dress: a sash tied at the waist that falls into a cascade.',ar:'حركة وحدة تشكّل هالفستان: حزام معقود على الخصر ينزل بطيّات متدرجة.'}},
+    desc:{en:'Steel-blue crepe with bishop sleeves, a tied sash and a cascading side drape.',ar:'كريب أزرق رمادي بأكمام منفوخة، وحزام معقود، وطيّة جانبية متدرجة.'},
+    story:{en:'One gesture shapes this dress: a sash tied at the waist that falls into a cascade.',ar:'حركة واحدة تشكّل هذا الفستان: حزام معقود على الخصر ينسدل بطيّات متدرجة.'}},
   {code:'S02', col:'drape', style:'evening', tone:'#E2E0D4', price:590, dye:'olive', name:{en:'Olive Drape Gown',ar:'فستان أوليف درايب'}, imgs:['img/front-olive.webp','img/side-olive.webp','img/rk-olive-back.webp'],
-    desc:{en:'Olive crepe gown with a wrapped bodice, flutter sleeves and a long waterfall drape.',ar:'فستان كريب زيتوني بصدر ملفوف، أكمام متموجة وطيّة طويلة منسدلة.'},
-    story:{en:'A wrapped bodice and a long waterfall drape that moves when you walk.',ar:'صدر ملفوف وطيّة طويلة منسدلة تتحرك مع خطوتج.'}},
+    desc:{en:'Olive crepe gown with a wrapped bodice, flutter sleeves and a long waterfall drape.',ar:'فستان من الكريب الزيتوني بصدر ملفوف، وأكمام متموجة، وطيّة طويلة منسدلة.'},
+    story:{en:'A wrapped bodice and a long waterfall drape that moves when you walk.',ar:'صدر ملفوف وطيّة طويلة منسدلة تتحرك مع خطواتك.'}},
   {code:'N07', col:'essentials', style:'everyday', price:350, name:{en:'Sage Tier Dress',ar:'فستان سيج'}, imgs:['img/n07.jpg'],
     desc:{en:'Relaxed midi with an asymmetric gathered tier and elasticated cuffs.',ar:'فستان ميدي مريح بطبقة مجمّعة غير متماثلة وأساور مطاطية.'},
-    story:{en:'An easy midi for everyday, with an asymmetric tier that adds movement without fuss.',ar:'فستان ميدي مريح لكل يوم، بطبقة غير متماثلة تعطيه حركة بدون تعقيد.'}},
+    story:{en:'An easy midi for everyday, with an asymmetric tier that adds movement without fuss.',ar:'فستان ميدي مريح لكل يوم، بطبقة غير متماثلة تمنحه حركة دون تكلّف.'}},
   {code:'N04', col:'essentials', style:'everyday', price:379, name:{en:'Mist Cascade Dress',ar:'فستان ميست'}, imgs:['img/n04.jpg'],
-    desc:{en:'Linen-look dress with pleated flutter sleeves and a cascading asymmetric hem.',ar:'فستان بملمس الكتان بأكمام مكسّرة وذيل متدرج غير متماثل.'},
-    story:{en:'Soft as morning haze: pleated flutter sleeves and a hem that cascades from one side to the other.',ar:'ناعم مثل ضباب الصبح: أكمام مكسّرة وذيل ينزل متدرج من جنب للثاني.'}},
+    desc:{en:'Linen-look dress with pleated flutter sleeves and a cascading asymmetric hem.',ar:'فستان بملمس الكتان، بأكمام مطوية وذيل متدرج غير متماثل.'},
+    story:{en:'Soft as morning haze: pleated flutter sleeves and a hem that cascades from one side to the other.',ar:'ناعم كضباب الصباح: أكمام مطوية وذيل ينسدل متدرجًا من جانب إلى آخر.'}},
   {code:'N01', col:'essentials', style:'everyday', price:370, name:{en:'Rose Quartz Set Dress',ar:'فستان روز كوارتز'}, imgs:['img/n01.jpg'],
     desc:{en:'Stand-collar blouse top with a soft draped waist over a straight midi skirt.',ar:'جزء علوي بياقة واقفة وخصر منسدل، مع تنورة ميدي مستقيمة.'},
-    story:{en:'A two-piece look in one dress: a stand-collar blouse with a draped waist over a straight midi skirt.',ar:'إطلالة قطعتين في فستان واحد: بلوزة بياقة واقفة وخصر منسدل فوق تنورة ميدي مستقيمة.'}},
+    story:{en:'A two-piece look in one dress: a stand-collar blouse with a draped waist over a straight midi skirt.',ar:'إطلالة من قطعتين في فستان واحد: بلوزة بياقة واقفة وخصر منسدل فوق تنورة ميدي مستقيمة.'}},
   {code:'N09', col:'essentials', style:'everyday', price:299, name:{en:'Olive Pleat Panel',ar:'فستان أوليف'}, imgs:['img/n09.jpg'],
-    desc:{en:'Satin midi with a pleated contrast panel, button side detail and flutter sleeves.',ar:'فستان ساتان بقطعة مكسّرة بلون مختلف، وأزرار جانبية وأكمام قصيرة.'},
-    story:{en:'Satin with a pleated contrast panel that shows when you move, finished with buttons at the side.',ar:'ساتان بقطعة مكسّرة بلون مختلف تبان لين تتحركين، وأزرار على الجنب.'}},
+    desc:{en:'Satin midi with a pleated contrast panel, button side detail and flutter sleeves.',ar:'فستان ساتان بلوحة مطوية بلون مختلف، وأزرار جانبية، وأكمام قصيرة.'},
+    story:{en:'Satin with a pleated contrast panel that shows when you move, finished with buttons at the side.',ar:'ساتان بلوحة مطوية بلون مختلف تظهر مع حركتك، وأزرار على الجانب.'}},
   {code:'N08', col:'essentials', style:'abaya', price:260, name:{en:'Midnight Under-Abaya',ar:'فستان ميدنايت تحت العباية'}, imgs:['img/navy.jpg'],
-    desc:{en:'A simple long-sleeve slip with a stand collar and a clean A-line, made to sit under an abaya.',ar:'فستان بسيط بأكمام طويلة وياقة واقفة وقصّة A، مسوّى عشان ينلبس تحت العباية.'},
-    story:{en:'The dress you reach for under your abaya: long sleeves, a stand collar and a clean A-line that sits quietly underneath.',ar:'الفستان اللي تلبسينه تحت العباية: أكمام طويلة، ياقة واقفة وقصّة A مرتبة تيي بهدوء تحتها.'}},
+    desc:{en:'A simple long-sleeve slip with a stand collar and a clean A-line, made to sit under an abaya.',ar:'فستان بسيط بأكمام طويلة وياقة واقفة وقصّة A، صُمّم ليُلبس تحت العباية.'},
+    story:{en:'The dress you reach for under your abaya: long sleeves, a stand collar and a clean A-line that sits quietly underneath.',ar:'الفستان الذي ترتدينه تحت العباية: أكمام طويلة، وياقة واقفة، وقصّة A أنيقة تنسدل بهدوء.'}},
   {code:'N06', col:'essentials', style:'jumpsuit', price:199, name:{en:'Onyx Belted Jumpsuit',ar:'جمبسوت أونيكس'}, imgs:['img/n06.jpg'],
-    desc:{en:'Wrap-front jumpsuit with a keyhole neckline, tie belt and cuffed ankles.',ar:'جمبسوت بصدر ملفوف وفتحة رقبة، حزام للربط وأساور عند الكاحل.'},
-    story:{en:'A wrap-front jumpsuit with a tie belt, for days that need both ease and polish.',ar:'جمبسوت بصدر ملفوف وحزام للربط، للأيام اللي تبين فيها راحة وأناقة مع بعض.'}}
+    desc:{en:'Wrap-front jumpsuit with a keyhole neckline, tie belt and cuffed ankles.',ar:'جمبسوت بصدر ملفوف وفتحة رقبة، وحزام للربط، وأساور عند الكاحل.'},
+    story:{en:'A wrap-front jumpsuit with a tie belt, for days that need both ease and polish.',ar:'جمبسوت بصدر ملفوف وحزام للربط، للأيام التي تجمع الراحة والأناقة.'}}
 ];
 
 /* ---- The One: a signature line of one-of-one pieces (placeholder photos and prices until the real ones arrive) ---- */
 var ONE = [
   {code:'O01', no:'01', one:true, col:'the-one', style:'evening', tone:'#E6CFC6', price:1450, name:{en:'Amber Dusk',ar:'غسق الكهرمان'}, imgs:['img/bloom-3.jpg','img/bloom-2.jpg'],
-    desc:{en:'A pleated floral gown with a softly gathered waist and long sleeves, made once.',ar:'فستان بطبعة زهور وكسرات، بخصر مجمّع وأكمام طويلة، ينسوى مرة وحدة بس.'},
-    story:{en:'Cut from the last length of a print we will not order again. There is fabric for one dress, and this is it.',ar:'متفصّل من آخر قطعة قماش من هالطبعة، وما بنطلبها مرة ثانية. القماش يكفي فستان واحد بس، وهو هذا.'}},
+    desc:{en:'A pleated floral gown with a softly gathered waist and long sleeves, made once.',ar:'فستان بطبعة زهور وطيّات، بخصر مجمّع وأكمام طويلة، يُصنع مرة واحدة فقط.'},
+    story:{en:'Cut from the last length of a print we will not order again. There is fabric for one dress, and this is it.',ar:'فُصّل من آخر قطعة من هذه الطبعة، ولن نطلبها مجددًا. يكفي القماش لفستان واحد، وهو هذا.'}},
   {code:'O02', no:'02', one:true, col:'the-one', style:'evening', tone:'#E3C9BB', price:1600, name:{en:'Rose Courtyard',ar:'الفناء الوردي'}, imgs:['img/desert-4.jpg','img/rose-wall.jpg'],
-    desc:{en:'A full-skirted maxi in a rose and plum print, with a fitted bodice and cuffed sleeves.',ar:'فستان طويل بتنورة واسعة وطبعة وردي وبرقوقي، بصدر محدد وأكمام بأساور.'},
-    story:{en:'Drawn for one evening in a stone courtyard at sunset. We made the pattern once, and it will not be repeated.',ar:'تصمّم لسهرة وحدة في فناء حجري وقت الغروب. سوّينا الباترون مرة وحدة، وما بيتكرر.'}},
+    desc:{en:'A full-skirted maxi in a rose and plum print, with a fitted bodice and cuffed sleeves.',ar:'فستان طويل بتنورة واسعة وطبعة وردية وبرقوقية، بصدر محدد وأكمام بأساور.'},
+    story:{en:'Drawn for one evening in a stone courtyard at sunset. We made the pattern once, and it will not be repeated.',ar:'صُمّم لأمسية واحدة في فناء حجري عند الغروب. صنعنا الباترون مرة واحدة، ولن يتكرر.'}},
   {code:'O03', no:'03', one:true, col:'the-one', style:'evening', tone:'#EBD8CC', price:1380, name:{en:'Sienna Hour',ar:'ساعة سيينا'}, imgs:['img/desert-3.jpg','img/desert-2.jpg'],
-    desc:{en:'A sculpted maxi in warm terracotta tones with a sweeping hem.',ar:'فستان طويل منحوت بدرجات التراكوتا الدافية وذيل واسع.'},
-    story:{en:'Made for the hour when the desert turns copper. One dress, one owner.',ar:'مسوّى للساعة اللي تصير فيها الصحراء نحاسية. فستان واحد، لصاحبة وحدة.'}},
+    desc:{en:'A sculpted maxi in warm terracotta tones with a sweeping hem.',ar:'فستان طويل منحوت بدرجات التيراكوتا الدافئة وذيل واسع.'},
+    story:{en:'Made for the hour when the desert turns copper. One dress, one owner.',ar:'صُنع للساعة التي تتحول فيها الصحراء إلى النحاسي. فستان واحد، لصاحبة واحدة.'}},
   {code:'O04', no:'04', one:true, col:'the-one', style:'evening', tone:'#E4E3D6', price:1520, name:{en:'Garden Veil',ar:'ستار الجنينة'}, imgs:['img/bloom-4.jpg','img/bloom-5.jpg'],
-    desc:{en:'Fine knife pleats in a soft botanical print, finished by hand.',ar:'كسرات دقيقة بطبعة نباتية ناعمة، متشطّبة باليد.'},
-    story:{en:'Every pleat on this dress was pressed by hand for one woman. When it leaves the atelier, the design leaves with it.',ar:'كل كسرة في هالفستان انكوت باليد لوحدة بس. ولين يطلع من الأتيليه، يطلع التصميم وياه.'}}
+    desc:{en:'Fine knife pleats in a soft botanical print, finished by hand.',ar:'طيّات دقيقة بطبعة نباتية ناعمة، بلمسات نهائية يدوية.'},
+    story:{en:'Every pleat on this dress was pressed by hand for one woman. When it leaves the atelier, the design leaves with it.',ar:'كل طيّة في هذا الفستان كُويت يدويًا لامرأة واحدة. وحين يغادر الأتيليه، يغادر التصميم معه.'}}
 ];
-COLLECTIONS.unshift({id:'the-one', season:{en:'Signature · One of one',ar:'التوقيع · قطعة وحدة'}, cover:'img/bloom-3.jpg', small:'img/desert-4.jpg', tone:'#1C1B1B',
-  name:{en:'The One',ar:'القطعة الوحدة'},
-  story:{en:'One piece. Made once. Never again. Each dress in this line exists as a single piece; when it finds its owner, it is gone for good.',ar:'قطعة وحدة. تنسوى مرة وحدة. وما تنعاد. كل فستان في هالخط موجود نسخة وحدة بس، ولين لقى صاحبته يختفي للأبد.'}});
+COLLECTIONS.unshift({id:'the-one', season:{en:'Signature · One of one',ar:'توقيع الدار · قطعة واحدة'}, cover:'img/bloom-3.jpg', small:'img/desert-4.jpg', tone:'#1C1B1B',
+  name:{en:'The One',ar:'القطعة الواحدة'},
+  story:{en:'One piece. Made once. Never again. Each dress in this line exists as a single piece; when it finds its owner, it is gone for good.',ar:'قطعة واحدة. تُصنع مرة واحدة. ولا تتكرر. كل فستان في هذا الخط قطعة فريدة، وحين يجد صاحبته يختفي إلى الأبد.'}});
 
 /* ---- The Courtyard: autumn/winter 2026 campaign (prices are placeholders, editable in the control room) ---- */
 STYLES.splice(1, 0, {id:'abayas', en:'Abayas', ar:'عبايات'});
-STYLE_INFO.abayas = {title:{en:'Abayas',ar:'عبايات'}, intro:{en:'Open and closed abayas with quiet detail: satin lapels, fine piping and hand-placed embroidery.',ar:'عبايات مفتوحة ومسكّرة بتفاصيل هادية: ياقات ساتان، حواف رفيعة وتطريز موزّع باليد.'}};
+STYLE_INFO.abayas = {title:{en:'Abayas',ar:'عبايات'}, intro:{en:'Open and closed abayas with quiet detail: satin lapels, fine piping and hand-placed embroidery.',ar:'عبايات مفتوحة ومغلقة بتفاصيل هادئة: ياقات من الساتان، وحواف رفيعة، وتطريز يدوي.'}};
 COLLECTIONS.splice(1, 0, {id:'courtyard', season:{en:'Autumn/Winter 2026',ar:'خريف وشتاء ٢٠٢٦'}, cover:'img/c/c06-w.jpg', small:'img/c/c13.jpg', tone:'#D9B8A6',
   name:{en:'The Courtyard',ar:'الفناء'},
-  story:{en:'Shot between terracotta walls in the last hour of light. Abayas with quiet, considered detail and evening dresses that move as you walk.',ar:'انصوّر بين حيطان التيراكوتا في آخر ساعة نور. عبايات بتفاصيل هادية ومدروسة، وفساتين سهرة تتحرك مع خطوتج.'},
+  story:{en:'Shot between terracotta walls in the last hour of light. Abayas with quiet, considered detail and evening dresses that move as you walk.',ar:'صُوّرت بين جدران التيراكوتا في آخر ساعات الضوء. عبايات بتفاصيل هادئة ومدروسة، وفساتين سهرة تتحرك مع خطواتك.'},
   specs:[]});
 var COURTYARD = [
   {code:'C01', col:'courtyard', style:'abayas', isNew:true, tone:'#2A2523', price:780, name:{en:'Noor Satin Lapel Abaya',ar:'عباية نور بياقة ساتان'}, imgs:['img/c/c04.jpg','img/c/c05.jpg','img/c/c02.jpg'],
     desc:{en:'An open black abaya with a wide satin shawl lapel and layered cuffs.',ar:'عباية سوداء مفتوحة بياقة ساتان عريضة وأساور بطبقتين.'},
-    story:{en:'One line of satin, from collar to hem, catches the light as you move. Everything else is kept quiet.',ar:'خط واحد من الساتان، من الياقة لين آخر العباية، يلقط النور مع حركتج. وكل شي ثاني هادي.'}},
+    story:{en:'One line of satin, from collar to hem, catches the light as you move. Everything else is kept quiet.',ar:'خط واحد من الساتان، من الياقة إلى الأطراف، يلتقط الضوء مع حركتك. وكل ما عداه هادئ.'}},
   {code:'C02', col:'courtyard', style:'abayas', isNew:true, tone:'#2A2523', price:850, name:{en:'Sahar Embroidered Abaya',ar:'عباية سحر المطرّزة'}, imgs:['img/c/c13.jpg','img/c/c11.jpg','img/c/c07.jpg'],
-    desc:{en:'A black abaya with a tonal embroidered panel down the front and embroidered cuffs.',ar:'عباية سوداء بشريط تطريز بنفس اللون من قدّام وأساور مطرّزة.'},
-    story:{en:'The embroidery is black on black, so it only shows up close. A detail for you, not for the room.',ar:'التطريز أسود على أسود، فما يبان إلا من قريب. تفصيلة لج إنتي، مب للناس.'}},
+    desc:{en:'A black abaya with a tonal embroidered panel down the front and embroidered cuffs.',ar:'عباية سوداء بشريط تطريز بنفس اللون في الأمام وأساور مطرّزة.'},
+    story:{en:'The embroidery is black on black, so it only shows up close. A detail for you, not for the room.',ar:'التطريز أسود على أسود، فلا يظهر إلا عن قرب. تفصيلة لكِ أنتِ، لا للآخرين.'}},
   {code:'C03', col:'courtyard', style:'abayas', isNew:true, tone:'#2A2523', price:820, name:{en:'Maghrib Piped Abaya',ar:'عباية مغرب'}, imgs:['img/c/c06.jpg','img/c/c08.jpg'],
-    desc:{en:'A flowing black abaya edged with fine copper piping along the front and sleeves.',ar:'عباية سوداء واسعة بحواف رفيعة نحاسية من قدّام وعلى الأكمام.'},
-    story:{en:'Named for the hour the courtyard turns copper. The piping picks up that light and keeps it.',ar:'اسمها من الساعة اللي يصير فيها الفناء نحاسي. والحواف تلقط هالنور وتحتفظ فيه.'}},
+    desc:{en:'A flowing black abaya edged with fine copper piping along the front and sleeves.',ar:'عباية سوداء واسعة بحواف نحاسية رفيعة في الأمام وعلى الأكمام.'},
+    story:{en:'Named for the hour the courtyard turns copper. The piping picks up that light and keeps it.',ar:'سُمّيت على الساعة التي يتحوّل فيها الفناء إلى النحاسي. تلتقط الحواف ذلك الضوء وتحتفظ به.'}},
   {code:'C04', col:'courtyard', style:'abayas', isNew:true, tone:'#2A2523', price:690, name:{en:'Fina Open Abaya',ar:'عباية فناء المفتوحة'}, imgs:['img/c/c12.jpg','img/c/c03.jpg'],
-    desc:{en:'A clean, open abaya with wide sleeves and a soft drape. The everyday essential.',ar:'عباية مفتوحة بسيطة بأكمام واسعة ونزلة ناعمة. أساسية لكل يوم.'},
-    story:{en:'The abaya you reach for every morning: light, easy and cut to fall straight from the shoulder.',ar:'العباية اللي تلبسينها كل صبح: خفيفة، مريحة، ومتفصّلة تنزل مستقيمة من الكتف.'}},
+    desc:{en:'A clean, open abaya with wide sleeves and a soft drape. The everyday essential.',ar:'عباية مفتوحة بسيطة بأكمام واسعة وانسدالة ناعمة. أساسية لكل يوم.'},
+    story:{en:'The abaya you reach for every morning: light, easy and cut to fall straight from the shoulder.',ar:'العباية التي ترتدينها كل صباح: خفيفة، ومريحة، ومفصّلة لتنسدل مستقيمة من الكتف.'}},
   {code:'C05', col:'courtyard', style:'evening', isNew:true, tone:'#E7D7BE', price:720, name:{en:'Mashrabiya Satin Dress',ar:'فستان مشربية الساتان'}, imgs:['img/c/c00.jpg'],
-    desc:{en:'A champagne satin dress with a high neck, bishop sleeves and a draped wrap skirt.',ar:'فستان ساتان شامبين برقبة عالية، أكمام منفوخة وتنورة ملفوفة منسدلة.'},
-    story:{en:'Made for light that falls through a carved screen: satin that shifts from gold to cream with every step.',ar:'مسوّى للنور اللي يعبر من المشربية: ساتان يتحوّل من ذهبي لكريمي مع كل خطوة.'}},
+    desc:{en:'A champagne satin dress with a high neck, bishop sleeves and a draped wrap skirt.',ar:'فستان من الساتان بلون الشامبانيا، برقبة عالية، وأكمام منفوخة، وتنورة ملفوفة منسدلة.'},
+    story:{en:'Made for light that falls through a carved screen: satin that shifts from gold to cream with every step.',ar:'صُنع للضوء الذي يعبر المشربية: ساتان يتحوّل من الذهبي إلى الكريمي مع كل خطوة.'}},
   {code:'C06', col:'courtyard', style:'abayas', isNew:true, tone:'#4A3A4E', price:760, name:{en:'Lavender Panel Abaya',ar:'عباية اللافندر'}, imgs:['img/c/c01.jpg'],
-    desc:{en:'A closed abaya in two shades of violet, with patterned panels on the sleeves.',ar:'عباية مسكّرة بدرجتين من البنفسجي، وقطع منقوشة على الأكمام.'},
-    story:{en:'Colour, kept soft. Two violets meet at the sleeve, where a woven pattern sits like a quiet signature.',ar:'لون، بس هادي. درجتين من البنفسجي يتلاقون عند الكم، وهناك نقشة منسوجة مثل توقيع هادي.'}},
+    desc:{en:'A closed abaya in two shades of violet, with patterned panels on the sleeves.',ar:'عباية مغلقة بدرجتين من البنفسجي، ونقوش منسوجة على الأكمام.'},
+    story:{en:'Colour, kept soft. Two violets meet at the sleeve, where a woven pattern sits like a quiet signature.',ar:'لون، لكن بهدوء. درجتان من البنفسجي تلتقيان عند الكم، حيث نقشة منسوجة كتوقيع هادئ.'}},
   {code:'C07', col:'courtyard', style:'abayas', isNew:true, tone:'#D9D2C2', price:740, name:{en:'Zeitoun Abaya',ar:'عباية زيتون'}, imgs:['img/c/c09.jpg'],
     desc:{en:'An olive abaya with a matching sheer shayla and fine tonal embroidery.',ar:'عباية زيتونية بشيلة شفافة من نفس اللون وتطريز رفيع بنفس الدرجة.'},
-    story:{en:'The green of olive leaves in a white courtyard. Light, layered and made to be worn all day.',ar:'أخضر ورق الزيتون في فناء أبيض. خفيفة، بطبقات، ومسوّاة عشان تنلبس طول اليوم.'}},
+    story:{en:'The green of olive leaves in a white courtyard. Light, layered and made to be worn all day.',ar:'أخضر ورق الزيتون في فناء أبيض. خفيفة، بطبقات، ومصمّمة لتُلبس طوال اليوم.'}},
   {code:'C08', col:'courtyard', style:'evening', isNew:true, tone:'#C98F8F', price:780, name:{en:'Emerald Satin Dress',ar:'فستان الزمرد'}, imgs:['img/c/c10.jpg'],
-    desc:{en:'An emerald satin dress with a tied waist, a full skirt and a matching shayla.',ar:'فستان ساتان زمردي بخصر معقود، تنورة واسعة وشيلة من نفس القماش.'},
-    story:{en:'A colour for celebrations: deep emerald satin that holds its shape and moves like water.',ar:'لون للمناسبات: ساتان زمردي غامق يحافظ على شكله ويتحرك مثل الماي.'}},
+    desc:{en:'An emerald satin dress with a tied waist, a full skirt and a matching shayla.',ar:'فستان من الساتان الزمردي بخصر معقود، وتنورة واسعة، وشيلة من نفس القماش.'},
+    story:{en:'A colour for celebrations: deep emerald satin that holds its shape and moves like water.',ar:'لون للمناسبات: ساتان زمردي داكن يحافظ على شكله ويتحرك كالماء.'}},
   {code:'C09', col:'courtyard', style:'evening', isNew:true, tone:'#E3DBD1', price:890, name:{en:'Taupe Pleated Gown',ar:'فستان التوب المكسّر'}, imgs:['img/c/c15.jpg','img/c/c14.jpg'],
-    desc:{en:'A taupe gown with a crossover draped bodice and a floor-length sunray-pleated skirt.',ar:'فستان بلون التوب بصدر ملفوف ومنسدل، وتنورة طويلة بكسرات شمسية للأرض.'},
-    story:{en:'Hundreds of fine pleats open like a fan when you turn. Quiet in colour, never quiet in movement.',ar:'مئات الكسرات الرفيعة تنفتح مثل المروحة لين تدورين. هادي في اللون، وأبد مب هادي في الحركة.'}},
+    desc:{en:'A taupe gown with a crossover draped bodice and a floor-length sunray-pleated skirt.',ar:'فستان بلون التوب بصدر ملفوف منسدل، وتنورة طويلة بطيّات شمسية تصل إلى الأرض.'},
+    story:{en:'Hundreds of fine pleats open like a fan when you turn. Quiet in colour, never quiet in movement.',ar:'مئات الطيّات الرفيعة تتفتح كالمروحة حين تدورين. هادئ في لونه، وغير هادئ أبدًا في حركته.'}},
   {code:'C10', col:'courtyard', style:'evening', isNew:true, tone:'#CFC9B4', price:920, name:{en:'Burgundy Cape Gown',ar:'فستان العنابي بالكاب'}, imgs:['img/c/c16.jpg','img/c/c18.jpg','img/c/c17.jpg'],
-    desc:{en:'A burgundy gown with a draped wrap bodice and a cape that falls from one shoulder.',ar:'فستان عنابي بصدر ملفوف منسدل وكاب نازل من كتف واحد.'},
-    story:{en:'A gown for the evening you have been waiting for: deep burgundy, a sculpted waist and a cape that follows you.',ar:'فستان للسهرة اللي تنتظرينها: عنابي غامق، خصر منحوت، وكاب يمشي وراج.'}},
+    desc:{en:'A burgundy gown with a draped wrap bodice and a cape that falls from one shoulder.',ar:'فستان عنابي بصدر ملفوف منسدل وكاب ينسدل من كتف واحد.'},
+    story:{en:'A gown for the evening you have been waiting for: deep burgundy, a sculpted waist and a cape that follows you.',ar:'فستان للأمسية التي تنتظرينها: عنابي داكن، وخصر منحوت، وكاب يتبعك.'}},
   {code:'C11', col:'courtyard', style:'everyday', isNew:true, tone:'#D9B9B6', price:760, name:{en:'Sage Drape Dress',ar:'فستان المريمية'}, imgs:['img/c/c19.jpg','img/c/c20.jpg'],
-    desc:{en:'A sage dress with a gathered side drape, long sleeves and a sheer matching shayla.',ar:'فستان بلون المريمية بطيّة مجمّعة على الجنب، أكمام طويلة وشيلة شفافة من نفس اللون.'},
-    story:{en:'Soft green, softer drape. A dress that works from a long lunch to a quiet evening.',ar:'أخضر ناعم وطيّة أنعم. فستان يناسب من غدا طويل لين سهرة هادية.'}}
+    desc:{en:'A sage dress with a gathered side drape, long sleeves and a sheer matching shayla.',ar:'فستان بلون المريمية بطيّة مجمّعة على الجانب، وأكمام طويلة، وشيلة شفافة من نفس اللون.'},
+    story:{en:'Soft green, softer drape. A dress that works from a long lunch to a quiet evening.',ar:'أخضر ناعم وطيّة أنعم. فستان يناسب من غداء طويل إلى أمسية هادئة.'}}
 ];
 PRODUCTS = COURTYARD.concat(PRODUCTS);
+
+/* home hero (default). The control room can replace it: settings/site.slides */
+var SLIDES = [
+  {type:'video', v:'video/behind-the-scenes.mp4', d:'video/behind-the-scenes.jpg', m:'video/behind-the-scenes.jpg', pos:'50% 50%', sub:{en:'Behind the scenes',ar:'خلف الكواليس'}, big:{en:'The making of The Courtyard',ar:'كيف صُنعت The Courtyard'}, href:'#courtyard', cta:{en:'Discover the collection',ar:'اكتشفي المجموعة'}},
+  {d:'img/c/c06-w.jpg', m:'img/c/c06.jpg', pos:'50% 35%', sub:{en:'Autumn / Winter 2026',ar:'خريف وشتاء ٢٠٢٦'}, big:{en:'The Courtyard',ar:'The Courtyard'}, href:'#courtyard', cta:{en:'Discover the collection',ar:'اكتشفي المجموعة'}},
+  {d:'img/c/c00-w.jpg', m:'img/c/c00.jpg', pos:'50% 30%', sub:{en:'Just arrived',ar:'وصل حديثًا'}, big:{en:'Light through the mashrabiya',ar:'ضوء عبر المشربية'}, href:'#p-C05', cta:{en:'Shop the dress',ar:'تسوّقي الفستان'}},
+  {d:'img/c/c16-w.jpg', m:'img/c/c16.jpg', pos:'50% 30%', sub:{en:'Evening',ar:'السهرة'}, big:{en:'For the evenings that matter',ar:'لأمسيات تستحق'}, href:'#s-evening', cta:{en:'Shop evening',ar:'تسوّقي فساتين السهرة'}},
+  {d:'img/c/c15-w.jpg', m:'img/c/c15.jpg', pos:'50% 30%', sub:{en:'Just arrived',ar:'وصل حديثًا'}, big:{en:'Pleats that open as you turn',ar:'طيّات تتفتح مع كل حركة'}, href:'#p-C09', cta:{en:'Shop the gown',ar:'تسوّقي الفستان'}},
+  {d:'img/c/c09-w.jpg', m:'img/c/c09.jpg', pos:'50% 30%', sub:{en:'The abaya edit',ar:'مختارات العبايات'}, big:{en:'Quiet colour, every day',ar:'ألوان هادئة لكل يوم'}, href:'#s-abayas', cta:{en:'Shop abayas',ar:'تسوّقي العبايات'}}
+];
 
 PRODUCTS = PRODUCTS.concat(ONE);
 var BASE = PRODUCTS.slice(), BASEMAP = {};
@@ -479,7 +516,7 @@ function loadAll(){
   $('main').innerHTML = '<div class="spin"></div>';
   Promise.all([DBX.list('products'), DBX.list('orders', 'created').catch(function(){ return []; }), DBX.list('subscribers', 'created').catch(function(){ return []; }), DBX.list('oneofone').catch(function(){ return []; }), DBX.get('settings', 'site').catch(function(){ return null; })]).then(function(r){
     S.over = {}; r[0].forEach(function(p){ var id = p._id; delete p._id; S.over[id] = p; });
-    S.orders = r[1]; S.subs = r[2]; S.claims = {}; r[3].forEach(function(c){ S.claims[c._id] = c; }); S.site = r[4] || {};
+    S.orders = r[1]; S.subs = r[2]; S.claims = {}; r[3].forEach(function(c){ S.claims[c._id] = c; }); S.site = r[4] || {}; S.hero = clone(S.site.slides && S.site.slides.length ? S.site.slides : SLIDES); S.heroDirty = false;
     S.loaded = true; render();
   }).catch(function(e){ console.error(e); $('main').innerHTML = '<div class="empty">Could not load the data: ' + esc(e.message || e) + '<br><br>If this says "permission", the database rules for the control room have not been published yet.</div>'; });
 }
@@ -487,10 +524,10 @@ function loadAll(){
 /* ================= render ================= */
 function render(){
   var newOrders = S.orders.filter(function(o){ return !o.status; }).length;
-  $('tabs').innerHTML = [['products', 'Products'], ['orders', 'Orders', newOrders], ['one', 'The One'], ['subs', 'Subscribers', S.subs.length], ['site', 'Site']].map(function(x){
+  $('tabs').innerHTML = [['products', 'Products'], ['orders', 'Orders', newOrders], ['one', 'The One'], ['hero', 'Home hero'], ['subs', 'Subscribers', S.subs.length], ['site', 'Site']].map(function(x){
     return '<button type="button" role="tab" data-tab="' + x[0] + '" aria-selected="' + (S.tab === x[0]) + '">' + x[1] + (x[2] ? '<span class="n">' + x[2] + '</span>' : '') + '</button>';
   }).join('');
-  ({products:viewProducts, orders:viewOrders, one:viewOne, subs:viewSubs, site:viewSite})[S.tab]();
+  ({products:viewProducts, orders:viewOrders, one:viewOne, hero:viewHero, subs:viewSubs, site:viewSite})[S.tab]();
 }
 function status(p){
   var c = [];
@@ -571,7 +608,12 @@ function viewSubs(){
 
 function viewSite(){
   var a = S.site.ann || {};
+  var cur = S.site.theme || 'classic';
   $('main').innerHTML = '<div class="head"><h2>Site</h2></div>' +
+    '<div class="card" style="max-width:1100px;margin-bottom:18px"><h4>Theme</h4><p class="muted" style="margin:0">The colours of the whole site. Click one to switch; it goes live straight away for every visitor. Visitors can still switch to dark mode themselves.</p>' +
+      '<div class="themes">' + SITE_THEMES.map(function(x){ var c = x.c; return '<button type="button" class="th' + (x.id === cur ? ' on' : '') + '" data-theme="' + x.id + '" aria-pressed="' + (x.id === cur) + '">' +
+        '<span class="th-mock" style="background:' + c[0] + ';color:' + c[1] + ';border-color:' + c[3] + '"><i style="background:' + c[4] + ';border-color:' + c[3] + '"><b style="color:' + c[1] + '">NMH</b></i><em style="background:' + c[5] + '"></em><span><u style="background:' + c[2] + '"></u><u style="background:' + c[2] + '"></u><u style="background:' + c[2] + '"></u></span><s style="background:' + c[6] + ';color:' + c[7] + '">Shop</s></span>' +
+        '<span class="th-n">' + x.name + (x.id === cur ? ' <span class="chip green">Live</span>' : '') + (x.rec ? ' <span class="chip">Suggested</span>' : '') + '</span><span class="th-d">' + x.d + '</span></button>'; }).join('') + '</div></div>' +
     '<form class="card" id="siteForm" style="max-width:760px"><h4>Announcement bar</h4><p class="muted" style="margin:0">The thin black bar at the very top of every page. Leave empty to use the default text.</p>' +
       '<label class="f"><span>English</span><input class="in" name="annEn" value="' + esc(a.en || '') + '" placeholder="Free UAE delivery over 500 AED · Every piece made to order in Dubai"></label>' +
       '<label class="f"><span>Arabic</span><input class="in" name="annAr" dir="rtl" value="' + esc(a.ar || '') + '" placeholder="توصيل مجاني في الإمارات للطلبات فوق ٥٠٠ درهم"></label>' +
@@ -758,10 +800,96 @@ document.addEventListener('submit', function(e){
   if(e.target.id === 'siteForm'){
     e.preventDefault(); var f = e.target;
     var data = {ann:{en:f.annEn.value.trim(), ar:f.annAr.value.trim()}, annOff:f.annOff.checked, updated:Date.now()};
-    DBX.set('settings', 'site', data).then(function(){ S.site = data; toast('Saved.'); }).catch(function(e2){ toast('Could not save: ' + (e2.message || e2), true); });
+    DBX.set('settings', 'site', data, true).then(function(){ S.site = Object.assign({}, S.site, data); toast('Saved.'); }).catch(function(e2){ toast('Could not save: ' + (e2.message || e2), true); });
   }
 });
 document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && E && !$('confirm').open) closeEditor(); });
+/* ================= home hero ================= */
+var VIDEOS = ['video/behind-the-scenes.mp4'];
+/* c: page, ink, card tone, line, header, photo, button, button text */
+var SITE_THEMES = [
+  {id:'classic', name:'Classic cream', d:'The current look. Warm cream, soft black, quiet and calm.', c:['#FDF9F4','#1C1B1B','#F5F0EA','#E7E2DB','#FFFFFF','#C9B8A6','#1C1B1B','#FFFFFF']},
+  {id:'mono', name:'Black and white', d:'Pure white and true black. Sharp, editorial, lets the photos do the talking.', c:['#FFFFFF','#000000','#F3F3F3','#E6E6E6','#FFFFFF','#BDBDBD','#000000','#FFFFFF']},
+  {id:'sand', name:'Desert sand', d:'Warm beige and coffee-brown buttons. Feels like the UAE desert, good for Ramadan and Eid.', c:['#F5EDE2','#2B2118','#ECE1D1','#E3D6C4','#FBF7F1','#C9A98A','#5B4532','#FFFFFF'], rec:1},
+  {id:'blush', name:'Rose blush', d:'Soft pink with a dusty-rose button. Romantic and feminine, good for spring and weddings.', c:['#FBF4F2','#2A1E1E','#F4E6E2','#EEDFDB','#FFFFFF','#D9B3AA','#8A4A47','#FFFFFF'], rec:1},
+  {id:'sage', name:'Sage green', d:'Light sage with deep green buttons. Fresh and natural, good for summer.', c:['#F4F5F0','#1F2620','#E8ECE3','#DEE3D8','#FFFFFF','#A9B8A3','#3F5446','#FFFFFF']},
+  {id:'midnight', name:'Midnight', d:'Opens in dark mode for everyone. Dramatic and luxurious, good for evening and Ramadan nights.', c:['#141312','#F2EDE7','#211F1D','#2C2A28','#1B1A19','#5A524B','#F2EDE7','#141312'], rec:1}
+];
+var POS = [['50% 15%', 'Top'], ['50% 30%', 'Upper'], ['50% 50%', 'Middle'], ['50% 75%', 'Lower'], ['50% 100%', 'Bottom']];
+function heroLinks(){
+  var a = [['#', 'Home'], ['#s-all', 'Shop all'], ['#the-one', 'The One']];
+  COLLECTIONS.forEach(function(c){ a.push(['#' + c.id, 'Collection · ' + t(c.name)]); });
+  STYLE_OPTS.forEach(function(x){ a.push(['#s-' + x.id, 'Style · ' + x.en]); });
+  merged().filter(function(p){ return !p.removed; }).forEach(function(p){ a.push(['#p-' + p.code, 'Product · ' + t(p.name) + ' (' + p.code + ')']); });
+  return a;
+}
+function blankSlide(video){ return video ? {type:'video', v:VIDEOS[0], d:'video/behind-the-scenes.jpg', m:'video/behind-the-scenes.jpg', pos:'50% 50%', sub:{en:'', ar:''}, big:{en:'', ar:''}, href:'#s-all', cta:{en:'Shop now', ar:'تسوّقي الآن'}} : {d:'img/c/c01-w.jpg', m:'img/c/c01.jpg', pos:'50% 30%', sub:{en:'', ar:''}, big:{en:'', ar:''}, href:'#s-all', cta:{en:'Shop now', ar:'تسوّقي الآن'}}; }
+function hf(i, k, label, val, extra){ return '<label class="f"><span>' + label + '</span><input class="in" data-h="' + i + '" data-k="' + k + '" value="' + esc(val) + '"' + (extra || '') + '></label>'; }
+function viewHero(){
+  var H = S.hero, links = heroLinks(), wide = [], tall = [];
+  LIB.forEach(function(x){ tall.push(x); var w = x.replace(/^img\/c\/(c\d\d)\.jpg$/, 'img/c/$1-w.jpg'); if(w !== x) wide.push(w); });
+  var custom = S.site.slides && S.site.slides.length;
+  $('main').innerHTML = '<div class="head"><h2>Home hero</h2>' + (S.heroDirty ? '<span class="chip red">Unsaved changes</span>' : '') +
+      '<button class="btn ghost" type="button" data-hadd="img">+ Photo slide</button><button class="btn ghost" type="button" data-hadd="video">+ Video slide</button>' +
+      '<button class="btn" type="button" data-hsave' + (S.heroDirty ? '' : ' disabled') + '>Save and publish</button></div>' +
+    '<p class="muted" style="margin:-8px 0 18px;max-width:760px">The big slideshow at the top of the home page. Slides play in this order; a video slide stays on screen for the length of the video. ' + (custom ? 'You are using your own slides. <button type="button" class="lnk" data-hreset>Go back to the default slides</button>' : 'You are seeing the default slides.') + ' <a href="/#" target="_blank" rel="noopener">Open the site ↗</a></p>' +
+    '<datalist id="dlWide">' + wide.concat(tall).map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist>' +
+    '<datalist id="dlTall">' + tall.concat(wide).map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist>' +
+    '<datalist id="dlVid">' + VIDEOS.map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist>' +
+    (H.length ? '' : '<div class="empty">No slides. Add a photo or video slide, or go back to the default slides.</div>') +
+    '<div class="hlist">' + H.map(function(s, i){
+      var vid = s.type === 'video';
+      s.sub = s.sub || {en:'', ar:''}; s.big = s.big || {en:'', ar:''}; s.cta = s.cta || {en:'', ar:''};
+      var known = links.some(function(l){ return l[0] === s.href; });
+      return '<div class="card hcard">' +
+        '<div class="hprev">' + (vid ? '<video muted loop playsinline autoplay src="' + esc(s.v) + '" poster="' + esc(s.d) + '" style="object-position:' + esc(s.pos || '50% 50%') + '"></video>' : '<img src="' + esc(s.d) + '" alt="" style="object-position:' + esc(s.pos || '50% 30%') + '">') +
+          '<div class="hov"><small>' + esc(s.sub.en) + '</small><b>' + esc(s.big.en) + '</b>' + (s.cta.en ? '<u>' + esc(s.cta.en) + '</u>' : '') + '</div>' +
+          '<span class="chip dark hnum">' + (i + 1) + ' · ' + (vid ? 'Video' : 'Photo') + '</span></div>' +
+        '<div class="hbody">' +
+          '<div class="hact"><button class="btn sm ghost" type="button" data-hmove="' + i + '" data-d="-1"' + (i ? '' : ' disabled') + '>↑ Up</button><button class="btn sm ghost" type="button" data-hmove="' + i + '" data-d="1"' + (i < H.length - 1 ? '' : ' disabled') + '>↓ Down</button><button class="btn sm danger" type="button" data-hdel="' + i + '">Delete</button></div>' +
+          (vid ? '<div class="g2">' + hf(i, 'v', 'Video file or link (.mp4)', s.v, ' list="dlVid" dir="ltr"') + hf(i, 'd', 'Cover photo (shown while it loads)', s.d, ' list="dlWide" dir="ltr"') + '</div>'
+               : '<div class="g2">' + hf(i, 'd', 'Photo, computer (wide)', s.d, ' list="dlWide" dir="ltr"') + hf(i, 'm', 'Photo, phone (tall)', s.m || '', ' list="dlTall" dir="ltr"') + '</div>') +
+          '<div class="g2">' + hf(i, 'sub.en', 'Small line, English', s.sub.en) + hf(i, 'sub.ar', 'Small line, Arabic', s.sub.ar, ' dir="rtl"') + '</div>' +
+          '<div class="g2">' + hf(i, 'big.en', 'Title, English', s.big.en) + hf(i, 'big.ar', 'Title, Arabic', s.big.ar, ' dir="rtl"') + '</div>' +
+          '<div class="g2">' + hf(i, 'cta.en', 'Button, English (empty = no button)', s.cta.en) + hf(i, 'cta.ar', 'Button, Arabic', s.cta.ar, ' dir="rtl"') + '</div>' +
+          '<div class="g2"><label class="f"><span>Button opens</span><select class="sel" data-h="' + i + '" data-k="href">' + links.map(function(l){ return '<option value="' + esc(l[0]) + '"' + (l[0] === s.href ? ' selected' : '') + '>' + esc(l[1]) + '</option>'; }).join('') + (known ? '' : '<option value="' + esc(s.href || '') + '" selected>' + esc(s.href || '(none)') + '</option>') + '</select></label>' +
+          '<label class="f"><span>Photo focus</span><select class="sel" data-h="' + i + '" data-k="pos">' + POS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === (s.pos || '50% 30%') ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + (POS.some(function(o){ return o[0] === s.pos; }) || !s.pos ? '' : '<option value="' + esc(s.pos) + '" selected>Custom</option>') + '</select></label></div>' +
+        '</div></div>';
+    }).join('') + '</div>' +
+    (H.length ? '<div style="margin-top:18px"><button class="btn" type="button" data-hsave' + (S.heroDirty ? '' : ' disabled') + '>Save and publish</button></div>' : '');
+}
+function heroSet(i, k, v){
+  var s = S.hero[i], ks = k.split('.');
+  if(ks.length === 2){ s[ks[0]] = Object.assign({en:'', ar:''}, s[ks[0]]); s[ks[0]][ks[1]] = v; } else s[k] = v;
+  if(k === 'v' && /^https?:|^video\//.test(v)) s.type = 'video';
+}
+function heroDirty(){ if(!S.heroDirty){ S.heroDirty = true; [].forEach.call(document.querySelectorAll('[data-hsave]'), function(b){ b.disabled = false; }); var h = document.querySelector('.head h2'); if(h && !document.querySelector('.head .chip')) h.insertAdjacentHTML('afterend', '<span class="chip red">Unsaved changes</span>'); } }
+function heroSave(){
+  var bad = S.hero.filter(function(s){ return s.type === 'video' ? !s.v : !s.d; });
+  if(bad.length){ toast('Every slide needs a photo or video.', true); return; }
+  var data = {slides:clone(S.hero), updated:Date.now()};
+  DBX.set('settings', 'site', data, true).then(function(){ S.site = Object.assign({}, S.site, data); S.heroDirty = false; render(); toast('Saved. The home page is updated.'); }).catch(function(e2){ toast('Could not save: ' + (e2.message || e2), true); });
+}
+document.addEventListener('click', function(e){
+  var b = e.target.closest('button'); if(!b || S.tab !== 'hero') return; var v;
+  if((v = b.getAttribute('data-hadd'))){ S.hero.push(blankSlide(v === 'video')); S.heroDirty = true; render(); window.scrollTo(0, document.body.scrollHeight); return; }
+  if((v = b.getAttribute('data-hmove')) != null){ var i = +v, j = i + (+b.getAttribute('data-d')); if(j >= 0 && j < S.hero.length){ var tmp = S.hero[i]; S.hero[i] = S.hero[j]; S.hero[j] = tmp; S.heroDirty = true; render(); } return; }
+  if((v = b.getAttribute('data-hdel')) != null){ confirmBox('Delete this slide?', 'It disappears from the home page after you save.', 'Delete').then(function(ok){ if(ok){ S.hero.splice(+v, 1); S.heroDirty = true; render(); } }); return; }
+  if(b.hasAttribute('data-hsave')){ heroSave(); return; }
+  if(b.hasAttribute('data-hreset')){ confirmBox('Go back to the default slides?', 'Your own slides will be replaced by the original ' + SLIDES.length + ' slides.', 'Reset').then(function(ok){ if(!ok) return; DBX.set('settings', 'site', {slides:[], updated:Date.now()}, true).then(function(){ S.site.slides = []; S.hero = clone(SLIDES); S.heroDirty = false; render(); toast('Back to the default slides.'); }).catch(function(e2){ toast('Could not reset: ' + (e2.message || e2), true); }); }); return; }
+});
+document.addEventListener('input', function(e){ var el = e.target, i = el.getAttribute('data-h'); if(i == null || el.tagName === 'SELECT') return; heroSet(+i, el.getAttribute('data-k'), el.value.trim()); heroDirty(); var card = el.closest('.hcard'), s = S.hero[+i]; if(card){ var o = card.querySelector('.hov'); o.innerHTML = '<small>' + esc(s.sub.en) + '</small><b>' + esc(s.big.en) + '</b>' + (s.cta.en ? '<u>' + esc(s.cta.en) + '</u>' : ''); } });
+document.addEventListener('change', function(e){ var el = e.target, i = el.getAttribute('data-h'); if(i == null) return; var k = el.getAttribute('data-k'); heroSet(+i, k, el.value.trim()); heroDirty(); var sl = S.hero[+i], card = el.closest('.hcard'); if(!card) return;
+  var media = card.querySelector('.hprev img, .hprev video'), vid = sl.type === 'video';
+  if(k === 'pos'){ media.style.objectPosition = sl.pos; return; }
+  if(k === 'v' && vid && media.tagName === 'VIDEO'){ media.src = sl.v; return; }
+  if(k === 'd'){ if(vid) media.poster = sl.d; else media.src = sl.d; } });
+
+document.addEventListener('click', function(e){
+  var b = e.target.closest('[data-theme]'); if(!b || S.tab !== 'site') return;
+  var th = b.getAttribute('data-theme'); if(th === (S.site.theme || 'classic')) return;
+  DBX.set('settings', 'site', {theme:th, updated:Date.now()}, true).then(function(){ S.site.theme = th; render(); toast('Theme changed. The site is updated.'); }).catch(function(e2){ toast('Could not save: ' + (e2.message || e2), true); });
+});
 boot();
 })();
 </script>
