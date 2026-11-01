@@ -2,34 +2,53 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Anyone can place an order (guest checkout, no accounts).
-    // Nobody can change or delete an order from the website; the brand manages orders in the Firebase console.
+    // The control room: only these Google accounts can change products, read orders or manage subscribers.
+    function isAdmin() {
+      return request.auth != null
+          && request.auth.token.email_verified == true
+          && request.auth.token.email in ['wedoogfx@gmail.com'];
+    }
+
+    // Product catalogue edits (sold out, new arrivals, labels, new pieces). Everyone can read; only admins write.
+    match /products/{code} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Site settings such as the announcement bar.
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Anyone can place an order (guest checkout, no accounts). Only admins can read or update orders.
     match /orders/{orderId} {
       allow create: if request.resource.data.keys().hasAll(['id', 'items', 'total', 'contact', 'address', 'uid'])
                     && request.resource.data.id == orderId
                     && request.resource.data.total is number
                     && request.resource.data.items.size() > 0 && request.resource.data.items.size() <= 30
-                    && (request.resource.data.uid == null
-                        || (request.auth != null && request.resource.data.uid == request.auth.uid));
-      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
-      allow update, delete: if false;
+                    && request.resource.data.uid == null;
+      allow read, update, delete: if isAdmin();
     }
 
     // The One: each one-of-one piece can be claimed exactly once, in the same write as its order.
     // A second claim would be an update, which is refused, so two people can never buy the same piece.
+    // Admins can release a claim (delete) when an order is cancelled.
     match /oneofone/{code} {
       allow read: if true;
       allow create: if request.resource.data.keys().hasOnly(['order', 'created'])
                     && request.resource.data.order is string
                     && existsAfter(/databases/$(database)/documents/orders/$(request.resource.data.order));
-      allow update, delete: if false;
+      allow delete: if isAdmin();
+      allow update: if false;
     }
 
-    // Newsletter sign-ups from the footer or checkout: add-only, nobody can read them from the website.
+    // Newsletter sign-ups: add-only from the website; admins can read and remove.
     match /subscribers/{id} {
       allow create: if request.resource.data.keys().hasOnly(['email', 'created', 'lang', 'source'])
                     && request.resource.data.email is string && request.resource.data.email.size() < 200;
-      allow read, update, delete: if false;
+      allow read, delete: if isAdmin();
+      allow update: if false;
     }
   }
 }

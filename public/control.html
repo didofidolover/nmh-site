@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Control room · NMH Dubai</title>
+<link rel="icon" href="img/logo-dark.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&family=IBM+Plex+Sans+Arabic:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F7F3EE; --panel:#FFFFFF; --ink:#1C1B1B; --muted:#6A6A6A; --line:#E7E2DB; --line-2:#D6D0C8; --soft:#F2ECE5;
+  --ok:#2E6B47; --ok-bg:#E5F0E9; --warn:#8A5A12; --warn-bg:#F7EEDC; --err:#B3261E; --err-bg:#F9E3E1; --info-bg:#E8ECF4;
+  --head:"Montserrat",Arial,sans-serif; --body:"Nunito Sans",Arial,sans-serif; --ar:"IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --ease:cubic-bezier(.215,.61,.355,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+a{color:inherit}
+img{display:block;max-width:100%}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+[hidden]{display:none!important}
+.cap{font:600 11px/1.4 var(--head);letter-spacing:.16em;text-transform:uppercase}
+.muted{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* sign-in */
+.gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+.gate-box{background:var(--panel);border:1px solid var(--line);width:min(420px,100%);padding:44px 36px;text-align:center;display:grid;gap:18px;justify-items:center}
+.gate-box img{height:44px;width:auto}
+.gate-box h1{margin:0;font:500 18px var(--head);letter-spacing:.24em;text-transform:uppercase}
+.gate-box p{margin:0;color:var(--muted)}
+.gbtn{display:inline-flex;align-items:center;gap:12px;height:48px;padding:0 22px;border:1px solid var(--line-2);border-radius:6px;background:#fff;font-weight:600;transition:background-color .2s}
+.gbtn:hover{background:var(--soft)}
+.gbtn svg{width:20px;height:20px}
+.msg{font-size:13px;min-height:20px}
+.msg.err{color:var(--err)}
+
+/* shell */
+.top{position:sticky;top:0;z-index:20;background:var(--panel);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:20px;padding:0 24px;height:64px;max-width:1400px;margin:0 auto}
+.top img{height:30px;width:auto}
+.top .t{font:600 11px var(--head);letter-spacing:.2em;text-transform:uppercase;color:var(--muted);padding-inline-start:16px;border-inline-start:1px solid var(--line)}
+.top .who{margin-inline-start:auto;display:flex;align-items:center;gap:14px;font-size:13px;color:var(--muted)}
+.tabs{display:flex;gap:4px;max-width:1400px;margin:0 auto;padding:0 18px;overflow-x:auto;scrollbar-width:none}
+.tabs button{position:relative;padding:14px 10px;font:600 11px var(--head);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink)}
+.tabs button[aria-selected="true"]::after{content:"";position:absolute;inset:auto 10px 0;height:2px;background:var(--ink)}
+.tabs .n{display:inline-block;min-width:18px;margin-inline-start:6px;padding:0 5px;border-radius:9px;background:var(--soft);color:var(--ink);font-size:10px;letter-spacing:0;line-height:18px}
+main{max-width:1400px;margin:0 auto;padding:28px 24px 80px}
+.head{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:20px}
+.head h2{margin:0;font:500 16px var(--head);letter-spacing:.2em;text-transform:uppercase;margin-inline-end:auto}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:6px;background:var(--ink);color:#fff;font:600 12px var(--head);letter-spacing:.12em;text-transform:uppercase;transition:opacity .2s,transform .1s}
+.btn:hover{opacity:.88}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line-2)}
+.btn.ghost:hover{background:var(--soft);opacity:1}
+.btn.danger{background:transparent;color:var(--err);box-shadow:inset 0 0 0 1px #E8BDB8}
+.btn.danger:hover{background:var(--err-bg);opacity:1}
+.btn.sm{height:32px;padding:0 10px;font-size:10px}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.btn svg{width:15px;height:15px}
+.link{color:var(--ink);text-decoration:underline;text-underline-offset:3px;font-size:13px}
+
+/* inputs */
+.in,.sel,textarea.in{height:40px;border:1px solid var(--line-2);border-radius:6px;background:#fff;padding:0 12px;outline:0;width:100%;transition:border-color .2s,box-shadow .2s}
+textarea.in{height:auto;min-height:84px;padding:10px 12px;resize:vertical;line-height:1.5}
+.in:focus,.sel:focus{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.sel{appearance:none;padding-inline-end:32px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%236A6A6A' stroke-width='1.5'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center}
+.in[dir="rtl"],textarea[dir="rtl"]{font-family:var(--ar)}
+.search{max-width:260px}
+.f{display:grid;gap:6px}
+.f>span{font:600 10px var(--head);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.f small{color:var(--muted);font-size:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media (max-width:700px){ .g2,.g3{grid-template-columns:1fr} }
+
+/* segmented filter */
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{height:32px;padding:0 12px;border-radius:16px;box-shadow:inset 0 0 0 1px var(--line-2);font-size:12px;font-weight:600;color:var(--muted);transition:background-color .2s,color .2s}
+.seg button[aria-pressed="true"]{background:var(--ink);color:#fff;box-shadow:none}
+
+/* switch */
+.sw{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:600;user-select:none}
+.sw input{appearance:none;width:34px;height:20px;border-radius:10px;background:var(--line-2);position:relative;cursor:pointer;margin:0;transition:background-color .2s;flex:none}
+.sw input::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .2s var(--ease)}
+.sw input:checked{background:var(--ink)}
+.sw input:checked::after{transform:translateX(14px)}
+.sw.red input:checked{background:var(--err)}
+.sw.green input:checked{background:var(--ok)}
+
+/* product cards */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.pc{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s,opacity .2s}
+.pc:hover{box-shadow:0 6px 24px rgba(28,27,27,.08)}
+.pc.off{opacity:.62}
+.pc .im{position:relative;aspect-ratio:4/5;background:var(--tone,var(--soft))}
+.pc .im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.pc .im img.cut{object-fit:contain;object-position:50% 100%;padding:8% 10% 0}
+.pc .chips{position:absolute;top:8px;inset-inline-start:8px;display:flex;flex-wrap:wrap;gap:4px;max-width:calc(100% - 16px)}
+.chip{display:inline-block;padding:2px 7px;border-radius:4px;font:700 9.5px/1.6 var(--head);letter-spacing:.1em;text-transform:uppercase;background:#fff;color:var(--ink)}
+.chip.red{background:var(--err);color:#fff}
+.chip.green{background:var(--ok);color:#fff}
+.chip.dark{background:var(--ink);color:#fff}
+.chip.grey{background:#8A8580;color:#fff}
+.pc .b{padding:14px;display:grid;gap:10px;flex:1}
+.pc .nm{font:600 12px/1.4 var(--head);letter-spacing:.1em;text-transform:uppercase}
+.pc .meta{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}
+.pc .tg{display:grid;gap:8px;padding-top:10px;border-top:1px solid var(--line)}
+.pc .acts{display:flex;gap:6px;margin-top:auto}
+.pc .acts .btn{flex:1}
+.add-card{border:1px dashed var(--line-2);border-radius:8px;display:grid;place-content:center;justify-items:center;gap:10px;min-height:300px;color:var(--muted);font-weight:600;transition:background-color .2s,color .2s}
+.add-card:hover{background:var(--panel);color:var(--ink)}
+.add-card svg{width:28px;height:28px}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.tbl th,.tbl td{text-align:start;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top;font-size:13px}
+.tbl th{font:600 10px var(--head);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);background:#FBF9F6}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tr.row{cursor:pointer;transition:background-color .15s}
+.tbl tr.row:hover{background:#FBF9F6}
+.tbl .sel{height:32px;font-size:12px;min-width:130px}
+.tbl .det td{background:#FBF9F6}
+.wrapx{overflow-x:auto;border-radius:8px}
+.st{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.st0{background:var(--info-bg)} .st1{background:var(--warn-bg);color:var(--warn)} .st2{background:var(--warn-bg);color:var(--warn)} .st3{background:var(--info-bg)} .st4{background:var(--ok-bg);color:var(--ok)} .st5{background:var(--err-bg);color:var(--err)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.kv h4{margin:0 0 6px;font:600 10px var(--head);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.kv p{margin:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:22px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}
+.stat b{display:block;font:500 24px var(--head);margin-top:6px}
+
+/* drawer editor */
+.ed{position:fixed;inset:0;z-index:50;visibility:hidden;transition:visibility 0s .35s}
+.ed.open{visibility:visible;transition:none}
+.ed-bg{position:absolute;inset:0;background:rgba(28,27,27,.4);opacity:0;transition:opacity .35s}
+.ed.open .ed-bg{opacity:1}
+.ed-p{position:absolute;inset-block:0;inset-inline-end:0;width:min(720px,100%);background:var(--bg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .35s var(--ease)}
+.ed.open .ed-p{transform:none}
+.ed-h{display:flex;align-items:center;gap:12px;padding:16px 22px;background:var(--panel);border-bottom:1px solid var(--line)}
+.ed-h h3{margin:0;font:500 14px var(--head);letter-spacing:.18em;text-transform:uppercase;margin-inline-end:auto}
+.ed-b{flex:1;overflow:auto;padding:22px;display:grid;gap:22px;align-content:start}
+.ed-f{display:flex;gap:10px;padding:14px 22px;background:var(--panel);border-top:1px solid var(--line)}
+.ed-f .sp{margin-inline-start:auto}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;display:grid;gap:14px}
+.card>h4{margin:0;font:600 11px var(--head);letter-spacing:.16em;text-transform:uppercase}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}
+.ph{position:relative;aspect-ratio:3/4;border-radius:6px;overflow:hidden;background:var(--tone,var(--soft));border:1px solid var(--line)}
+.ph img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.ph img.cut{object-fit:contain;object-position:50% 100%;padding:8% 8% 0}
+.ph .pa{position:absolute;inset:auto 0 0;display:flex;justify-content:space-between;padding:4px;background:linear-gradient(transparent,rgba(0,0,0,.45))}
+.ph .pa button{width:26px;height:26px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
+.ph .first{position:absolute;top:6px;inset-inline-start:6px}
+.ph-add{aspect-ratio:3/4;border:1px dashed var(--line-2);border-radius:6px;display:grid;place-content:center;justify-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--muted);text-align:center;padding:6px}
+.ph-add:hover{color:var(--ink);background:var(--soft)}
+.ph-add svg{width:20px;height:20px}
+.lib{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;max-height:340px;overflow:auto;padding:2px}
+.lib button{aspect-ratio:3/4;border-radius:6px;overflow:hidden;border:2px solid transparent;background:var(--soft)}
+.lib button:hover{border-color:var(--ink)}
+.lib img{width:100%;height:100%;object-fit:cover}
+.lbls{display:flex;flex-wrap:wrap;gap:8px}
+.lbls button{height:30px;padding:0 12px;border-radius:15px;box-shadow:inset 0 0 0 1px var(--line-2);font-size:12px;font-weight:600;transition:background-color .2s}
+.lbls button[aria-pressed="true"]{background:var(--ink);color:#fff;box-shadow:none}
+.lbls .x{margin-inline-start:6px;opacity:.7}
+.row-flex{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+.empty{padding:60px 20px;text-align:center;color:var(--muted);background:var(--panel);border:1px dashed var(--line-2);border-radius:8px}
+.note{background:var(--warn-bg);color:var(--warn);border-radius:6px;padding:10px 12px;font-size:13px}
+
+/* toast + confirm */
+.toast{position:fixed;inset-inline:0;bottom:22px;z-index:80;display:flex;justify-content:center;pointer-events:none}
+.toast p{margin:0;background:var(--ink);color:#fff;padding:11px 18px;border-radius:6px;font-size:13px;opacity:0;transform:translateY(10px);transition:opacity .25s,transform .25s}
+.toast.on p{opacity:1;transform:none}
+.toast.err p{background:var(--err)}
+dialog{border:0;border-radius:10px;padding:24px;max-width:420px;width:calc(100% - 32px)}
+dialog::backdrop{background:rgba(28,27,27,.4)}
+dialog h3{margin:0 0 8px;font:600 15px var(--body)}
+dialog p{margin:0 0 18px;color:var(--muted)}
+dialog .r{display:flex;justify-content:flex-end;gap:8px}
+.spin{width:18px;height:18px;border:2px solid var(--line-2);border-top-color:var(--ink);border-radius:50%;animation:sp .8s linear infinite;margin:40px auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (max-width:700px){ .top .t,.top .who span{display:none} main{padding:20px 14px 60px} .tabs{padding:0 8px} }
+@media (max-width:700px){
+  .pgrid{grid-template-columns:1fr 1fr;gap:10px}
+  .add-card{min-height:200px}
+  .pc .b{padding:10px;gap:8px}
+  .pc .acts{flex-wrap:wrap}
+  .pc .acts .btn{flex:1 1 40%}
+  .pc .meta{flex-direction:column;gap:2px}
+  .search{max-width:none;flex:1 1 100%}
+  .wrapx{overflow:visible}
+  .tbl,.tbl tbody,.tbl tr,.tbl td{display:block;width:100%}
+  .tbl thead{display:none}
+  .tbl{background:transparent;border:0}
+  .tbl tr{background:var(--panel);border:1px solid var(--line);border-radius:8px;margin-bottom:10px;padding:6px 0}
+  .tbl td{border:0;padding:6px 14px}
+  .tbl td[style*="text-align:end"]{text-align:start!important}
+  .tbl .det{margin-top:-14px;border-top:0;border-radius:0 0 8px 8px}
+}
+</style>
+</head>
+<body>
+<section class="gate" id="gate">
+  <div class="gate-box">
+    <img src="img/logo-dark.png" alt="NMH Dubai" width="92" height="44">
+    <h1>Control room</h1>
+    <p>Private. Sign in with the brand's Google account.</p>
+    <button class="gbtn" id="signIn" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Sign in with Google</button>
+    <p class="msg" id="gateMsg" role="status"></p>
+  </div>
+</section>
+<div id="shell" hidden>
+  <header class="top">
+    <div class="top-in"><a href="/" target="_blank" rel="noopener" aria-label="Open the shop"><img src="img/logo-dark.png" alt="NMH Dubai" width="62" height="30"></a><span class="t">Control room</span>
+      <div class="who"><span id="who"></span><button class="btn ghost sm" id="signOut" type="button">Sign out</button></div></div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Sections"></nav>
+  </header>
+  <main id="main"></main>
+</div>
+<div class="ed" id="ed" aria-hidden="true"><div class="ed-bg" data-close-ed></div>
+  <aside class="ed-p" role="dialog" aria-modal="true" aria-labelledby="edT">
+    <div class="ed-h"><h3 id="edT">Product</h3><button class="btn ghost sm" type="button" data-close-ed>Close</button></div>
+    <div class="ed-b" id="edB"></div>
+    <div class="ed-f"><button class="btn danger" type="button" id="edDel">Remove</button><span class="sp"></span><button class="btn ghost" type="button" data-close-ed>Cancel</button><button class="btn" type="button" id="edSave">Save</button></div>
+  </aside>
+</div>
+<dialog id="confirm"><form method="dialog"><h3></h3><p></p><div class="r"><button class="btn ghost" value="cancel">Cancel</button><button class="btn danger" value="ok" data-ok>Confirm</button></div></form></dialog>
+<div class="toast" id="toast" role="status"><p></p></div>
+<script src="firebase-config.js"></script>
+<script>
+(function(){
+'use strict';
+/* Who may enter. The same list is enforced by firestore.rules, which is what actually protects the data. */
+var ADMINS = ['wedoogfx@gmail.com'];
+var L = 'en';
+function t(o){ return o && typeof o === 'object' ? (o.en || o.ar || '') : (o || ''); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function $(id){ return document.getElementById(id); }
+function money(n){ return Number(n || 0).toLocaleString('en') + ' AED'; }
+function isCut(src){ return /\.webp$/.test(src || ''); }
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+function fdate(ts){ try{ return new Date(ts).toLocaleString('en-GB', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}); }catch(e){ return ''; } }
+
+/* ================= catalogue data (same source as the shop) ================= */
+var STYLES = [
+  {id:'all', en:'All', ar:'الكل'}, {id:'evening', en:'Evening', ar:'سهرة'}, {id:'everyday', en:'Everyday', ar:'يومي'},
+  {id:'abaya', en:'Under-abaya', ar:'تحت العباية'}, {id:'jumpsuit', en:'Jumpsuits', ar:'جمبسوت'}
+];
+var STYLE_INFO = {
+  all:{title:{en:'All pieces',ar:'كل القطع'}, intro:{en:'Every piece we make, across all four collections. Each one is cut to order in the colour you choose.',ar:'كل القطع اللي بنعملها من الأربع كولكشنز. كل قطعة بتتفصّل بالطلب باللون اللي تختاريه.'}, imgs:['img/bloom-1.jpg','img/front-olive.webp','img/n04.jpg']},
+  evening:{title:{en:'Evening',ar:'سهرة'}, intro:{en:'Full skirts, long sleeves and prints that hold the light. Dresses for weddings, Eid and the evenings you plan for.',ar:'تنانير واسعة، أكمام طويلة وطبعات بتلمع مع الضوء. فساتين للأفراح والعيد والسهرات اللي بتستعدي ليها.'}, imgs:['img/desert-1.jpg','img/front-dew.webp','img/rose-wall.jpg']},
+  everyday:{title:{en:'Everyday',ar:'يومي'}, intro:{en:'Easy shapes in calm colours, for work, errands and long days out.',ar:'قصّات مريحة بألوان هادية، للشغل والمشاوير والأيام الطويلة برّه.'}, imgs:['img/n07.jpg','img/front-azure.webp','img/n01.jpg']},
+  abaya:{title:{en:'Under-abaya',ar:'تحت العباية'}, intro:{en:'Simple, light layers cut to sit cleanly under your abaya.',ar:'طبقات بسيطة وخفيفة متفصّلة عشان تقعد مظبوط تحت العباية.'}, imgs:['img/navy.jpg','img/n04.jpg','img/n09.jpg']},
+  jumpsuit:{title:{en:'Jumpsuits',ar:'جمبسوت'}, intro:{en:'One piece, belted and ready. Modest cover with the ease of trousers.',ar:'قطعة واحدة بحزام وجاهزة. محتشمة وبراحة البنطلون.'}, imgs:['img/n06.jpg','img/n07.jpg','img/n01.jpg']}
+};
+var SHADES = [
+  {c:'#8A4A47', en:'Rosewood', ar:'خشب الورد'}, {c:'#24304F', en:'Midnight', ar:'كحلي ليلي'}, {c:'#C9A98A', en:'Sand', ar:'رملي'},
+  {c:'#8FA594', en:'Sage', ar:'مريمية'}, {c:'#E3C2BC', en:'Blush', ar:'وردي فاتح'}, {c:'#EEE6D8', en:'Ivory', ar:'عاجي'},
+  {c:'#5E2D4F', en:'Plum', ar:'برقوقي'}, {c:'#2F2A2C', en:'Onyx', ar:'أونيكس'}
+];
+var DYES = {
+  olive:{code:'S02', en:'Olive Drape Gown', ar:'فستان أوليف درايب'},
+  azure:{code:'S01', en:'Azure Cascade Midi', ar:'فستان أزور'}
+};
+var COLLECTIONS = [
+  { id:'bloom', season:{en:'Spring/Summer 2026',ar:'ربيع وصيف ٢٠٢٦'}, cover:'img/bloom-1.jpg', small:'img/bloom-4.jpg', tone:'#E6CFC6',
+    name:{en:'Femininity in Bloom',ar:'أنوثة تنبض بالأناقة'},
+    story:{en:'A celebration of floral artistry and graceful silhouettes. Rich botanical prints meet fluid pleats, for a look that feels effortless and timeless.',ar:'احتفال بفن الزهور والقصّات الانسيابية. طبعات نباتية غنية تلتقي بالكسرات الناعمة، لإطلالة بسيطة وخالدة.'},
+    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Botanical, soft',ar:'نباتي وناعم'}},{k:{en:'Signature',ar:'التوقيع'},v:{en:'Knife pleats',ar:'كسرات دقيقة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Location',ar:'اللوكيشن'},v:{en:'Rose courtyard',ar:'فناء وردي'}}],
+    album:['img/bloom-1.jpg','img/bloom-4.jpg','img/front-dew.webp','img/bloom-2.jpg','img/front-magnolia.webp','img/bloom-5.jpg','img/bloom-3.jpg','img/rk-dew-back.webp','img/side-magnolia.webp'] },
+  { id:'desert', season:{en:'Spring/Summer 2026',ar:'ربيع وصيف ٢٠٢٦'}, cover:'img/desert-1.jpg', small:'img/desert-3.jpg', tone:'#E3C9BB',
+    name:{en:'Timeless Desert Elegance',ar:'أناقة الصحراء الخالدة'},
+    story:{en:'Inspired by the light of the dunes at golden hour. Full skirts that sweep the stone, long sleeves and a quiet, sculpted waist.',ar:'مستوحاة من ضوء الكثبان وقت الغروب. تنانير واسعة تلامس الحجر، أكمام طويلة وخصر منحوت بهدوء.'},
+    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Sunlit, sculptural',ar:'مشمس ومنحوت'}},{k:{en:'Signature',ar:'التوقيع'},v:{en:'Full circle skirt',ar:'تنورة دائرية كاملة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Location',ar:'اللوكيشن'},v:{en:'Stone courtyard',ar:'فناء حجري'}}],
+    album:['img/desert-1.jpg','img/front-sienna.webp','img/desert-3.jpg','img/rose-wall.jpg','img/side-sienna.webp','img/desert-2.jpg','img/rk-rose-back.webp'] },
+  { id:'drape', season:{en:'Autumn/Winter 2026',ar:'خريف وشتاء ٢٠٢٦'}, cut:['img/front-azure.webp','img/front-olive.webp'], tone:'#DCD8D2',
+    name:{en:'The Drape Edit',ar:'كولكشن الطيّات'},
+    story:{en:'Solid crepe in quiet colours, shaped by one gesture: a fold of fabric that falls from the waist and moves when you walk.',ar:'كريب سادة بألوان هادية، شكله حركة واحدة: طيّة قماش بتنزل من الخصر وتتحرك مع كل خطوة.'},
+    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Sculpted, calm',ar:'منحوت وهادي'}},{k:{en:'Signature',ar:'التوقيع'},v:{en:'Waterfall drape',ar:'طيّة منسدلة'}},{k:{en:'Fabric',ar:'القماش'},v:{en:'[Fabric]',ar:'[القماش]'}},{k:{en:'Colours',ar:'الألوان'},v:{en:'Any, try them above',ar:'أي لون، جرّبيه فوق'}}],
+    album:['img/front-azure.webp','img/side-azure.webp','img/rk-azure-back.webp','img/front-olive.webp','img/side-olive.webp','img/rk-olive-back.webp'] },
+  { id:'essentials', season:{en:'The archive',ar:'الأرشيف'}, cover:'img/n04.jpg', small:'img/n07.jpg', tone:'#DDDBD8',
+    name:{en:'Everyday Essentials',ar:'أساسيات كل يوم'},
+    story:{en:'The pieces that started NMH: easy dresses, an under-abaya slip and a belted jumpsuit, each one available in any colour.',ar:'القطع اللي بدأت بيها NMH: فساتين مريحة، فستان تحت العباية، وجمبسوت بحزام، وكل قطعة متاحة بأي لون.'},
+    specs:[{k:{en:'Mood',ar:'الإحساس'},v:{en:'Calm, versatile',ar:'هادي ومتعدد'}},{k:{en:'Pieces',ar:'القطع'},v:{en:'Six designs',ar:'٦ تصميمات'}},{k:{en:'Colours',ar:'الألوان'},v:{en:'Any, on request',ar:'أي لون بالطلب'}},{k:{en:'Location',ar:'اللوكيشن'},v:{en:'Studio',ar:'استوديو'}}],
+    album:['img/n07.jpg','img/n04.jpg','img/n01.jpg','img/navy.jpg','img/n09.jpg','img/n06.jpg'] }
+];
+var PRODUCTS = [
+  {code:'B01', col:'bloom', style:'evening', tone:'#E6CFC6', price:520, name:{en:'Layla Pleated Maxi',ar:'فستان ليلى المكسّر'}, imgs:['img/bloom-1.jpg','img/bloom-2.jpg','img/bloom-3.jpg','img/bloom-5.jpg'],
+    desc:{en:'Long-sleeve floral maxi with fine knife pleats from the yoke down and a softly gathered waist.',ar:'فستان طويل بطبعة زهور وأكمام طويلة، بكسرات دقيقة من الصدر لتحت وخصر ناعم.'},
+    story:{en:'Drawn for the hour after sunset, when the courtyard walls turn rose. Fine pleats fall from the yoke and open like a fan with every step.',ar:'اتصمم لساعة ما بعد الغروب، لما حيطان الفناء بتتلوّن وردي. كسرات دقيقة بتنزل من الصدر وبتتفتح زي المروحة مع كل خطوة.'}},
+  {code:'D01', col:'desert', style:'evening', tone:'#EAD9D3', price:560, name:{en:'Noor Circle Maxi',ar:'فستان نور الدائري'}, imgs:['img/front-rose.webp','img/side-rose.webp','img/rk-rose-back.webp','img/desert-1.jpg','img/desert-3.jpg','img/desert-2.jpg'],
+    desc:{en:'Fitted floral bodice, long cuffed sleeves and a full circle skirt that sweeps the floor.',ar:'صدر محدد بطبعة زهور، أكمام طويلة بأساور، وتنورة دائرية واسعة تلامس الأرض.'},
+    story:{en:'Noor means light. A fitted floral bodice gives way to a full circle skirt that catches the late sun and sweeps the stone floor.',ar:'نور يعني ضوء. صدر محدد بطبعة زهور بيكمّل لتنورة دائرية كاملة بتلقط ضوء الشمس وبتلمس أرضية الحجر.'}},
+  {code:'D02', col:'desert', style:'evening', tone:'#E3C9BB', price:480, name:{en:'Rose Wall Gathered Maxi',ar:'فستان روز المجمّع'}, imgs:['img/rose-wall.jpg','img/desert-4.jpg'],
+    desc:{en:'Floral maxi with a gathered waist and long sleeves, cut to move.',ar:'فستان طويل بطبعة زهور، بخصر مجمّع وأكمام طويلة، متفصّل للحركة.'},
+    story:{en:'Made for long evenings outdoors. A gathered waist and soft sleeves keep it easy, while the print does the talking.',ar:'معمول للسهرات الطويلة برّه. خصر مجمّع وأكمام ناعمة بيخلّوه مريح، والطبعة هي اللي بتتكلم.'}},
+  {code:'D03', col:'desert', style:'evening', tone:'#EBD8CC', price:540, name:{en:'Sienna Leaf Maxi',ar:'فستان سيينا'}, imgs:['img/front-sienna.webp','img/side-sienna.webp','img/rk-sienna-back.webp'],
+    desc:{en:'Painterly terracotta leaf print on a fitted bodice with a full pleated skirt and cuffed long sleeves.',ar:'طبعة أوراق بلون التراكوتا على صدر محدد وتنورة واسعة بكسرات وأكمام طويلة بأساور.'},
+    story:{en:'A painterly leaf print in terracotta and cream, inspired by desert stone at golden hour. The skirt is full enough to turn in.',ar:'طبعة أوراق كأنها مرسومة بالفرشاة بلون التراكوتا والكريمي، مستوحاة من حجر الصحراء وقت الغروب. التنورة واسعة كفاية إنك تلفّي بيها.'}},
+  {code:'B02', col:'bloom', style:'evening', tone:'#DCE2E6', price:520, name:{en:'Dew Blossom Maxi',ar:'فستان ندى'}, imgs:['img/front-dew.webp','img/side-dew.webp','img/rk-dew-back.webp'],
+    desc:{en:'Dusty-blue ground with ivory blossoms, a softly gathered waist and a floor-sweeping skirt.',ar:'أرضية زرقاء هادية بزهور عاجية، خصر مجمّع بنعومة وتنورة طويلة للأرض.'},
+    story:{en:'Ivory blossoms on a dusty-blue ground, like morning dew on a garden wall. Quiet enough for daytime, full enough for an occasion.',ar:'زهور عاجية على أرضية زرقاء هادية، زي الندى الصبح على سور جنينة. هادي كفاية للنهار، وفخم كفاية لمناسبة.'}},
+  {code:'B03', col:'bloom', style:'evening', tone:'#E4E3D6', price:520, name:{en:'Magnolia Maxi',ar:'فستان ماغنوليا'}, imgs:['img/front-magnolia.webp','img/side-magnolia.webp','img/rk-magnolia-back.webp'],
+    desc:{en:'Cream magnolias and sage leaves on a long-sleeve maxi with a fitted bodice and full skirt.',ar:'زهور ماغنوليا كريمي وأوراق سيج على فستان طويل بصدر محدد وتنورة واسعة.'},
+    story:{en:'Cream magnolias and sage leaves, cut into a long-sleeve maxi with a fitted bodice. A garden dress for a formal day.',ar:'زهور ماغنوليا كريمي وأوراق سيج على فستان طويل بأكمام وصدر محدد. فستان جنينة ليوم رسمي.'}},
+  {code:'S01', col:'drape', style:'everyday', tone:'#DCE0E6', price:460, dye:'azure', name:{en:'Azure Cascade Midi',ar:'فستان أزور'}, imgs:['img/front-azure.webp','img/side-azure.webp','img/rk-azure-back.webp'],
+    desc:{en:'Steel-blue crepe with bishop sleeves, a tied sash and a cascading side drape.',ar:'كريب أزرق رصاصي بأكمام منفوخة، حزام معقود وطيّة جانبية متدرجة.'},
+    story:{en:'One gesture shapes this dress: a sash tied at the waist that falls into a cascade. Choose it in steel blue or in any colour you like.',ar:'حركة واحدة بتشكّل الفستان ده: حزام معقود على الخصر بينزل في طيّات متدرجة. اختاريه أزرق رصاصي أو بأي لون تحبيه.'}},
+  {code:'S02', col:'drape', style:'evening', tone:'#E2E0D4', price:590, dye:'olive', name:{en:'Olive Drape Gown',ar:'فستان أوليف درايب'}, imgs:['img/front-olive.webp','img/side-olive.webp','img/rk-olive-back.webp'],
+    desc:{en:'Olive crepe gown with a wrapped bodice, flutter sleeves and a long waterfall drape.',ar:'فستان كريب زيتوني بصدر ملفوف، أكمام متموجة وطيّة طويلة منسدلة.'},
+    story:{en:'A wrapped bodice and a long waterfall drape that moves when you walk. Shown in olive, made in the colour you choose.',ar:'صدر ملفوف وطيّة طويلة منسدلة بتتحرك مع خطوتك. ظاهر بالزيتي، وبيتفصّل باللون اللي تختاريه.'}},
+  {code:'N07', col:'essentials', style:'everyday', price:350, name:{en:'Sage Tier Dress',ar:'فستان سيج'}, imgs:['img/n07.jpg'],
+    desc:{en:'Relaxed midi with an asymmetric gathered tier and elasticated cuffs.',ar:'فستان ميدي مريح بطبقة مجمّعة غير متماثلة وأساور مطاطية.'},
+    story:{en:'An easy midi for everyday, with an asymmetric tier that adds movement without fuss.',ar:'فستان ميدي مريح لكل يوم، بطبقة غير متماثلة بتدّي حركة من غير تعقيد.'}},
+  {code:'N04', col:'essentials', style:'everyday', price:379, name:{en:'Mist Cascade Dress',ar:'فستان ميست'}, imgs:['img/n04.jpg'],
+    desc:{en:'Linen-look dress with pleated flutter sleeves and a cascading asymmetric hem.',ar:'فستان بملمس الكتان بأكمام مكسّرة وذيل متدرج غير متماثل.'},
+    story:{en:'Soft as morning haze: pleated flutter sleeves and a hem that cascades from one side to the other.',ar:'ناعم زي شبورة الصبح: أكمام مكسّرة وذيل بينزل متدرج من جنب للتاني.'}},
+  {code:'N01', col:'essentials', style:'everyday', price:370, name:{en:'Rose Quartz Set Dress',ar:'فستان روز كوارتز'}, imgs:['img/n01.jpg'],
+    desc:{en:'Stand-collar blouse top with a soft draped waist over a straight midi skirt.',ar:'جزء علوي بياقة واقفة وخصر منسدل، مع تنورة ميدي مستقيمة.'},
+    story:{en:'A two-piece look in one dress: a stand-collar blouse with a draped waist over a straight midi skirt.',ar:'إطلالة قطعتين في فستان واحد: بلوزة بياقة واقفة وخصر منسدل فوق تنورة ميدي مستقيمة.'}},
+  {code:'N09', col:'essentials', style:'everyday', price:299, name:{en:'Olive Pleat Panel',ar:'فستان أوليف'}, imgs:['img/n09.jpg'],
+    desc:{en:'Satin midi with a pleated contrast panel, button side detail and flutter sleeves.',ar:'فستان ساتان بقطعة مكسّرة بلون مختلف، وأزرار جانبية وأكمام قصيرة.'},
+    story:{en:'Satin with a pleated contrast panel that shows when you move, finished with buttons at the side.',ar:'ساتان بقطعة مكسّرة بلون مختلف بتظهر لما تتحركي، وأزرار على الجنب.'}},
+  {code:'N08', col:'essentials', style:'abaya', price:260, name:{en:'Midnight Under-Abaya',ar:'فستان ميدنايت تحت العباية'}, imgs:['img/navy.jpg'],
+    desc:{en:'A simple long-sleeve slip with a stand collar and a clean A-line, made to sit under an abaya.',ar:'فستان بسيط بأكمام طويلة وياقة واقفة وقصّة A، معمول يتلبس تحت العباية.'},
+    story:{en:'The dress you reach for under your abaya: long sleeves, a stand collar and a clean A-line that sits quietly underneath.',ar:'الفستان اللي بتلبسيه تحت العباية: أكمام طويلة، ياقة واقفة وقصّة A نظيفة بتقعد بهدوء تحتها.'}},
+  {code:'N06', col:'essentials', style:'jumpsuit', price:199, name:{en:'Onyx Belted Jumpsuit',ar:'جمبسوت أونيكس'}, imgs:['img/n06.jpg'],
+    desc:{en:'Wrap-front jumpsuit with a keyhole neckline, tie belt and cuffed ankles.',ar:'جمبسوت بصدر ملفوف وفتحة رقبة، حزام للربط وأساور عند الكاحل.'},
+    story:{en:'A wrap-front jumpsuit with a tie belt, for days that need both ease and polish.',ar:'جمبسوت بصدر ملفوف وحزام للربط، للأيام اللي محتاجة راحة وأناقة مع بعض.'}}
+];
+
+/* ---- The One: a signature line of one-of-one pieces (placeholder photos and prices until the real ones arrive) ---- */
+var ONE = [
+  {code:'O01', no:'01', one:true, col:'the-one', style:'evening', tone:'#E6CFC6', price:1450, name:{en:'Amber Dusk',ar:'غسق الكهرمان'}, imgs:['img/bloom-3.jpg','img/bloom-2.jpg'],
+    desc:{en:'A pleated floral gown with a softly gathered waist and long sleeves, made once.',ar:'فستان بطبعة زهور وكسرات، بخصر مجمّع وأكمام طويلة، بيتعمل مرة واحدة بس.'},
+    story:{en:'Cut from the last length of a print we will not order again. There is fabric for one dress, and this is it.',ar:'متفصّل من آخر حتة قماش من الطبعة دي، ومش هنطلبها تاني. القماش يكفي فستان واحد بس، وهو ده.'}},
+  {code:'O02', no:'02', one:true, col:'the-one', style:'evening', tone:'#E3C9BB', price:1600, name:{en:'Rose Courtyard',ar:'الفناء الوردي'}, imgs:['img/desert-4.jpg','img/rose-wall.jpg'],
+    desc:{en:'A full-skirted maxi in a rose and plum print, with a fitted bodice and cuffed sleeves.',ar:'فستان طويل بتنورة واسعة وطبعة وردي وبرقوقي، بصدر محدد وأكمام بأساور.'},
+    story:{en:'Drawn for one evening in a stone courtyard at sunset. We made the pattern once, and it will not be repeated.',ar:'اتصمم لسهرة واحدة في فناء حجري وقت الغروب. عملنا الباترون مرة واحدة، ومش هيتكرر.'}},
+  {code:'O03', no:'03', one:true, col:'the-one', style:'evening', tone:'#EBD8CC', price:1380, name:{en:'Sienna Hour',ar:'ساعة سيينا'}, imgs:['img/desert-3.jpg','img/desert-2.jpg'],
+    desc:{en:'A sculpted maxi in warm terracotta tones with a sweeping hem.',ar:'فستان طويل منحوت بدرجات التراكوتا الدافية وذيل واسع.'},
+    story:{en:'Made for the hour when the desert turns copper. One dress, one owner.',ar:'معمول للساعة اللي الصحراء بتبقى فيها نحاسي. فستان واحد، لصاحبة واحدة.'}},
+  {code:'O04', no:'04', one:true, col:'the-one', style:'evening', tone:'#E4E3D6', price:1520, name:{en:'Garden Veil',ar:'ستار الجنينة'}, imgs:['img/bloom-4.jpg','img/bloom-5.jpg'],
+    desc:{en:'Fine knife pleats in a soft botanical print, finished by hand.',ar:'كسرات دقيقة بطبعة نباتية ناعمة، متشطّبة باليد.'},
+    story:{en:'Every pleat on this dress was pressed by hand for one woman. When it leaves the atelier, the design leaves with it.',ar:'كل كسرة في الفستان ده اتكوت باليد لست واحدة. لما يخرج من الأتيليه، التصميم بيخرج معاه.'}}
+];
+COLLECTIONS.unshift({id:'the-one', season:{en:'Signature · One of one',ar:'التوقيع · قطعة واحدة'}, cover:'img/bloom-3.jpg', small:'img/desert-4.jpg', tone:'#1C1B1B',
+  name:{en:'The One',ar:'القطعة الواحدة'},
+  story:{en:'One piece. Made once. Never again. Each dress in this line exists as a single piece; when it finds its owner, it is gone for good.',ar:'قطعة واحدة. بتتعمل مرة واحدة. ومش بتتكرر تاني. كل فستان في الخط ده موجود نسخة واحدة بس، ولما يلاقي صاحبته بيختفي للأبد.'}});
+
+PRODUCTS = PRODUCTS.concat(ONE);
+var BASE = PRODUCTS.slice(), BASEMAP = {};
+BASE.forEach(function(p, i){ BASEMAP[p.code] = Object.assign({sort:i}, p); });
+var STYLE_OPTS = STYLES.filter(function(s){ return s.id !== 'all'; });
+var LIB = ['img/bloom-1.jpg','img/bloom-2.jpg','img/bloom-3.jpg','img/bloom-4.jpg','img/bloom-5.jpg','img/desert-1.jpg','img/desert-2.jpg','img/desert-3.jpg','img/desert-4.jpg','img/rose-wall.jpg','img/hero.jpg','img/n01.jpg','img/n04.jpg','img/n06.jpg','img/n07.jpg','img/n09.jpg','img/navy.jpg',
+  'img/front-azure.webp','img/side-azure.webp','img/rk-azure-back.webp','img/front-olive.webp','img/side-olive.webp','img/rk-olive-back.webp','img/front-dew.webp','img/side-dew.webp','img/rk-dew-back.webp','img/front-magnolia.webp','img/side-magnolia.webp','img/rk-magnolia-back.webp','img/front-rose.webp','img/side-rose.webp','img/rk-rose-back.webp','img/front-sienna.webp','img/side-sienna.webp','img/rk-sienna-back.webp'];
+var PRESET_LABELS = [
+  {en:'Best seller', ar:'الأكثر مبيعًا'}, {en:'Limited', ar:'كمية محدودة'}, {en:'Last pieces', ar:'آخر قطع'}, {en:'Back in stock', ar:'رجع تاني'},
+  {en:'Eid edit', ar:'مختارات العيد'}, {en:'Ramadan', ar:'رمضان'}, {en:'Exclusive', ar:'حصري'}, {en:'Sale', ar:'تخفيض'}
+];
+var STATUS = ['Received', 'Confirmed', 'Being cut', 'Shipped', 'Delivered', 'Cancelled'];
+
+/* ================= Firebase (or a local mock for testing) ================= */
+var MOCK = /^(localhost|127\.)/.test(location.hostname) && /mock=1/.test(location.search);
+var DBX = null, AUTH = null, ME = null;
+function boot(){
+  if(MOCK) return bootMock();
+  var cfg = window.NMH_FIREBASE;
+  if(!cfg || !cfg.apiKey){ gateMsg('Firebase is not configured for this site.', true); return; }
+  var base = 'https://www.gstatic.com/firebasejs/12.19.0/';
+  Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-auth.js'), import(base + 'firebase-firestore.js')]).then(function(m){
+    var app = m[0].initializeApp(cfg), A = m[1], F = m[2], auth = A.getAuth(app), db = F.getFirestore(app);
+    AUTH = {
+      signIn:function(){ var pr = new A.GoogleAuthProvider(); pr.setCustomParameters({prompt:'select_account'}); return A.signInWithPopup(auth, pr); },
+      signOut:function(){ return A.signOut(auth); },
+      watch:function(fn){ A.onAuthStateChanged(auth, fn); }
+    };
+    DBX = {
+      list:function(name, order){ var q = order ? F.query(F.collection(db, name), F.orderBy(order, 'desc'), F.limit(300)) : F.collection(db, name); return F.getDocs(q).then(function(qs){ var a = []; qs.forEach(function(d){ var v = d.data(); v._id = d.id; a.push(v); }); return a; }); },
+      get:function(name, id){ return F.getDoc(F.doc(db, name, id)).then(function(d){ return d.exists() ? d.data() : null; }); },
+      set:function(name, id, data, merge){ return F.setDoc(F.doc(db, name, id), data, merge ? {merge:true} : undefined); },
+      update:function(name, id, data){ return F.updateDoc(F.doc(db, name, id), data); },
+      del:function(name, id){ return F.deleteDoc(F.doc(db, name, id)); }
+    };
+    AUTH.watch(onUser);
+  }).catch(function(e){ console.error(e); gateMsg('Could not load. Check your connection and refresh.', true); });
+}
+function bootMock(){
+  var store = {products:{}, orders:{}, subscribers:{}, oneofone:{}, settings:{}};
+  try{ store = Object.assign(store, JSON.parse(localStorage.getItem('nmh-mock-db') || '{}')); }catch(e){}
+  var save = function(){ localStorage.setItem('nmh-mock-db', JSON.stringify(store)); };
+  var P = function(v){ return new Promise(function(r){ setTimeout(function(){ r(v); }, 60); }); };
+  AUTH = {signIn:function(){ onUser({email:'wedoogfx@gmail.com', emailVerified:true, displayName:'Mock admin'}); return P(); }, signOut:function(){ onUser(null); return P(); }, watch:function(){}};
+  DBX = {
+    list:function(n, order){ var a = Object.keys(store[n] || {}).map(function(k){ var v = clone(store[n][k]); v._id = k; return v; }); if(order) a.sort(function(x, y){ return (y[order] || 0) - (x[order] || 0); }); return P(a); },
+    get:function(n, id){ return P(store[n] && store[n][id] ? clone(store[n][id]) : null); },
+    set:function(n, id, d, merge){ store[n] = store[n] || {}; store[n][id] = merge ? Object.assign({}, store[n][id] || {}, clone(d)) : clone(d); save(); return P(); },
+    update:function(n, id, d){ store[n][id] = Object.assign({}, store[n][id], clone(d)); save(); return P(); },
+    del:function(n, id){ delete store[n][id]; save(); return P(); }
+  };
+  gateMsg('Local test mode', false);
+}
+
+/* ================= sign-in gate ================= */
+function gateMsg(m, err){ var el = $('gateMsg'); el.textContent = m || ''; el.className = 'msg' + (err ? ' err' : ''); }
+function onUser(user){
+  if(user && ADMINS.indexOf(String(user.email || '').toLowerCase()) > -1 && user.emailVerified !== false){
+    ME = user; $('gate').hidden = true; $('shell').hidden = false; $('who').textContent = user.email; loadAll(); return;
+  }
+  ME = null; $('shell').hidden = true; $('gate').hidden = false;
+  if(user){ gateMsg(user.email + ' does not have access to the control room.', true); AUTH.signOut(); }
+}
+$('signIn').addEventListener('click', function(){
+  if(!AUTH) return; gateMsg('Opening Google…');
+  AUTH.signIn().then(function(){ gateMsg(''); }).catch(function(e){ gateMsg(/popup-closed|cancelled/.test(e && e.code) ? '' : /popup-blocked/.test(e && e.code) ? 'Your browser blocked the Google window. Allow pop-ups for this site.' : 'Sign-in failed. Try again.', true); });
+});
+$('signOut').addEventListener('click', function(){ AUTH.signOut(); });
+
+/* ================= state ================= */
+var S = {tab:'products', over:{}, orders:[], subs:[], claims:{}, site:{}, filter:'all', q:'', open:null, loaded:false};
+function merged(){
+  var list = BASE.map(function(p){ return Object.assign({}, BASEMAP[p.code], S.over[p.code] || {}, {_base:true}); });
+  Object.keys(S.over).forEach(function(c){ if(!BASEMAP[c]){ var o = S.over[c]; if(o && o.name) list.push(Object.assign({sort:1000, tone:'#F5F0EA', imgs:[]}, o, {code:c, _base:false})); } });
+  return list.sort(function(a, b){ return (a.sort || 0) - (b.sort || 0); });
+}
+function byCode(c){ return merged().filter(function(p){ return p.code === c; })[0]; }
+function loadAll(){
+  $('main').innerHTML = '<div class="spin"></div>';
+  Promise.all([DBX.list('products'), DBX.list('orders', 'created').catch(function(){ return []; }), DBX.list('subscribers', 'created').catch(function(){ return []; }), DBX.list('oneofone').catch(function(){ return []; }), DBX.get('settings', 'site').catch(function(){ return null; })]).then(function(r){
+    S.over = {}; r[0].forEach(function(p){ var id = p._id; delete p._id; S.over[id] = p; });
+    S.orders = r[1]; S.subs = r[2]; S.claims = {}; r[3].forEach(function(c){ S.claims[c._id] = c; }); S.site = r[4] || {};
+    S.loaded = true; render();
+  }).catch(function(e){ console.error(e); $('main').innerHTML = '<div class="empty">Could not load the data: ' + esc(e.message || e) + '<br><br>If this says "permission", the database rules for the control room have not been published yet.</div>'; });
+}
+
+/* ================= render ================= */
+function render(){
+  var newOrders = S.orders.filter(function(o){ return !o.status; }).length;
+  $('tabs').innerHTML = [['products', 'Products'], ['orders', 'Orders', newOrders], ['one', 'The One'], ['subs', 'Subscribers', S.subs.length], ['site', 'Site']].map(function(x){
+    return '<button type="button" role="tab" data-tab="' + x[0] + '" aria-selected="' + (S.tab === x[0]) + '">' + x[1] + (x[2] ? '<span class="n">' + x[2] + '</span>' : '') + '</button>';
+  }).join('');
+  ({products:viewProducts, orders:viewOrders, one:viewOne, subs:viewSubs, site:viewSite})[S.tab]();
+}
+function status(p){
+  var c = [];
+  if(p.removed) c.push(['Removed', 'grey']); else if(p.hidden) c.push(['Hidden', 'grey']);
+  if(p.soldOut) c.push(['Sold out', 'red']);
+  if(p.one && S.claims[p.code]) c.push(['Claimed', 'red']);
+  if(p.isNew) c.push(['New', 'green']);
+  if(p.one) c.push(['1 of 1 · N° ' + (p.no || '?'), 'dark']);
+  (p.labels || []).forEach(function(l){ c.push([t(l), '']); });
+  return c;
+}
+function thumb(p){ var src = (p.imgs || [])[0]; return src ? '<img' + (isCut(src) ? ' class="cut"' : '') + ' src="' + esc(src) + '" alt="">' : ''; }
+
+function viewProducts(){
+  var all = merged(), q = S.q.toLowerCase();
+  var counts = {all:0, live:0, soldout:0, new:0, hidden:0, removed:0};
+  var match = function(p, f){ return f === 'all' ? !p.removed : f === 'live' ? !p.removed && !p.hidden && !p.soldOut : f === 'soldout' ? !p.removed && p.soldOut : f === 'new' ? !p.removed && p.isNew : f === 'hidden' ? !p.removed && p.hidden : p.removed; };
+  Object.keys(counts).forEach(function(f){ counts[f] = all.filter(function(p){ return match(p, f); }).length; });
+  var list = all.filter(function(p){ return match(p, S.filter) && (!q || (t(p.name) + ' ' + (p.name.ar || '') + ' ' + p.code).toLowerCase().indexOf(q) > -1); });
+  $('main').innerHTML =
+    '<div class="head"><h2>Products</h2><input class="in search" id="q" type="search" placeholder="Search name or code" value="' + esc(S.q) + '"><button class="btn" type="button" data-new>+ Add product</button></div>' +
+    '<div class="seg" style="margin-bottom:18px">' + [['all', 'All'], ['live', 'On sale'], ['soldout', 'Sold out'], ['new', 'New arrivals'], ['hidden', 'Hidden'], ['removed', 'Removed']].map(function(f){ return '<button type="button" data-filter="' + f[0] + '" aria-pressed="' + (S.filter === f[0]) + '">' + f[1] + ' (' + counts[f[0]] + ')</button>'; }).join('') + '</div>' +
+    (list.length || S.filter === 'all' ? '<div class="pgrid">' + (S.filter === 'all' && !q ? '<button class="add-card" type="button" data-new><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>Add a new product</button>' : '') +
+      list.map(function(p){
+        return '<article class="pc' + (p.hidden || p.removed ? ' off' : '') + '">' +
+          '<div class="im" style="--tone:' + esc(p.tone || '') + '">' + thumb(p) + '<div class="chips">' + status(p).map(function(c){ return '<span class="chip ' + c[1] + '">' + esc(c[0]) + '</span>'; }).join('') + '</div></div>' +
+          '<div class="b"><div class="nm">' + esc(t(p.name)) + '</div><div class="meta"><span>' + esc(p.code) + ' · ' + esc(t((COLLECTIONS.filter(function(c){ return c.id === p.col; })[0] || {}).name)) + '</span><b>' + money(p.price) + '</b></div>' +
+          (p.removed ? '<div class="acts"><button class="btn ghost sm" type="button" data-restore="' + p.code + '">Restore</button></div>' :
+          '<div class="tg">' +
+            '<label class="sw red"><input type="checkbox" data-flag="soldOut" data-code="' + p.code + '"' + (p.soldOut ? ' checked' : '') + '>Sold out</label>' +
+            '<label class="sw green"><input type="checkbox" data-flag="isNew" data-code="' + p.code + '"' + (p.isNew ? ' checked' : '') + '>New arrival</label>' +
+            '<label class="sw"><input type="checkbox" data-flag="hidden" data-code="' + p.code + '"' + (p.hidden ? ' checked' : '') + '>Hidden from shop</label></div>' +
+          '<div class="acts"><button class="btn sm" type="button" data-edit="' + p.code + '">Edit</button><a class="btn ghost sm" href="/#p-' + p.code + '" target="_blank" rel="noopener">View</a><button class="btn danger sm" type="button" data-remove="' + p.code + '">Remove</button></div>') +
+          '</div></article>';
+      }).join('') + '</div>' : '<div class="empty">Nothing here.</div>');
+}
+
+function viewOrders(){
+  var o = S.orders, sum = function(a){ return a.reduce(function(n, x){ return n + (x.total || 0); }, 0); };
+  var openO = o.filter(function(x){ return (x.status || 0) < 4; });
+  $('main').innerHTML = '<div class="head"><h2>Orders</h2><button class="btn ghost" type="button" data-reload>Refresh</button></div>' +
+    '<div class="stats"><div class="stat"><span class="cap muted">New</span><b>' + o.filter(function(x){ return !x.status; }).length + '</b></div><div class="stat"><span class="cap muted">In progress</span><b>' + openO.length + '</b></div><div class="stat"><span class="cap muted">All orders</span><b>' + o.length + '</b></div><div class="stat"><span class="cap muted">Value of open orders</span><b>' + money(sum(openO.filter(function(x){ return x.status !== 5; }))) + '</b></div></div>' +
+    (o.length ? '<div class="wrapx"><table class="tbl"><thead><tr><th>Order</th><th>Customer</th><th>Pieces</th><th>Total</th><th>Status</th></tr></thead><tbody>' +
+      o.map(function(x){
+        var open = S.open === x.id, st = x.status || 0;
+        return '<tr class="row" data-open="' + esc(x.id) + '"><td><b>' + esc(x.id) + '</b><br><span class="muted">' + fdate(x.created) + '</span></td><td>' + esc(x.contact && x.contact.name) + '<br><a class="link" href="https://wa.me/' + esc(String(x.contact && x.contact.phone || '').replace(/\D/g, '')) + '" target="_blank" rel="noopener">' + esc(x.contact && x.contact.phone) + '</a></td>' +
+          '<td>' + (x.items || []).map(function(it){ return esc(it.qty) + ' × ' + esc(it.name || it.code); }).join('<br>') + '</td><td><b>' + money(x.total) + '</b><br><span class="muted">' + (x.pay === 'cod' ? 'Cash on delivery' : 'Payment link') + '</span></td>' +
+          '<td><select class="sel" data-status="' + esc(x.id) + '" aria-label="Status of ' + esc(x.id) + '">' + STATUS.map(function(s, i){ return '<option value="' + i + '"' + (i === st ? ' selected' : '') + '>' + s + '</option>'; }).join('') + '</select></td></tr>' +
+          (open ? '<tr class="det"><td colspan="5"><div class="kv">' +
+            '<div><h4>Contact</h4><p>' + esc(x.contact.name) + '<br>' + esc(x.contact.email) + '<br>' + esc(x.contact.phone) + '</p></div>' +
+            '<div><h4>Delivery</h4><p>' + esc(x.address.line) + (x.address.apt ? ', ' + esc(x.address.apt) : '') + '<br>' + esc(x.address.city) + (x.address.region ? ', ' + esc(x.address.region) : '') + '<br>' + esc(x.address.country) + ' · ' + esc(x.method) + '</p></div>' +
+            '<div><h4>Pieces</h4><p>' + (x.items || []).map(function(it){ return '<b>' + esc(it.code) + '</b> ' + esc(it.name) + '<br><span class="muted">' + esc(it.variant || '') + (it.hex ? ' · ' + esc(it.hex) : '') + '</span>'; }).join('<br>') + '</p></div>' +
+            (x.measure ? '<div><h4>Measurements (cm)</h4><p>' + Object.keys(x.measure).filter(function(k){ return x.measure[k]; }).map(function(k){ return esc(k) + ': ' + esc(x.measure[k]); }).join('<br>') + '</p></div>' : '') +
+            (x.note ? '<div><h4>Note</h4><p>' + esc(x.note) + '</p></div>' : '') +
+            '<div><h4>Totals</h4><p>Subtotal ' + money(x.sub) + '<br>Shipping ' + money(x.ship) + '<br><b>Total ' + money(x.total) + '</b></p></div>' +
+          '</div></td></tr>' : '');
+      }).join('') + '</tbody></table></div>' : '<div class="empty">No orders yet. New orders appear here, and you also get an email for each one.</div>');
+}
+
+function viewOne(){
+  var list = merged().filter(function(p){ return p.one && !p.removed; });
+  $('main').innerHTML = '<div class="head"><h2>The One</h2><button class="btn" type="button" data-new="one">+ Add a 1 of 1 piece</button></div>' +
+    '<p class="muted" style="margin:-8px 0 18px;max-width:720px">A piece is claimed automatically when someone orders it, so nobody else can buy it. If that order is cancelled, press Release to put the piece back on sale.</p>' +
+    (list.length ? '<div class="wrapx"><table class="tbl"><thead><tr><th></th><th>Piece</th><th>Price</th><th>State</th><th></th></tr></thead><tbody>' + list.map(function(p){
+      var c = S.claims[p.code];
+      return '<tr><td style="width:70px"><div class="ph" style="width:56px;--tone:' + esc(p.tone || '') + '">' + thumb(p) + '</div></td><td><b>N° ' + esc(p.no || '?') + ' · ' + esc(t(p.name)) + '</b><br><span class="muted">' + esc(p.code) + '</span></td><td>' + money(p.price) + '</td>' +
+        '<td>' + (c ? '<span class="st st5">Claimed by ' + esc(c.order) + '</span><br><span class="muted">' + fdate(c.created) + '</span>' : p.soldOut ? '<span class="st st5">Marked sold out</span>' : p.hidden ? '<span class="st st0">Hidden</span>' : '<span class="st st4">Available</span>') + '</td>' +
+        '<td style="text-align:end;white-space:nowrap">' + (c ? '<button class="btn danger sm" type="button" data-release="' + p.code + '">Release</button> ' : '') + '<button class="btn ghost sm" type="button" data-edit="' + p.code + '">Edit</button></td></tr>';
+    }).join('') + '</tbody></table></div>' : '<div class="empty">No 1 of 1 pieces yet.</div>');
+}
+
+function viewSubs(){
+  $('main').innerHTML = '<div class="head"><h2>Subscribers</h2><button class="btn ghost" type="button" data-copysubs' + (S.subs.length ? '' : ' disabled') + '>Copy all emails</button><button class="btn ghost" type="button" data-csv' + (S.subs.length ? '' : ' disabled') + '>Download CSV</button></div>' +
+    (S.subs.length ? '<div class="wrapx"><table class="tbl"><thead><tr><th>Email</th><th>Signed up</th><th>From</th><th>Language</th><th></th></tr></thead><tbody>' + S.subs.map(function(s){
+      return '<tr><td>' + esc(s.email) + '</td><td>' + fdate(s.created) + '</td><td>' + esc(s.source || '') + '</td><td>' + (s.lang === 'ar' ? 'Arabic' : 'English') + '</td><td style="text-align:end"><button class="btn danger sm" type="button" data-unsub="' + esc(s._id) + '">Remove</button></td></tr>';
+    }).join('') + '</tbody></table></div>' : '<div class="empty">No subscribers yet. Sign-ups from the footer and the checkout land here.</div>');
+}
+
+function viewSite(){
+  var a = S.site.ann || {};
+  $('main').innerHTML = '<div class="head"><h2>Site</h2></div>' +
+    '<form class="card" id="siteForm" style="max-width:760px"><h4>Announcement bar</h4><p class="muted" style="margin:0">The thin black bar at the very top of every page. Leave empty to use the default text.</p>' +
+      '<label class="f"><span>English</span><input class="in" name="annEn" value="' + esc(a.en || '') + '" placeholder="Free UAE delivery over 500 AED · Every piece made to order in Dubai"></label>' +
+      '<label class="f"><span>Arabic</span><input class="in" name="annAr" dir="rtl" value="' + esc(a.ar || '') + '" placeholder="توصيل مجاني في الإمارات للطلبات فوق ٥٠٠ درهم"></label>' +
+      '<label class="sw"><input type="checkbox" name="annOff"' + (S.site.annOff ? ' checked' : '') + '>Hide the announcement bar</label>' +
+      '<div><button class="btn" type="submit">Save</button></div></form>';
+}
+
+/* ================= product editor ================= */
+var E = null;
+function blank(one){
+  var ones = merged().filter(function(p){ return p.one; }).map(function(p){ return +p.no || 0; });
+  return {code:'P' + Date.now().toString(36).toUpperCase().slice(-5), name:{en:'', ar:''}, price:0, col:one ? 'the-one' : 'essentials', style:'everyday', tone:'#F5F0EA', imgs:[],
+    desc:{en:'', ar:''}, story:{en:'', ar:''}, fabric:{en:'', ar:''}, labels:[], soldOut:false, isNew:true, hidden:false, one:!!one, no:one ? ('0' + (Math.max.apply(null, ones.concat([0])) + 1)).slice(-2) : '', sort:-Date.now() / 1e13, _base:false};
+}
+function openEditor(code, one){
+  var p = code ? byCode(code) : blank(one);
+  E = clone(p); E._isNew = !code;
+  ['name', 'desc', 'story', 'fabric'].forEach(function(k){ E[k] = Object.assign({en:'', ar:''}, E[k] || {}); });
+  E.labels = E.labels || []; E.imgs = E.imgs || [];
+  renderEditor();
+  $('ed').classList.add('open'); $('ed').setAttribute('aria-hidden', 'false'); document.documentElement.style.overflow = 'hidden';
+  setTimeout(function(){ var f = $('ed').querySelector('[name=nameEn]'); if(f) f.focus(); }, 300);
+}
+function closeEditor(){ $('ed').classList.remove('open'); $('ed').setAttribute('aria-hidden', 'true'); document.documentElement.style.overflow = ''; E = null; }
+function renderEditor(){
+  var p = E, cfg = window.NMH_CLOUDINARY || {};
+  $('edT').textContent = p._isNew ? (p.one ? 'New 1 of 1 piece' : 'New product') : 'Edit ' + (t(p.name) || p.code);
+  $('edB').innerHTML =
+    '<div class="card"><h4>Name and price</h4><div class="g2"><label class="f"><span>Name, English</span><input class="in" name="nameEn" value="' + esc(p.name.en) + '" required></label><label class="f"><span>Name, Arabic</span><input class="in" name="nameAr" dir="rtl" value="' + esc(p.name.ar) + '"></label></div>' +
+      '<div class="g3"><label class="f"><span>Price (AED)</span><input class="in" name="price" type="number" min="0" step="1" value="' + esc(p.price) + '"></label>' +
+      '<label class="f"><span>Collection</span><select class="sel" name="col">' + COLLECTIONS.map(function(c){ return '<option value="' + c.id + '"' + (c.id === p.col ? ' selected' : '') + '>' + esc(t(c.name)) + '</option>'; }).join('') + '</select></label>' +
+      '<label class="f"><span>Style</span><select class="sel" name="style">' + STYLE_OPTS.map(function(s){ return '<option value="' + s.id + '"' + (s.id === p.style ? ' selected' : '') + '>' + esc(s.en) + '</option>'; }).join('') + '</select></label></div>' +
+      '<div class="f"><span>Code</span><div class="muted">' + esc(p.code) + (p._base ? ' · built-in piece' : '') + '</div></div></div>' +
+
+    '<div class="card"><h4>Photos</h4><p class="muted" style="margin:-6px 0 0;font-size:13px">The first photo is the main one. On the shop, the second photo shows when someone hovers.</p><div class="photos" id="edPhotos">' +
+      p.imgs.map(function(src, i){ return '<div class="ph" style="--tone:' + esc(p.tone) + '"><img' + (isCut(src) ? ' class="cut"' : '') + ' src="' + esc(src) + '" alt="">' + (i === 0 ? '<span class="chip dark first">Main</span>' : '') + '<div class="pa"><button type="button" data-imgmove="' + i + '" data-d="-1" aria-label="Move earlier">‹</button><button type="button" data-imgdel="' + i + '" aria-label="Remove photo">×</button><button type="button" data-imgmove="' + i + '" data-d="1" aria-label="Move later">›</button></div></div>'; }).join('') +
+      '<label class="ph-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg>Upload from<br>phone or computer<input type="file" accept="image/*" multiple id="edUpload" class="sr"></label>' +
+      '<button class="ph-add" type="button" data-lib><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>Choose from<br>site photos</button>' +
+      '<button class="ph-add" type="button" data-imgurl><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Paste a<br>photo link</button>' +
+    '</div>' + (cfg.cloud && cfg.preset ? '' : '<p class="note" id="upNote" hidden>Photo uploads need the free image hosting to be connected first. Until then, choose from the site photos or paste a photo link.</p>') +
+      '<div id="libBox" hidden><div class="lib">' + LIB.concat(uploadedImgs()).map(function(src){ return '<button type="button" data-pick="' + esc(src) + '"><img src="' + esc(src) + '" alt="" loading="lazy"></button>'; }).join('') + '</div></div>' +
+      '<label class="f" style="max-width:220px"><span>Background behind cut-out photos</span><input class="in" type="color" name="tone" value="' + esc(/^#[0-9a-f]{6}$/i.test(p.tone) ? p.tone : '#F5F0EA') + '" style="padding:4px;height:40px"></label></div>' +
+
+    '<div class="card"><h4>Status</h4><div class="row-flex">' +
+      '<label class="sw red"><input type="checkbox" name="soldOut"' + (p.soldOut ? ' checked' : '') + '>Sold out</label>' +
+      '<label class="sw green"><input type="checkbox" name="isNew"' + (p.isNew ? ' checked' : '') + '>New arrival</label>' +
+      '<label class="sw"><input type="checkbox" name="hidden"' + (p.hidden ? ' checked' : '') + '>Hidden from shop</label>' +
+      '<label class="sw"><input type="checkbox" name="one"' + (p.one ? ' checked' : '') + '>1 of 1 piece</label>' +
+      '<label class="f" style="width:110px"' + (p.one ? '' : ' hidden') + ' id="noBox"><span>Number</span><input class="in" name="no" value="' + esc(p.no || '') + '" placeholder="05"></label></div></div>' +
+
+    '<div class="card"><h4>Labels</h4><p class="muted" style="margin:-6px 0 0;font-size:13px">Labels show on the photo in the shop. The first one shows on the card; all of them show on the product page.</p><div class="lbls" id="edLabels">' +
+      PRESET_LABELS.map(function(l){ var on = p.labels.some(function(x){ return x.en === l.en; }); return '<button type="button" data-label="' + esc(l.en) + '" aria-pressed="' + on + '">' + esc(l.en) + ' · ' + esc(l.ar) + '</button>'; }).join('') +
+      p.labels.filter(function(x){ return !PRESET_LABELS.some(function(l){ return l.en === x.en; }); }).map(function(x, i){ return '<button type="button" data-dellabel="' + esc(x.en) + '" aria-pressed="true">' + esc(x.en) + (x.ar ? ' · ' + esc(x.ar) : '') + '<span class="x">×</span></button>'; }).join('') +
+    '</div><div class="g3" style="align-items:end"><label class="f"><span>Your own label, English</span><input class="in" id="lblEn" placeholder="Wedding guest"></label><label class="f"><span>Arabic</span><input class="in" id="lblAr" dir="rtl" placeholder="لضيفة الفرح"></label><div><button class="btn ghost" type="button" data-addlabel>Add label</button></div></div></div>' +
+
+    '<div class="card"><h4>Words</h4>' +
+      '<div class="g2"><label class="f"><span>Short description, English</span><textarea class="in" name="descEn">' + esc(p.desc.en) + '</textarea></label><label class="f"><span>Short description, Arabic</span><textarea class="in" name="descAr" dir="rtl">' + esc(p.desc.ar) + '</textarea></label></div>' +
+      '<div class="g2"><label class="f"><span>The story, English</span><textarea class="in" name="storyEn">' + esc(p.story.en) + '</textarea></label><label class="f"><span>The story, Arabic</span><textarea class="in" name="storyAr" dir="rtl">' + esc(p.story.ar) + '</textarea></label></div>' +
+      '<div class="g2"><label class="f"><span>Fabric and care, English</span><textarea class="in" name="fabricEn" placeholder="Crepe. Dry clean only.">' + esc(p.fabric.en) + '</textarea></label><label class="f"><span>Fabric and care, Arabic</span><textarea class="in" name="fabricAr" dir="rtl" placeholder="كريب. تنظيف جاف فقط.">' + esc(p.fabric.ar) + '</textarea></label></div></div>';
+  $('edDel').hidden = !!p._isNew;
+  $('edDel').textContent = p._base ? 'Remove from shop' : 'Delete product';
+}
+function uploadedImgs(){ var a = []; merged().forEach(function(p){ (p.imgs || []).forEach(function(s){ if(/^https?:/.test(s) && a.indexOf(s) < 0) a.push(s); }); }); return a; }
+function readEditor(){
+  var f = $('edB'), v = function(n){ var el = f.querySelector('[name="' + n + '"]'); return el ? (el.type === 'checkbox' ? el.checked : el.value.trim()) : ''; };
+  E.name = {en:v('nameEn'), ar:v('nameAr')}; E.price = Math.max(0, Math.round(+v('price') || 0)); E.col = v('col'); E.style = v('style'); E.tone = v('tone');
+  E.desc = {en:v('descEn'), ar:v('descAr')}; E.story = {en:v('storyEn'), ar:v('storyAr')}; E.fabric = {en:v('fabricEn'), ar:v('fabricAr')};
+  E.soldOut = v('soldOut'); E.isNew = v('isNew'); E.hidden = v('hidden'); E.one = v('one'); E.no = E.one ? (v('no') || E.no || '') : '';
+  if(E.one && E.col !== 'the-one') E.col = 'the-one';
+}
+function saveEditor(){
+  readEditor();
+  if(!E.name.en && !E.name.ar){ toast('Give the product a name.', true); $('edB').querySelector('[name=nameEn]').focus(); return; }
+  if(!E.imgs.length){ toast('Add at least one photo.', true); return; }
+  if(!E.price){ toast('Add a price.', true); $('edB').querySelector('[name=price]').focus(); return; }
+  if(!E.name.ar) E.name.ar = E.name.en; if(!E.name.en) E.name.en = E.name.ar;
+  var data = {}, keys = ['name', 'price', 'col', 'style', 'tone', 'imgs', 'desc', 'story', 'fabric', 'labels', 'soldOut', 'isNew', 'hidden', 'one', 'no', 'sort'];
+  keys.forEach(function(k){ if(E[k] !== undefined) data[k] = E[k]; });
+  if(E._base && BASEMAP[E.code].dye) data.dye = BASEMAP[E.code].dye;
+  data.removed = false; data.updated = Date.now();
+  var btn = $('edSave'); btn.disabled = true; btn.textContent = 'Saving…';
+  DBX.set('products', E.code, data).then(function(){
+    S.over[E.code] = data; toast(E._isNew ? 'Product added to the shop.' : 'Saved. The shop shows it on the next page load.');
+    btn.disabled = false; btn.textContent = 'Save'; closeEditor(); render();
+  }).catch(function(e){ btn.disabled = false; btn.textContent = 'Save'; toast('Could not save: ' + (e.message || e), true); });
+}
+
+/* ================= image upload (Cloudinary, free plan) ================= */
+function upload(files){
+  var cfg = window.NMH_CLOUDINARY || {};
+  if(!cfg.cloud || !cfg.preset){ var n = $('upNote'); if(n) n.hidden = false; return; }
+  [].slice.call(files).forEach(function(file){
+    toast('Uploading ' + file.name + '…');
+    shrink(file).then(function(blob){
+      var fd = new FormData(); fd.append('file', blob, file.name.replace(/\.\w+$/, '') + '.jpg'); fd.append('upload_preset', cfg.preset); fd.append('folder', 'nmh');
+      return fetch('https://api.cloudinary.com/v1_1/' + cfg.cloud + '/image/upload', {method:'POST', body:fd}).then(function(r){ return r.json(); });
+    }).then(function(j){
+      if(!j.secure_url) throw new Error(j.error && j.error.message || 'upload failed');
+      var url = j.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_1400/');
+      if(E){ readEditor(); E.imgs.push(url); renderEditor(); }
+      toast('Photo added.');
+    }).catch(function(e){ toast('Upload failed: ' + (e.message || e), true); });
+  });
+}
+function shrink(file){
+  return new Promise(function(res){
+    var img = new Image(), url = URL.createObjectURL(file);
+    img.onload = function(){ var s = Math.min(1, 2000 / Math.max(img.width, img.height)), c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); c.toBlob(function(b){ URL.revokeObjectURL(url); res(b || file); }, 'image/jpeg', .9); };
+    img.onerror = function(){ res(file); };
+    img.src = url;
+  });
+}
+
+/* ================= helpers ================= */
+function toast(m, err){ var el = $('toast'); el.querySelector('p').textContent = m; el.classList.toggle('err', !!err); el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function(){ el.classList.remove('on'); }, err ? 6000 : 3200); }
+function confirmBox(title, text, ok){
+  var d = $('confirm'); d.querySelector('h3').textContent = title; d.querySelector('p').textContent = text; d.querySelector('[data-ok]').textContent = ok || 'Confirm';
+  return new Promise(function(res){ d.onclose = function(){ res(d.returnValue === 'ok'); }; d.returnValue = ''; d.showModal(); });
+}
+function setFlag(code, flag, val){
+  var data = {}; data[flag] = val; data.updated = Date.now();
+  if(!BASEMAP[code] && !S.over[code]) return;
+  S.over[code] = Object.assign({}, S.over[code] || {}, data); render();
+  DBX.set('products', code, data, true).then(function(){ toast(({soldOut:val ? 'Marked sold out.' : 'Back on sale.', isNew:val ? 'Added to new arrivals.' : 'Removed from new arrivals.', hidden:val ? 'Hidden from the shop.' : 'Visible in the shop again.'})[flag]); })
+    .catch(function(e){ toast('Could not save: ' + (e.message || e), true); loadAll(); });
+}
+
+/* ================= events ================= */
+document.addEventListener('click', function(e){
+  var b = e.target.closest('button,a,tr.row'); if(!b) return;
+  var v;
+  if((v = b.getAttribute('data-tab'))){ S.tab = v; S.open = null; render(); return; }
+  if((v = b.getAttribute('data-filter'))){ S.filter = v; render(); return; }
+  if(b.hasAttribute('data-new')){ openEditor(null, b.getAttribute('data-new') === 'one'); return; }
+  if((v = b.getAttribute('data-edit'))){ openEditor(v); return; }
+  if(b.hasAttribute('data-reload')){ loadAll(); return; }
+  if((v = b.getAttribute('data-remove'))){
+    var p = byCode(v);
+    confirmBox('Remove ' + t(p.name) + '?', p._base ? 'It disappears from the shop. You can bring it back from the Removed filter.' : 'This deletes the product for good.', 'Remove').then(function(ok){
+      if(!ok) return;
+      var job = p._base ? DBX.set('products', v, {removed:true, updated:Date.now()}, true) : DBX.del('products', v);
+      job.then(function(){ if(p._base) S.over[v] = Object.assign({}, S.over[v] || {}, {removed:true}); else delete S.over[v]; render(); toast('Removed from the shop.'); }).catch(function(e2){ toast('Could not remove: ' + (e2.message || e2), true); });
+    });
+    return;
+  }
+  if((v = b.getAttribute('data-restore'))){ DBX.set('products', v, {removed:false, updated:Date.now()}, true).then(function(){ S.over[v].removed = false; render(); toast('Back in the shop.'); }); return; }
+  if((v = b.getAttribute('data-release'))){
+    confirmBox('Release this piece?', 'Only do this if its order was cancelled. The piece goes back on sale and someone else can buy it.', 'Release').then(function(ok){
+      if(ok) DBX.del('oneofone', v).then(function(){ delete S.claims[v]; render(); toast('The piece is back on sale.'); }).catch(function(e2){ toast('Could not release: ' + (e2.message || e2), true); });
+    });
+    return;
+  }
+  if((v = b.getAttribute('data-open')) && !e.target.closest('select,a')){ S.open = S.open === v ? null : v; render(); return; }
+  if(b.hasAttribute('data-copysubs')){ var txt = S.subs.map(function(s){ return s.email; }).join(', '); (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function(){ toast('Copied ' + S.subs.length + ' emails.'); }, function(){ prompt('Copy these emails', txt); }); return; }
+  if(b.hasAttribute('data-csv')){ var csv = 'email,signed_up,source,language\n' + S.subs.map(function(s){ return [s.email, new Date(s.created).toISOString(), s.source || '', s.lang || ''].map(function(x){ return '"' + String(x).replace(/"/g, '""') + '"'; }).join(','); }).join('\n'); var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'nmh-subscribers.csv'; a.click(); return; }
+  if((v = b.getAttribute('data-unsub'))){ confirmBox('Remove this subscriber?', 'They will no longer be on your list.', 'Remove').then(function(ok){ if(ok) DBX.del('subscribers', v).then(function(){ S.subs = S.subs.filter(function(s){ return s._id !== v; }); render(); }); }); return; }
+  /* editor */
+  if(b.hasAttribute('data-close-ed')){ closeEditor(); return; }
+  if(b.id === 'edSave'){ saveEditor(); return; }
+  if(b.id === 'edDel'){ var code = E.code; closeEditor(); var fake = document.createElement('button'); fake.setAttribute('data-remove', code); document.body.appendChild(fake); fake.click(); fake.remove(); return; }
+  if(b.hasAttribute('data-lib')){ $('libBox').hidden = !$('libBox').hidden; return; }
+  if((v = b.getAttribute('data-pick'))){ readEditor(); E.imgs.push(v); renderEditor(); $('libBox').hidden = false; toast('Photo added.'); return; }
+  if(b.hasAttribute('data-imgurl')){ var u = prompt('Paste the photo link (it must start with https://)'); if(u && /^https:\/\//.test(u.trim())){ readEditor(); E.imgs.push(u.trim()); renderEditor(); } else if(u) toast('That is not a https:// link.', true); return; }
+  if((v = b.getAttribute('data-imgdel')) != null){ readEditor(); E.imgs.splice(+v, 1); renderEditor(); return; }
+  if((v = b.getAttribute('data-imgmove')) != null){ readEditor(); var i = +v, j = i + (+b.getAttribute('data-d')); if(j >= 0 && j < E.imgs.length){ var tmp = E.imgs[i]; E.imgs[i] = E.imgs[j]; E.imgs[j] = tmp; } renderEditor(); return; }
+  if((v = b.getAttribute('data-label'))){ readEditor(); var on = E.labels.some(function(x){ return x.en === v; }); if(on) E.labels = E.labels.filter(function(x){ return x.en !== v; }); else E.labels.push(PRESET_LABELS.filter(function(l){ return l.en === v; })[0]); renderEditor(); return; }
+  if((v = b.getAttribute('data-dellabel'))){ readEditor(); E.labels = E.labels.filter(function(x){ return x.en !== v; }); renderEditor(); return; }
+  if(b.hasAttribute('data-addlabel')){ var en = $('lblEn').value.trim(), ar = $('lblAr').value.trim(); if(!en && !ar) return; readEditor(); E.labels.push({en:en || ar, ar:ar || en}); renderEditor(); return; }
+});
+document.addEventListener('change', function(e){
+  var el = e.target, v;
+  if((v = el.getAttribute('data-flag'))){ setFlag(el.getAttribute('data-code'), v, el.checked); return; }
+  if((v = el.getAttribute('data-status'))){
+    var o = S.orders.filter(function(x){ return x.id === v; })[0], st = +el.value;
+    DBX.update('orders', v, {status:st, statusAt:Date.now()}).then(function(){ o.status = st; toast(v + ': ' + STATUS[st]); render(); }).catch(function(e2){ toast('Could not update: ' + (e2.message || e2), true); el.value = o.status || 0; });
+    return;
+  }
+  if(el.id === 'edUpload'){ upload(el.files); el.value = ''; return; }
+  if(el.name === 'one' && E){ readEditor(); renderEditor(); return; }
+  if(el.name === 'tone' && E){ readEditor(); [].forEach.call($('edPhotos').querySelectorAll('.ph'), function(x){ x.style.setProperty('--tone', E.tone); }); }
+});
+document.addEventListener('input', function(e){ if(e.target.id === 'q'){ S.q = e.target.value; var pos = e.target.selectionStart; render(); var q = $('q'); q.focus(); q.setSelectionRange(pos, pos); } });
+document.addEventListener('submit', function(e){
+  if(e.target.id === 'siteForm'){
+    e.preventDefault(); var f = e.target;
+    var data = {ann:{en:f.annEn.value.trim(), ar:f.annAr.value.trim()}, annOff:f.annOff.checked, updated:Date.now()};
+    DBX.set('settings', 'site', data).then(function(){ S.site = data; toast('Saved.'); }).catch(function(e2){ toast('Could not save: ' + (e2.message || e2), true); });
+  }
+});
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && E && !$('confirm').open) closeEditor(); });
+boot();
+})();
+</script>
+</body>
+</html>
