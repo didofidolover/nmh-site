@@ -562,6 +562,41 @@ html[lang="ar"] .page h2{letter-spacing:0;font-family:"IBM Plex Sans Arabic";fon
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
   .slide img{transform:none!important}
 }
+
+/* ---------- The One: signature one-of-one line ---------- */
+.one-band{background:#141312;color:#F2EDE7;padding-block:clamp(64px,8vw,120px);position:relative;overflow:hidden}
+html.dark .one-band{background:#0C0B0B;box-shadow:0 1px 0 #2C2A28 inset,0 -1px 0 #2C2A28 inset}
+.one-band .u-h7{color:rgba(242,237,231,.6)}
+.one-in{display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1.7fr);gap:clamp(32px,5vw,88px);align-items:end}
+.one-title{font:500 clamp(36px,4.6vw,68px)/1.05 var(--head);letter-spacing:.26em;text-transform:uppercase;margin:14px 0 0}
+html[lang="ar"] .one-title{letter-spacing:0;font-family:"IBM Plex Sans Arabic";font-weight:600;font-size:clamp(38px,4.6vw,64px)}
+.one-line{font:500 12px/1.7 var(--head);letter-spacing:.24em;text-transform:uppercase;margin:18px 0 0;color:#C9B8A6}
+html[lang="ar"] .one-line{letter-spacing:0;font-family:"IBM Plex Sans Arabic";font-size:16px;text-transform:none}
+.one-copy .rte{color:rgba(242,237,231,.66);margin:18px 0 30px;max-width:360px}
+.one-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.ot{display:block;color:inherit}
+.ot .ph{aspect-ratio:3/4;background:#2A2725}
+.ot .ph img{transition:transform 1.4s var(--ease-out),filter .6s var(--ease),opacity .6s var(--ease)}
+.ot:hover .ph img{transform:scale(1.05)}
+.ot-m{display:flex;justify-content:space-between;gap:8px;margin-top:14px;font:500 11px/1.6 var(--head);letter-spacing:.2em;color:rgba(242,237,231,.6)}
+.ot-m .no{color:#F2EDE7}
+.ot-n{display:block;margin-top:2px;font:500 12px/1.6 var(--head);letter-spacing:.2em;text-transform:uppercase}
+html[lang="ar"] .ot-m,html[lang="ar"] .ot-n{letter-spacing:0;font-family:"IBM Plex Sans Arabic";font-size:13px;text-transform:none}
+.ot.sold .ph img,.card.sold .ph img{filter:grayscale(1);opacity:.5}
+.sold-tag{position:absolute;inset:auto 0 0;z-index:2;padding:10px;text-align:center;background:rgba(20,19,18,.72);color:#F2EDE7;font:500 10px var(--head);letter-spacing:.25em;text-transform:uppercase}
+.card .lbl.one{background:#141312;color:#F2EDE7}
+.one-badge{display:flex;align-items:center;gap:12px;margin:0 0 12px;font:500 11px/1.6 var(--head);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.one-badge .num{background:var(--ink);color:var(--bg);padding:3px 8px;letter-spacing:.15em}
+.one-badge.sm{margin:0;font-size:10px}
+html[lang="ar"] .one-badge{letter-spacing:0;font-family:"IBM Plex Sans Arabic";font-size:13px;text-transform:none}
+.one-head{text-align:center}
+.one-head .wrap{display:grid;justify-items:center}
+.one-rules{display:grid;grid-template-columns:repeat(3,minmax(0,240px));gap:clamp(20px,4vw,56px);margin-top:clamp(36px,5vw,64px);text-align:center}
+.one-rules b{display:block;font:500 13px var(--head);letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
+.one-rules span{color:rgba(242,237,231,.62);font-size:14px}
+html[lang="ar"] .one-rules b{letter-spacing:0;font-family:"IBM Plex Sans Arabic";font-size:16px;text-transform:none}
+@media (max-width:1023px){ .one-in{grid-template-columns:1fr;align-items:start} .one-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:640px){ .one-rules{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
@@ -580,6 +615,7 @@ html[lang="ar"] .page h2{letter-spacing:0;font-family:"IBM Plex Sans Arabic";fon
       <ul class="nav">
         <li><button type="button" id="megaBtn" aria-expanded="false" aria-controls="mega" data-ar="الكولكشنز">Collections</button></li>
         <li><a href="#s-all" data-ar="تسوّقي">Shop</a></li>
+        <li><a href="#the-one" data-ar="القطعة الواحدة">The One</a></li>
         <li><a href="#colour" data-ar="استوديو الألوان">Colour studio</a></li>
       </ul>
     </div>
@@ -755,6 +791,28 @@ var PRODUCTS = [
     story:{en:'A wrap-front jumpsuit with a tie belt, for days that need both ease and polish.',ar:'جمبسوت بصدر ملفوف وحزام للربط، للأيام اللي محتاجة راحة وأناقة مع بعض.'}}
 ];
 
+/* ---- The One: a signature line of one-of-one pieces (placeholder photos and prices until the real ones arrive) ---- */
+var ONE = [
+  {code:'O01', no:'01', one:true, col:'the-one', style:'evening', tone:'#E6CFC6', price:1450, name:{en:'Amber Dusk',ar:'غسق الكهرمان'}, imgs:['img/bloom-3.jpg','img/bloom-2.jpg'],
+    desc:{en:'A pleated floral gown with a softly gathered waist and long sleeves, made once.',ar:'فستان بطبعة زهور وكسرات، بخصر مجمّع وأكمام طويلة، بيتعمل مرة واحدة بس.'},
+    story:{en:'Cut from the last length of a print we will not order again. There is fabric for one dress, and this is it.',ar:'متفصّل من آخر حتة قماش من الطبعة دي، ومش هنطلبها تاني. القماش يكفي فستان واحد بس، وهو ده.'}},
+  {code:'O02', no:'02', one:true, col:'the-one', style:'evening', tone:'#E3C9BB', price:1600, name:{en:'Rose Courtyard',ar:'الفناء الوردي'}, imgs:['img/desert-4.jpg','img/rose-wall.jpg'],
+    desc:{en:'A full-skirted maxi in a rose and plum print, with a fitted bodice and cuffed sleeves.',ar:'فستان طويل بتنورة واسعة وطبعة وردي وبرقوقي، بصدر محدد وأكمام بأساور.'},
+    story:{en:'Drawn for one evening in a stone courtyard at sunset. We made the pattern once, and it will not be repeated.',ar:'اتصمم لسهرة واحدة في فناء حجري وقت الغروب. عملنا الباترون مرة واحدة، ومش هيتكرر.'}},
+  {code:'O03', no:'03', one:true, col:'the-one', style:'evening', tone:'#EBD8CC', price:1380, name:{en:'Sienna Hour',ar:'ساعة سيينا'}, imgs:['img/desert-3.jpg','img/desert-2.jpg'],
+    desc:{en:'A sculpted maxi in warm terracotta tones with a sweeping hem.',ar:'فستان طويل منحوت بدرجات التراكوتا الدافية وذيل واسع.'},
+    story:{en:'Made for the hour when the desert turns copper. One dress, one owner.',ar:'معمول للساعة اللي الصحراء بتبقى فيها نحاسي. فستان واحد، لصاحبة واحدة.'}},
+  {code:'O04', no:'04', one:true, col:'the-one', style:'evening', tone:'#E4E3D6', price:1520, name:{en:'Garden Veil',ar:'ستار الجنينة'}, imgs:['img/bloom-4.jpg','img/bloom-5.jpg'],
+    desc:{en:'Fine knife pleats in a soft botanical print, finished by hand.',ar:'كسرات دقيقة بطبعة نباتية ناعمة، متشطّبة باليد.'},
+    story:{en:'Every pleat on this dress was pressed by hand for one woman. When it leaves the atelier, the design leaves with it.',ar:'كل كسرة في الفستان ده اتكوت باليد لست واحدة. لما يخرج من الأتيليه، التصميم بيخرج معاه.'}}
+];
+COLLECTIONS.unshift({id:'the-one', season:{en:'Signature · One of one',ar:'التوقيع · قطعة واحدة'}, cover:'img/bloom-3.jpg', small:'img/desert-4.jpg', tone:'#1C1B1B',
+  name:{en:'The One',ar:'القطعة الواحدة'},
+  story:{en:'One piece. Made once. Never again. Each dress in this line exists as a single piece; when it finds its owner, it is gone for good.',ar:'قطعة واحدة. بتتعمل مرة واحدة. ومش بتتكرر تاني. كل فستان في الخط ده موجود نسخة واحدة بس، ولما يلاقي صاحبته بيختفي للأبد.'}});
+PRODUCTS = PRODUCTS.concat(ONE);
+var SOLD = {};
+function isSold(p){ return !!(p && p.one && SOLD[p.code]); }
+function inCart(code){ return CART.some(function(it){ return it.code === code; }); }
 var SIZES = [
   {id:'XS', en:'X-Small', ar:'إكس سمول'}, {id:'S', en:'Small', ar:'سمول'}, {id:'M', en:'Medium', ar:'ميديم'},
   {id:'L', en:'Large', ar:'لارج'}, {id:'XL', en:'X-Large', ar:'إكس لارج'}, {id:'XXL', en:'XX-Large', ar:'دبل إكس لارج'},
@@ -794,6 +852,14 @@ var DB = {
 var CART = DB.get('cart', []), ORDERS = DB.get('orders', []), SAVED = DB.get('details', null);
 if(!Array.isArray(CART)) CART = [];
 function saveCart(){ DB.set('cart', CART); updateCount(); }
+ORDERS.forEach(function(o){ (o.items || []).forEach(function(it){ if(/^O\d/.test(it.code)) SOLD[it.code] = 1; }); });
+function pruneSold(){
+  var gone = CART.filter(function(it){ return isSold(prod(it.code)); });
+  if(!gone.length) return false;
+  CART = CART.filter(function(it){ return !isSold(prod(it.code)); }); saveCart();
+  toast(tr('Sorry, ', 'للأسف، ') + gone.map(function(it){ return t(prod(it.code).name); }).join(', ') + tr(' has just found its owner and was removed from your cart.', ' لقت صاحبتها واتشالت من حقيبتك.'));
+  return true;
+}
 
 /* ================= Firebase: orders and newsletter only (no accounts) ================= */
 var FBCFG = (window.NMH_FIREBASE && window.NMH_FIREBASE.apiKey) ? window.NMH_FIREBASE : null, FB = null, fbQueue = [];
@@ -804,9 +870,34 @@ function fbInit(){
     var app = m[0].initializeApp(FBCFG);
     FB = {F:m[1], db:m[1].getFirestore(app)};
     fbQueue.splice(0).forEach(function(fn){ fn(); });
+    fbLoadSold();
   }).catch(function(err){ console.warn('NMH: Firebase did not load; orders stay in this browser.', err); });
 }
 function fbDo(fn){ if(FB) fn(); else if(FBCFG) fbQueue.push(fn); }
+function fbReady(){ return new Promise(function(res, rej){ if(FB) return res(); if(!FBCFG) return rej(new Error('offline')); fbQueue.push(res); setTimeout(function(){ rej(new Error('timeout')); }, 15000); }); }
+function fbLoadSold(){
+  if(!FB) return;
+  FB.F.getDocs(FB.F.collection(FB.db, 'oneofone')).then(function(qs){
+    var changed = false;
+    qs.forEach(function(d){ if(!SOLD[d.id]){ SOLD[d.id] = 1; changed = true; } });
+    if(!changed) return;
+    var removed = pruneSold();
+    if(/^(the-one|p-O\d+)?$/.test(curKey || '') || (removed && curKey === 'checkout')) rerender();
+    if(drwOpen()) renderDrawer();
+  }).catch(fbWarn);
+}
+/* an order with a one-of-one piece claims it in the same write; if someone else got there first, the whole write is refused */
+function commitOrder(o){
+  var ones = o.items.filter(function(it){ var p = prod(it.code); return p && p.one; });
+  if(!FBCFG) return Promise.resolve();
+  if(!ones.length){ saveOrderRemote(o); return Promise.resolve(); }
+  return fbReady().then(function(){
+    var F = FB.F, b = F.writeBatch(FB.db), rec = JSON.parse(JSON.stringify(o)); rec.uid = null;
+    b.set(F.doc(FB.db, 'orders', o.id), rec);
+    ones.forEach(function(it){ b.set(F.doc(FB.db, 'oneofone', it.code), {order:o.id, created:Date.now()}); });
+    return b.commit();
+  });
+}
 function fbWarn(e){ console.warn('NMH: Firebase write failed', e); }
 function saveOrderRemote(o){ fbDo(function(){ var rec = JSON.parse(JSON.stringify(o)); rec.uid = null; FB.F.setDoc(FB.F.doc(FB.db, 'orders', o.id), rec).catch(fbWarn); }); }
 function subscribe(email, src){ fbDo(function(){ FB.F.addDoc(FB.F.collection(FB.db, 'subscribers'), {email:email, created:Date.now(), lang:L, source:src}).catch(fbWarn); }); }
@@ -846,12 +937,18 @@ function variant(it){ return [shadeName(it), sizeName(it.size), it.len ? (it.len
 
 /* ================= cards and grids ================= */
 function card(p, i){
-  var a = p.imgs[0], b = p.imgs[1];
-  return '<a class="card" href="#p-' + p.code + '" data-rv style="--d:' + (i % 4) + '">' +
-    '<div class="ph" style="--tone:' + (p.tone || '') + '">' + (p.dye ? '<span class="lbl">' + tr('Any colour', 'أي لون') + '</span>' : '') +
+  var a = p.imgs[0], b = p.imgs[1], sold = isSold(p);
+  var lbl = p.one ? (sold ? tr('Sold', 'اتباعت') : tr('1 of 1', 'قطعة واحدة')) : p.dye ? tr('Any colour', 'أي لون') : '';
+  return '<a class="card' + (sold ? ' sold' : '') + '" href="#p-' + p.code + '" data-rv style="--d:' + (i % 4) + '">' +
+    '<div class="ph" style="--tone:' + (p.tone || '') + '">' + (lbl ? '<span class="lbl' + (p.one ? ' one' : '') + '">' + lbl + '</span>' : '') +
     '<img class="a' + (b ? ' has-b' : '') + (isCut(a) ? ' cut' : '') + '" src="' + a + '" alt="' + esc(t(p.name)) + '" loading="lazy">' +
     (b ? '<img class="b' + (isCut(b) ? ' cut' : '') + '" src="' + b + '" alt="" loading="lazy">' : '') + '</div>' +
-    '<span class="ttl">' + esc(t(p.name)) + '</span><span class="pr num">' + money(p.price) + '</span></a>';
+    '<span class="ttl">' + (p.one ? 'N° ' + p.no + ' · ' : '') + esc(t(p.name)) + '</span><span class="pr num">' + (sold ? tr('Sold, never to be made again', 'اتباعت، ومش هتتعمل تاني') : money(p.price)) + '</span></a>';
+}
+function oneTile(p, i){
+  var sold = isSold(p);
+  return '<a class="ot' + (sold ? ' sold' : '') + '" href="#p-' + p.code + '" data-rv style="--d:' + i + '"><div class="ph" style="--tone:' + p.tone + '"><img src="' + p.imgs[0] + '" alt="' + esc(t(p.name)) + '" loading="lazy">' + (sold ? '<span class="sold-tag">' + tr('Sold', 'اتباعت') + '</span>' : '') + '</div>' +
+    '<span class="ot-m"><span class="no num">N° ' + p.no + '</span><span>' + (sold ? tr('Sold', 'اتباعت') : money(p.price)) + '</span></span><span class="ot-n">' + esc(t(p.name)) + '</span></a>';
 }
 function grid(list, cls){ return '<div class="grid' + (cls ? ' ' + cls : '') + '">' + list.map(card).join('') + '</div>'; }
 function sortList(list, how){
@@ -882,6 +979,14 @@ function viewHome(){
       }).join('') +
       '<div class="dots" role="group" aria-label="' + tr('Choose slide', 'اختاري الصورة') + '">' + SLIDES.map(function(s, i){ return '<button type="button" data-slide="' + i + '" aria-label="' + tr('Slide ', 'صورة ') + (i + 1) + '"' + (i ? '' : ' aria-current="true"') + '></button>'; }).join('') + '</div>' +
     '</section>' +
+
+    '<section class="one-band" aria-labelledby="oneT"><div class="wrap one-in">' +
+      '<div class="one-copy" data-rv><p class="u-h7">' + tr('Signature', 'التوقيع') + '</p><h2 class="one-title" id="oneT">' + tr('The One', 'القطعة الواحدة') + '</h2>' +
+        '<p class="one-line">' + tr('One piece. Made once. Never again.', 'قطعة واحدة. بتتعمل مرة واحدة. ومش بتتكرر.') + '</p>' +
+        '<div class="rte"><p>' + tr('Each dress in this line exists as a single piece. When it finds its owner, it is gone for good.', 'كل فستان في الخط ده موجود نسخة واحدة بس. ولما يلاقي صاحبته، بيختفي للأبد.') + '</p></div>' +
+        '<a class="btn light" href="#the-one">' + tr('Discover The One', 'اكتشفي القطعة الواحدة') + '</a></div>' +
+      '<div class="one-grid">' + ONE.map(oneTile).join('') + '</div>' +
+    '</div></section>' +
 
     '<section class="sec"><div class="wrap">' +
       '<header class="sec-h" data-rv><p class="u-h7">' + tr('Featured collection', 'كولكشن مميز') + '</p><h2 class="u-h2">' + tr('The new season', 'الموسم الجديد') + '</h2><span class="dash"></span></header>' +
@@ -947,8 +1052,23 @@ function viewCollection(id){
     '<div class="wrap" style="padding-bottom:90px"><p class="u-h7 muted" style="margin:-16px 0 28px">' + count(list.length) + '</p>' + grid(list) + '</div>';
   var b = $('banner'); if(b) requestAnimationFrame(function(){ b.classList.add('in'); });
 }
+function viewOne(){
+  var c = col('the-one'), avail = ONE.filter(function(p){ return !isSold(p); }), gone = ONE.filter(isSold);
+  app.innerHTML =
+    '<section class="one-band one-head"><div class="wrap"><p class="u-h7">' + esc(t(c.season)) + '</p><h1 class="one-title">' + esc(t(c.name)) + '</h1><p class="one-line">' + tr('One piece. Made once. Never again.', 'قطعة واحدة. بتتعمل مرة واحدة. ومش بتتكرر.') + '</p>' +
+      '<div class="one-rules">' +
+        '<div><b class="num">1/1</b><span>' + tr('Each design is made a single time, from a single length of fabric.', 'كل تصميم بيتعمل مرة واحدة، من حتة قماش واحدة.') + '</span></div>' +
+        '<div><b>' + tr('Yours', 'ليكِ') + '</b><span>' + tr('Cut to your size and length once you claim it.', 'بيتفصّل على مقاسك وطولك أول ما تحجزيه.') + '</span></div>' +
+        '<div><b>' + tr('Never again', 'مش هيتكرر') + '</b><span>' + tr('When it finds its owner, the design goes into our archive.', 'لما يلاقي صاحبته، التصميم بيدخل الأرشيف.') + '</span></div>' +
+      '</div></div></section>' +
+    '<section class="sec"><div class="wrap"><header class="sec-h" data-rv><p class="u-h7">' + (avail.length ? count(avail.length) : '') + '</p><h2 class="u-h2">' + tr('Available now', 'متاحة دلوقتي') + '</h2><span class="dash"></span></header>' +
+      (avail.length ? grid(avail) : '<p class="center muted">' + tr('Every piece has found its owner. The next pieces are announced on Instagram first.', 'كل القطع لقت أصحابها. القطع الجاية بنعلن عنها على إنستجرام الأول.') + '</p>') + '</div></section>' +
+    '<section class="sec line"><div class="wrap"><header class="sec-h" data-rv><p class="u-h7">' + tr('The archive', 'الأرشيف') + '</p><h2 class="u-h2">' + tr('Found their owners', 'لقت أصحابها') + '</h2><span class="dash"></span></header>' +
+      (gone.length ? grid(gone) : '<p class="center muted" data-rv>' + tr('Nothing has left the atelier yet. When a piece is claimed, it rests here, never to be made again.', 'لسه مفيش قطعة خرجت من الأتيليه. لما قطعة تتحجز، بتفضل هنا، ومش بتتعمل تاني.') + '</p>') + '</div></section>';
+  fbLoadSold();
+}
 function viewStyle(id){
-  var info = STYLE_INFO[id] || STYLE_INFO.all, list = sortList(id === 'all' ? PRODUCTS : PRODUCTS.filter(function(p){ return p.style === id; }), SORT);
+  var info = STYLE_INFO[id] || STYLE_INFO.all, list = sortList(PRODUCTS.filter(function(p){ return !p.one && (id === 'all' || p.style === id); }), SORT);
   app.innerHTML =
     '<header class="ph-head wrap"><h1 class="u-h1">' + esc(t(info.title)) + '</h1><div class="rte"><p>' + esc(t(info.intro)) + '</p></div></header>' +
     '<div class="bar"><div class="chips u-h7">' + STYLES.map(function(s){ return '<a href="#s-' + s.id + '"' + (s.id === id ? ' aria-current="page"' : '') + '>' + esc(t(s)) + '</a>'; }).join('') + '</div><div>' + sortSel('sortS', SORT) + '</div></div>' +
@@ -960,36 +1080,39 @@ var PP = null;
 function viewProduct(code){
   var p = prod(code); if(!p){ location.hash = 's-all'; return; }
   if(!PP || PP.code !== code) PP = {code:code, shade:null, custom:null, size:'', len:'', qty:1, img:0};
-  var c = col(p.col);
-  var related = PRODUCTS.filter(function(x){ return x.code !== code && (x.col === p.col || x.style === p.style); }).slice(0, 4);
+  var c = col(p.col), sold = isSold(p), one = !!p.one;
+  var related = one ? ONE.filter(function(x){ return x.code !== code && !isSold(x); }).slice(0, 4) : PRODUCTS.filter(function(x){ return !x.one && x.code !== code && (x.col === p.col || x.style === p.style); }).slice(0, 4);
+  if(one) fbLoadSold();
   app.innerHTML =
     '<div class="wrap"><div class="pp">' +
       '<div class="pp-th" id="ppTh" aria-label="' + tr('Photos', 'الصور') + '"></div>' +
       '<div><div class="pp-media" id="ppMedia"></div><div class="pp-dots" id="ppDots"></div></div>' +
       '<div class="pp-info">' +
         '<nav class="crumb u-h7" style="justify-content:flex-start" aria-label="' + tr('Breadcrumb', 'المسار') + '"><a href="#" data-home>' + tr('Home', 'الرئيسية') + '</a><span>/</span><a href="#' + c.id + '">' + esc(t(c.name)) + '</a></nav>' +
-        '<h1 class="u-h1">' + esc(t(p.name)) + '</h1><p class="pp-pr num">' + money(p.price) + '</p><hr>' +
-        '<div class="rte"><p>' + esc(t(p.desc)) + '</p><p>' + tr('Collection: ', 'الكولكشن: ') + esc(t(c.name)) + '</p><p>' + tr('Made to order in Dubai. Code ', 'بيتفصّل بالطلب في دبي. الكود ') + p.code + '</p></div>' +
+        (one ? '<p class="one-badge"><span class="num">N° ' + p.no + '</span>' + (sold ? tr('Sold, never to be made again', 'اتباعت، ومش هتتعمل تاني') : tr('One of one', 'قطعة واحدة بس')) + '</p>' : '') +
+        '<h1 class="u-h1">' + esc(t(p.name)) + '</h1><p class="pp-pr num">' + (sold ? tr('Sold', 'اتباعت') : money(p.price)) + '</p><hr>' +
+        '<div class="rte"><p>' + esc(t(p.desc)) + '</p>' + (one ? '<p>' + tr('This dress exists as a single piece. Once claimed, it is cut to your size and the design is never made again.', 'الفستان ده موجود نسخة واحدة بس. أول ما تحجزيه، بيتفصّل على مقاسك والتصميم مش بيتعمل تاني.') + '</p>' : '<p>' + tr('Collection: ', 'الكولكشن: ') + esc(t(c.name)) + '</p>') + '<p>' + (one ? tr('Made once in Dubai. Code ', 'بيتعمل مرة واحدة في دبي. الكود ') : tr('Made to order in Dubai. Code ', 'بيتفصّل بالطلب في دبي. الكود ')) + p.code + '</p></div>' +
         '<button class="size-link" type="button" id="sizeChart"><svg viewBox="0 0 18 12" fill="none" stroke="currentColor"><rect x=".5" y=".5" width="17" height="11"/><path d="M4 1v4M7 1v6M10 1v4M13 1v6"/></svg>' + tr('Size chart', 'جدول المقاسات') + '</button>' +
-        '<form id="buy" novalidate>' +
-          '<div class="opt"><div class="opt-l"><span class="u-h7">' + tr('Colour', 'اللون') + '</span><span class="muted" id="ppShadeN"></span></div>' +
+        (sold ? '<div class="buy"><button class="btn full" type="button" disabled><span>' + tr('Sold, never to be made again', 'اتباعت، ومش هتتعمل تاني') + '</span></button><a class="link" href="#the-one" style="justify-self:center;margin-top:8px">' + tr('See the pieces still available', 'شوفي القطع المتاحة') + '</a></div>' : '<form id="buy" novalidate>' +
+          (one ? '' : '<div class="opt"><div class="opt-l"><span class="u-h7">' + tr('Colour', 'اللون') + '</span><span class="muted" id="ppShadeN"></span></div>' +
             '<ul class="sw" id="ppSw" aria-label="' + tr('Colour', 'اللون') + '"><li><button type="button" class="orig" data-sh="o" aria-label="' + tr('As shown', 'زي الصورة') + '"></button></li>' +
             SHADES.map(function(s, i){ return '<li><button type="button" data-sh="' + i + '" style="--c:' + s.c + '" aria-label="' + esc(t(s)) + '"></button></li>'; }).join('') +
             '<li><label class="pick" id="ppPickL" title="' + tr('Any colour', 'أي لون') + '"><span class="sr">' + tr('Pick any colour', 'اختاري أي لون') + '</span><input type="color" id="ppPick" value="#8a4a47"></label></li></ul>' +
-            '<p class="dye-note">' + (p.dye ? tr('The photo changes to preview your colour. Before cutting we send you a photo of the real fabric.', 'الصورة بتتغيّر عشان تشوفي لونك. وقبل التفصيل بنبعتلك صورة القماش الحقيقي.') : tr('Made in the colour you choose. Before cutting we send you a photo of the real fabric.', 'بيتفصّل باللون اللي تختاريه. وقبل التفصيل بنبعتلك صورة القماش الحقيقي.')) + '</p></div>' +
+            '<p class="dye-note">' + (p.dye ? tr('The photo changes to preview your colour. Before cutting we send you a photo of the real fabric.', 'الصورة بتتغيّر عشان تشوفي لونك. وقبل التفصيل بنبعتلك صورة القماش الحقيقي.') : tr('Made in the colour you choose. Before cutting we send you a photo of the real fabric.', 'بيتفصّل باللون اللي تختاريه. وقبل التفصيل بنبعتلك صورة القماش الحقيقي.')) + '</p></div>') +
           '<div class="opt"><label class="sr" for="ppSize">' + tr('Size', 'المقاس') + '</label><div class="sel"><select id="ppSize"><option value="">' + tr('Size', 'المقاس') + '</option>' + SIZES.map(function(s){ return '<option value="' + s.id + '">' + tr('Size: ', 'المقاس: ') + esc(t(s)) + '</option>'; }).join('') + '</select></div><p class="dye-note" id="ppSizeE" style="color:var(--err)" hidden>' + tr('Choose a size.', 'اختاري المقاس.') + '</p></div>' +
           '<div class="opt"><p class="help">' + tr('Length of the piece, from shoulder to where you want it to end. Not your height.', 'طول القطعة من الكتف لحد ما تحبي تنتهي. مش طولك إنتِ.') + '</p><label class="sr" for="ppLen">' + tr('Length', 'الطول') + '</label><div class="sel"><select id="ppLen"><option value="">' + tr('Length', 'الطول') + '</option>' + LENGTHS.map(function(l){ return '<option value="' + l + '">' + tr('Length: ', 'الطول: ') + l + '″</option>'; }).join('') + '<option value="unsure">' + tr('Not sure, help me', 'مش متأكدة، ساعدوني') + '</option></select></div><p class="dye-note" id="ppLenE" style="color:var(--err)" hidden>' + tr('Choose a length.', 'اختاري الطول.') + '</p></div>' +
-          '<div class="buy"><div class="qty" role="group" aria-label="' + tr('Quantity', 'الكمية') + '"><button type="button" data-q="-1" aria-label="' + tr('Less', 'أقل') + '">−</button><output id="ppQty" class="num">1</output><button type="button" data-q="1" aria-label="' + tr('More', 'أكتر') + '">+</button></div>' +
-            '<button class="btn full" type="submit" id="ppAdd"><span>' + tr('Add to cart', 'أضيفي للحقيبة') + '</span></button></div>' +
-        '</form>' +
+          '<div class="buy"><div class="qty"' + (one ? ' hidden' : '') + ' role="group" aria-label="' + tr('Quantity', 'الكمية') + '"><button type="button" data-q="-1" aria-label="' + tr('Less', 'أقل') + '">−</button><output id="ppQty" class="num">1</output><button type="button" data-q="1" aria-label="' + tr('More', 'أكتر') + '">+</button></div>' +
+            '<button class="btn full" type="submit" id="ppAdd"><span>' + (one && inCart(code) ? tr('In your cart', 'في حقيبتك') : one ? tr('Claim this piece', 'احجزي القطعة دي') : tr('Add to cart', 'أضيفي للحقيبة')) + '</span></button></div>' +
+        '</form>') +
         '<div class="acc">' +
           acc(tr('The story', 'الحكاية'), '<p>' + esc(t(p.story)) + '</p>', true) +
+          (one ? acc(tr('Why only one', 'ليه قطعة واحدة'), '<p>' + tr('Some fabrics come in a single length and some designs deserve a single owner. Pieces in The One are made once; after that the pattern is retired and the dress is shown in our archive.', 'فيه أقمشة بتيجي حتة واحدة بس، وفيه تصميمات تستاهل صاحبة واحدة. قطع القطعة الواحدة بتتعمل مرة واحدة، وبعدها الباترون بيتقفل والفستان بيتعرض في الأرشيف.') + '</p>') : '') +
           acc(tr('Fabric and care', 'القماش والعناية'), '<p>' + tr('[Fabric to confirm]. Dry clean or hand wash cold. Steam on low; do not tumble dry.', '[القماش هيتأكد]. تنظيف جاف أو غسيل يدوي بمية باردة. بخار على درجة هادية، ومن غير مجفف.') + '</p>') +
           acc(tr('Delivery and returns', 'التوصيل والاسترجاع'), '<p>' + tr('Each piece is cut after you order. Free UAE delivery over 500 AED. Because pieces are made for you, see our refund policy before ordering.', 'كل قطعة بتتفصّل بعد طلبك. توصيل مجاني في الإمارات فوق ٥٠٠ درهم. وبما إن القطعة بتتعمل ليكِ، شوفي سياسة الاسترجاع قبل الطلب.') + ' <a href="#page-refund" style="text-decoration:underline">' + tr('Refund policy', 'سياسة الاسترجاع') + '</a></p>') +
         '</div>' +
       '</div>' +
     '</div></div>' +
-    (related.length ? '<section class="sec line"><div class="wrap"><header class="sec-h" data-rv><h2 class="u-h2">' + tr('You may also like', 'ممكن يعجبك كمان') + '</h2><span class="dash"></span></header>' + grid(related) + '</div></section>' : '');
+    (related.length ? '<section class="sec line"><div class="wrap"><header class="sec-h" data-rv><h2 class="u-h2">' + (one ? tr('More from The One', 'قطع تانية من القطعة الواحدة') : tr('You may also like', 'ممكن يعجبك كمان')) + '</h2><span class="dash"></span></header>' + grid(related) + '</div></section>' : '');
   paintPP(true);
   var m = $('ppMedia');
   m.addEventListener('scroll', function(){ var i = Math.round(Math.abs(m.scrollLeft) / m.clientWidth); $('ppDots').querySelectorAll('i').forEach(function(d, k){ d.classList.toggle('on', k === i); }); }, {passive:true});
@@ -1008,6 +1131,7 @@ function paintPP(first){
   var dyedNow = !!(p.dye && hex), m = $('ppMedia');
   if(first || m.dataset.dyed !== String(dyedNow)){ m.innerHTML = media; $('ppTh').innerHTML = th; $('ppDots').innerHTML = p.imgs.length > 1 ? dots : ''; m.dataset.dyed = String(dyedNow); }
   if(hex) dyeTo('dyePFlood', hex, first);
+  if(!$('ppSw')){ if($('ppSize')){ $('ppSize').value = PP.size; $('ppLen').value = PP.len; } return; }
   $('ppSw').querySelectorAll('[data-sh]').forEach(function(b){ var v = b.getAttribute('data-sh'); b.setAttribute('aria-pressed', String(v === 'o' ? PP.shade === null : +v === PP.shade)); });
   $('ppPickL').classList.toggle('on', PP.shade === -1);
   $('ppShadeN').textContent = PP.shade === null ? tr('As shown', 'زي الصورة') : PP.shade === -1 ? PP.custom.toUpperCase() : t(SHADES[PP.shade]);
@@ -1018,6 +1142,14 @@ function addToCart(){
   $('ppSizeE').hidden = !!PP.size; $('ppLenE').hidden = !!PP.len;
   if(!PP.size){ bad = true; } if(!PP.len){ bad = true; }
   if(bad){ ($('ppSize').value ? $('ppLen') : $('ppSize')).focus(); return; }
+  var pr = prod(PP.code);
+  if(pr.one){
+    if(isSold(pr)) return;
+    if(inCart(pr.code)){ openDrawer(); return; }
+    CART.push({key:pr.code, code:pr.code, shade:null, hex:null, size:PP.size, len:PP.len, qty:1}); saveCart();
+    $('ppAdd').querySelector('span').textContent = tr('In your cart', 'في حقيبتك');
+    setTimeout(openDrawer, 250); return;
+  }
   var hex = ppHex(), key = PP.code + '|' + (hex || 'orig') + '|' + PP.size + '|' + PP.len;
   var ex = CART.filter(function(it){ return it.key === key; })[0];
   if(ex) ex.qty += PP.qty; else CART.push({key:key, code:PP.code, shade:PP.shade, hex:hex, size:PP.size, len:PP.len, qty:PP.qty});
@@ -1041,7 +1173,7 @@ function renderDrawer(){
         var p = prod(it.code); if(!p) return '';
         return '<div class="li"><a class="im" href="#p-' + p.code + '" data-close-drw style="--tone:' + (p.tone || '') + '">' + lineImg(it) + '</a><div><a class="ttl" href="#p-' + p.code + '" data-close-drw>' + esc(t(p.name)) + '</a>' +
           '<span class="meta">' + (it.hex ? '<i class="dot" style="background:' + it.hex + '"></i>' : '') + esc(variant(it)) + '</span><span class="pr num">' + money(p.price * it.qty) + '</span>' +
-          '<div class="acts"><div class="qty sm" role="group" aria-label="' + tr('Quantity', 'الكمية') + '"><button type="button" data-cq="' + i + '" data-d="-1" aria-label="' + tr('Less', 'أقل') + '">−</button><output class="num">' + it.qty + '</output><button type="button" data-cq="' + i + '" data-d="1" aria-label="' + tr('More', 'أكتر') + '">+</button></div><button class="rm" type="button" data-rm="' + i + '">' + tr('Remove', 'شيلي') + '</button></div></div></div>';
+          '<div class="acts">' + (p.one ? '<span class="one-badge sm">N° ' + p.no + ' · ' + tr('1 of 1', 'قطعة واحدة') + '</span>' : '<div class="qty sm" role="group" aria-label="' + tr('Quantity', 'الكمية') + '"><button type="button" data-cq="' + i + '" data-d="-1" aria-label="' + tr('Less', 'أقل') + '">−</button><output class="num">' + it.qty + '</output><button type="button" data-cq="' + i + '" data-d="1" aria-label="' + tr('More', 'أكتر') + '">+</button></div>') + '<button class="rm" type="button" data-rm="' + i + '">' + tr('Remove', 'شيلي') + '</button></div></div></div>';
       }).join('') + '</div>' +
       '<div class="drw-f"><p class="note">' + tr('Delivery is calculated at checkout. Prices include VAT.', 'التوصيل بيتحسب في صفحة الدفع. الأسعار شاملة الضريبة.') + '</p><a class="btn full" href="#checkout" data-close-drw><span>' + tr('Checkout', 'إتمام الطلب') + ' · <span class="num">' + money(s) + '</span></span></a></div>'
     : '<div class="drw-empty"><p class="u-h6">' + tr('Your cart is empty', 'حقيبتك فاضية') + '</p><a class="btn" href="#s-all" data-close-drw>' + tr('Shop our products', 'تسوّقي القطع') + '</a></div>');
@@ -1079,6 +1211,7 @@ function renderSide(){
   $('sideNav').innerHTML =
     '<details open><summary>' + tr('Collections', 'الكولكشنز') + '<i></i></summary><ul>' + COLLECTIONS.map(function(c){ return '<li><a href="#' + c.id + '" data-close-side>' + esc(t(c.name)) + '</a></li>'; }).join('') + '</ul></details>' +
     '<details><summary>' + tr('Shop', 'تسوّقي') + '<i></i></summary><ul>' + STYLES.map(function(s){ return '<li><a href="#s-' + s.id + '" data-close-side>' + esc(t(s.id === 'all' ? {en:'All products', ar:'كل القطع'} : s)) + '</a></li>'; }).join('') + '</ul></details>' +
+    '<a class="s-l" href="#the-one" data-close-side>' + tr('The One', 'القطعة الواحدة') + '</a>' +
     '<a class="s-l" href="#colour" data-close-side>' + tr('Colour studio', 'استوديو الألوان') + '</a>' +
     '<a class="s-l" href="#page-how" data-close-side>' + tr('How ordering works', 'طريقة الطلب') + '</a>';
 }
@@ -1234,13 +1367,28 @@ function placeOrder(f){
     address:{country:CO.country, region:regionTxt, city:g('city'), line:g('addr'), apt:g('apt'), zip:g('zip')},
     billing:CO.bill === 'diff' ? {name:g('b_name'), line:g('b_addr'), city:g('b_city')} : 'same',
     note:g('note'), measure:meas};
+  var btn = $('coSubmit'), lab = btn.querySelector('span'), was = lab.textContent;
+  if(pruneSold()){ viewCheckout(); return; }
+  btn.disabled = true; lab.textContent = tr('Placing your order…', 'بنسجّل طلبك…');
+  commitOrder(o).then(function(){ finishOrder(f, o, regionEl, meas); }, function(err){
+    btn.disabled = false; lab.textContent = was;
+    if(err && /permission|denied/i.test(err.code || err.message || '')){
+      o.items.forEach(function(it){ var p = prod(it.code); if(p && p.one) SOLD[p.code] = 1; });
+      fbLoadSold(); pruneSold(); viewCheckout();
+      if($('coErr')) $('coErr').textContent = tr('Someone claimed that piece a moment before you, so it was removed from your cart. Nothing was charged.', 'حد حجز القطعة دي قبلك بلحظة، فاتشالت من حقيبتك. مفيش أي حاجة اتخصمت.');
+    } else {
+      $('coErr').textContent = tr('We could not reach our server. Check your connection and try again.', 'مقدرناش نوصل للسيرفر. اتأكدي من الإنترنت وجرّبي تاني.');
+    }
+  });
+}
+function finishOrder(f, o, regionEl, meas){
   ORDERS.unshift(o); DB.set('orders', ORDERS.slice(0, 30));
-  saveOrderRemote(o);
+  o.items.forEach(function(it){ if(/^O\d/.test(it.code)) SOLD[it.code] = 1; });
   if(o.contact.news) subscribe(o.contact.email, 'checkout');
   if(f.elements.save.checked){ SAVED = {email:o.contact.email, news:o.contact.news, country:CO.country, first:o.contact.first, last:o.contact.last, addr:o.address.line, apt:o.address.apt, city:o.address.city, region:regionEl.value, zip:o.address.zip, phone:o.contact.phone, measure:meas || (SAVED && SAVED.measure) || null}; DB.set('details', SAVED); }
   else { SAVED = null; DB.set('details', null); }
   CART = []; saveCart();
-  location.hash = 'order-' + id;
+  location.hash = 'order-' + o.id;
 }
 function viewOrder(id){
   var o = ORDERS.filter(function(x){ return x.id === id; })[0];
@@ -1289,6 +1437,7 @@ function viewPage(id){
 function resolve(h){
   if(!h || h === 'top') return viewHome;
   if(h === 'colour') return function(){ viewHome(); setTimeout(function(){ var el = $('colour'); if(el) el.scrollIntoView({behavior:'auto'}); }, 30); };
+  if(h === 'the-one') return viewOne;
   if(col(h)) return function(){ viewCollection(h); };
   var m;
   if((m = /^s-(\w+)$/.exec(h)) && STYLE_INFO[m[1]]) return function(){ viewStyle(m[1]); };
@@ -1379,7 +1528,7 @@ document.addEventListener('click', function(e){
   if((v = a.getAttribute('data-sh')) != null && PP){ PP.shade = v === 'o' ? null : +v; paintPP(); return; }
   if((v = a.getAttribute('data-th')) != null && PP){ PP.img = +v; var fig = $('ppMedia').querySelectorAll('figure')[+v]; $('ppTh').querySelectorAll('button').forEach(function(b, i){ if(i === +v) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); }); if(fig) fig.scrollIntoView({behavior:reduce ? 'auto' : 'smooth', block:'start'}); return; }
   if((v = a.getAttribute('data-q')) != null && PP){ PP.qty = clamp(PP.qty + (+v), 1, 9); $('ppQty').textContent = PP.qty; return; }
-  if((v = a.getAttribute('data-cq')) != null){ var it = CART[+v]; it.qty = clamp(it.qty + (+a.getAttribute('data-d')), 1, 9); saveCart(); renderDrawer(); var q = $('drw').querySelector('[data-cq="' + v + '"][data-d="' + a.getAttribute('data-d') + '"]'); if(q) q.focus(); return; }
+  if((v = a.getAttribute('data-cq')) != null){ var it = CART[+v]; it.qty = clamp(it.qty + (+a.getAttribute('data-d')), 1, prod(it.code).one ? 1 : 9); saveCart(); renderDrawer(); var q = $('drw').querySelector('[data-cq="' + v + '"][data-d="' + a.getAttribute('data-d') + '"]'); if(q) q.focus(); return; }
   if((v = a.getAttribute('data-rm')) != null){ CART.splice(+v, 1); saveCart(); renderDrawer(); var f2 = $('drw').querySelector('[data-close-drw]'); if(f2) f2.focus(); return; }
   if((v = a.getAttribute('data-lb')) != null){ if(v === 'x'){ closePanel($('lb')); return; } LB.i = (LB.i + (+v) + LB.list.length) % LB.list.length; $('lbImg').src = LB.list[LB.i]; return; }
 });
