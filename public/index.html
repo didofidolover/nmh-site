@@ -890,16 +890,21 @@ function fbLoadSold(){
 function commitOrder(o){
   var ones = o.items.filter(function(it){ var p = prod(it.code); return p && p.one; });
   if(!FBCFG) return Promise.resolve();
-  if(!ones.length){ saveOrderRemote(o); return Promise.resolve(); }
+  if(!ones.length){ saveOrderRemote(o).then(function(){ mailOrder(o.id); }, fbWarn); return Promise.resolve(); }
   return fbReady().then(function(){
     var F = FB.F, b = F.writeBatch(FB.db), rec = JSON.parse(JSON.stringify(o)); rec.uid = null;
     b.set(F.doc(FB.db, 'orders', o.id), rec);
     ones.forEach(function(it){ b.set(F.doc(FB.db, 'oneofone', it.code), {order:o.id, created:Date.now()}); });
-    return b.commit();
+    return b.commit().then(function(){ mailOrder(o.id); });
   });
 }
 function fbWarn(e){ console.warn('NMH: Firebase write failed', e); }
-function saveOrderRemote(o){ fbDo(function(){ var rec = JSON.parse(JSON.stringify(o)); rec.uid = null; FB.F.setDoc(FB.F.doc(FB.db, 'orders', o.id), rec).catch(fbWarn); }); }
+function saveOrderRemote(o){ return fbReady().then(function(){ var rec = JSON.parse(JSON.stringify(o)); rec.uid = null; return FB.F.setDoc(FB.F.doc(FB.db, 'orders', o.id), rec); }); }
+/* ask the mailer (a Google Apps Script) to email the confirmation; it reads the order from Firestore itself */
+function mailOrder(id){
+  var url = window.NMH_MAIL_URL; if(!url) return;
+  try{ fetch(url, {method:'POST', mode:'no-cors', keepalive:true, headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify({id:id})}).catch(function(e){ console.warn('NMH: mail request failed', e); }); }catch(e){}
+}
 function subscribe(email, src){ fbDo(function(){ FB.F.addDoc(FB.F.collection(FB.db, 'subscribers'), {email:email, created:Date.now(), lang:L, source:src}).catch(fbWarn); }); }
 
 /* ================= dye engine ================= */
@@ -1361,7 +1366,7 @@ function placeOrder(f){
   var id = 'NMH-' + Date.now().toString(36).slice(-4).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase();
   var regionEl = f.elements.region, regionTxt = regionEl.tagName === 'SELECT' ? (find(EMIRATES, regionEl.value) || {}).en || '' : regionEl.value.trim();
   var o = {id:id, created:Date.now(), status:0, lang:L,
-    items:CART.map(function(it){ var p = prod(it.code); return {code:it.code, name:p.name.en, shade:it.shade, hex:it.hex, size:it.size, len:it.len || '', qty:it.qty, price:p.price}; }),
+    items:CART.map(function(it){ var p = prod(it.code); return {code:it.code, name:p.name.en, name_ar:p.name.ar, img:p.imgs[0], tone:p.tone || '', no:p.no || '', variant:variant(it), shade:it.shade, hex:it.hex, size:it.size, len:it.len || '', qty:it.qty, price:p.price}; }),
     sub:sub, ship:sh, total:sub + sh, method:CO.method, pay:CO.pay,
     contact:{name:(g('first') + ' ' + g('last')).trim(), first:g('first'), last:g('last'), phone:g('phone'), email:g('email'), news:f.elements.news.checked},
     address:{country:CO.country, region:regionTxt, city:g('city'), line:g('addr'), apt:g('apt'), zip:g('zip')},
