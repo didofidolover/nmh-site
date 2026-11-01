@@ -90,7 +90,7 @@ html[lang="ar"] .btn{letter-spacing:0;font-family:"IBM Plex Sans Arabic",var(--h
 html[lang="ar"] .link{letter-spacing:0;font-size:13px;text-transform:none}
 
 /* ---------- announcement + header ---------- */
-.ann{background:var(--btn);color:var(--btn-ink);text-align:center;padding:10px var(--g);font:500 10px/1.6 var(--head);text-transform:uppercase;letter-spacing:.25em}
+.ann{background:var(--ann-bg,var(--btn));color:var(--ann-ink,var(--btn-ink));text-align:center;padding:10px var(--g);font:500 10px/1.6 var(--head);text-transform:uppercase;letter-spacing:.25em}
 html[lang="ar"] .ann{letter-spacing:0;font-size:12px}
 .hd{position:sticky;top:0;z-index:50;height:var(--hd);background:var(--panel);color:var(--ink);box-shadow:0 -1px var(--line) inset;transition:background-color .35s var(--ease),color .35s var(--ease),box-shadow .35s var(--ease)}
 .hd-in{height:100%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px}
@@ -607,8 +607,8 @@ html[lang="ar"] .pp-lbls span{letter-spacing:0;font-family:"IBM Plex Sans Arabic
 .ann[hidden]{display:none}
 
 /* status colours: new arrival green, sold out red; sold-out pieces turn black and white */
-.card .lbl.new,.pp-lbls span.new{background:#2F6B4A;color:#fff;border-color:#2F6B4A}
-.card .lbl.out,.sold-tag{background:#A3302A;color:#fff}
+.card .lbl.new,.pp-lbls span.new{background:var(--new,#2F6B4A);color:#fff;border-color:var(--new,#2F6B4A)}
+.card .lbl.out,.sold-tag{background:var(--out,#A3302A);color:#fff}
 .card.sold .ph,.ot.sold .ph{background:#E6E6E6!important}
 .card.sold .ph img{filter:grayscale(1) contrast(.95);opacity:.8}
 .card.sold .ttl,.card.sold .pr{color:var(--muted)}
@@ -729,18 +729,31 @@ html[lang="ar"] .sline b{font-family:var(--head);letter-spacing:.06em}
 'use strict';
 var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 var L = 'en', DARK = false;
-var THEMES = {classic:'#FDF9F4', mono:'#FFFFFF', sand:'#F5EDE2', blush:'#FBF4F2', sage:'#F4F5F0', midnight:'#141312'}, TH = 'classic', THEME_PREF = null;
+var THEMES = {custom:'#FDF9F4', classic:'#FDF9F4', mono:'#FFFFFF', sand:'#F5EDE2', blush:'#FBF4F2', sage:'#F4F5F0', midnight:'#141312'}, TH = 'classic', THEME_PREF = null;
 try{ L = localStorage.getItem('nmh-lang') || 'en'; THEME_PREF = localStorage.getItem('nmh-theme'); TH = localStorage.getItem('nmh-site-theme') || 'classic'; }catch(e){}
 DARK = THEME_PREF ? THEME_PREF === 'dark' : TH === 'midnight';
 function applySiteTheme(th){
   TH = THEMES[th] ? th : 'classic'; try{ localStorage.setItem('nmh-site-theme', TH); }catch(e){}
   var h = document.documentElement; if(TH === 'classic' || TH === 'midnight') h.removeAttribute('data-th'); else h.setAttribute('data-th', TH);
+  var cs = document.getElementById('thCustom'), col = (typeof SITE === 'object' && SITE && SITE.colors) || DB_COLORS();
+  if(TH === 'custom' && col){ if(!cs){ cs = document.createElement('style'); cs.id = 'thCustom'; document.head.appendChild(cs); }
+    var vars = {bg:'--bg', panel:'--panel', ink:'--ink', muted:'--muted', line:'--line', line2:'--line-2', btn:'--btn', btnInk:'--btn-ink', soft:'--soft', ann:'--ann-bg', annInk:'--ann-ink', newL:'--new', outL:'--out'};
+    cs.textContent = 'html[data-th="custom"]{' + Object.keys(vars).filter(function(k){ return /^#[0-9a-fA-F]{3,8}$/.test(col[k] || ''); }).map(function(k){ return vars[k] + ':' + col[k]; }).join(';') + '}';
+    THEMES.custom = col.bg || '#FDF9F4';
+  } else if(cs) cs.textContent = '';
   if(!THEME_PREF){ DARK = TH === 'midnight'; h.classList.toggle('dark', DARK); }
   var m = document.querySelector('meta[name=theme-color]'); if(m) m.content = DARK ? '#141312' : THEMES[TH];
 }
+function DB_COLORS(){ try{ var s = JSON.parse(localStorage.getItem('nmh-site') || '{}'); return s.colors; }catch(e){ return null; } }
 applySiteTheme(TH);
 function t(o){ return o && typeof o === 'object' ? (o[L] || o.en) : o; }
-function tr(en, ar){ return L === 'ar' ? ar : en; }
+var TX = {}, PAGEX = {};
+function tr(en, ar){ var o = TX[en]; if(o){ var v = L === 'ar' ? o.ar : o.en; if(v) return esc(v); } return L === 'ar' ? ar : en; }
+function applyTexts(doc){
+  TX = {}; PAGEX = {};
+  ((doc && doc.list) || []).forEach(function(x){ if(x && x.k) TX[x.k] = {en:x.en || '', ar:x.ar || ''}; });
+  PAGEX = (doc && doc.pages) || {};
+}
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 function $(id){ return document.getElementById(id); }
 function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
@@ -931,7 +944,16 @@ function applyCatalog(over){
   list.sort(function(a, b){ return (a.sort || 0) - (b.sort || 0); });
   ALLP = list; PRODUCTS = list.filter(visible); ONE = PRODUCTS.filter(function(p){ return p.one; });
 }
-COLLECTIONS.forEach(function(c){ c.name = {en:c.name.en, ar:c.name.en}; });
+var BASECOLS = JSON.parse(JSON.stringify(COLLECTIONS));
+function applyCols(doc){
+  var over = (doc && doc.over) || {}, added = (doc && doc.added) || [], order = (doc && doc.order) || [];
+  var list = JSON.parse(JSON.stringify(BASECOLS.concat(added))).map(function(c){ var o = over[c.id]; if(o) Object.keys(o).forEach(function(k){ if(o[k] !== '' && o[k] != null) c[k] = o[k]; }); return c; });
+  list = list.filter(function(c){ return !c.hidden && c.name; });
+  list.sort(function(x, y){ var i = order.indexOf(x.id), j = order.indexOf(y.id); return (i < 0 ? 999 : i) - (j < 0 ? 999 : j); });
+  list.forEach(function(c){ var n = c.name.en || c.name.ar; c.name = {en:n, ar:n}; c.season = c.season || {en:'', ar:''}; c.story = c.story || {en:'', ar:''}; if(!c.small) c.small = c.cover; });
+  COLLECTIONS.splice.apply(COLLECTIONS, [0, COLLECTIONS.length].concat(list));
+}
+applyCols(null);
 function annH(){ var a = document.getElementById('ann'); document.documentElement.style.setProperty('--ann', (a && !a.hidden ? a.offsetHeight : 0) + 'px'); }
 window.addEventListener('resize', annH);
 function applySite(site){
@@ -1020,6 +1042,8 @@ function fbWatch(){
   };
   F.onSnapshot(F.collection(FB.db, 'products'), function(qs){ over = {}; qs.forEach(function(d){ over[d.id] = d.data(); }); apply(); }, fbWarn);
   F.onSnapshot(F.doc(FB.db, 'settings', 'site'), function(d){ site = d.exists() ? d.data() : {}; apply(); }, fbWarn);
+  F.onSnapshot(F.doc(FB.db, 'settings', 'texts'), function(d){ var v = d.exists() ? d.data() : {}; if(JSON.stringify(v) === JSON.stringify(DB.get('texts', {}))) return; DB.set('texts', v); applyTexts(v); applyLang(); refreshViews(); }, fbWarn);
+  F.onSnapshot(F.doc(FB.db, 'settings', 'collections'), function(d){ var v = d.exists() ? d.data() : {}; if(JSON.stringify(v) === JSON.stringify(DB.get('cols', {}))) return; DB.set('cols', v); applyCols(v); renderMenus(); refreshViews(); }, fbWarn);
   F.onSnapshot(F.collection(FB.db, 'oneofone'), function(qs){
     var next = {}; qs.forEach(function(d){ next[d.id] = 1; });
     if(JSON.stringify(next) === JSON.stringify(SOLD)) return;
@@ -1124,10 +1148,56 @@ function sortSel(id, val){
 /* ================= views ================= */
 var app = $('app'), curKey = null, SORT = 'featured';
 
+
+/* ================= home page sections (order, visibility and media come from the control room) ================= */
+var HOME_ORDER = ['one', 'arrivals', 'styles', 'edit', 'featured', 'brand'];
+function homeCfg(){ return SITE.home || {}; }
+function homeSections(fresh, feat){
+  var cfg = homeCfg(), hid = cfg.hidden || {}, order = (cfg.order || []).filter(function(id){ return HOME_ORDER.indexOf(id) > -1; });
+  HOME_ORDER.forEach(function(id){ if(order.indexOf(id) < 0) order.push(id); });
+  var make = {
+    one:function(){ return ONE.length ? '<section class="one-band" aria-labelledby="oneT"><div class="wrap one-in">' +
+      '<div class="one-copy" data-rv><p class="u-h7">' + tr('Signature', 'توقيع الدار') + '</p><h2 class="one-title" id="oneT">' + tr('The One', 'القطعة الواحدة') + '</h2>' +
+        '<p class="one-line">' + tr('One piece. Made once. Never again.', 'قطعة واحدة. تُصنع مرة واحدة. ولا تتكرر.') + '</p>' +
+        '<div class="rte"><p>' + tr('Each dress in this line exists as a single piece. When it finds its owner, it is gone for good.', 'كل فستان في هذا الخط قطعة فريدة. وحين يجد صاحبته، يختفي إلى الأبد.') + '</p></div>' +
+        '<a class="btn light" href="#the-one">' + tr('Discover The One', 'اكتشفي القطعة الواحدة') + '</a></div>' +
+      '<div class="one-grid">' + ONE.slice(0, 4).map(oneTile).join('') + '</div>' +
+    '</div></section>' : ''; },
+    arrivals:function(){ return '<section class="sec"><div class="wrap">' +
+      '<header class="sec-h" data-rv><p class="u-h7">' + (fresh.length ? tr('Just arrived', 'وصل حديثًا') : tr('Featured collection', 'مجموعة مميزة')) + '</p><h2 class="u-h2">' + (fresh.length ? tr('New arrivals', 'وصل حديثًا') : tr('The new season', 'الموسم الجديد')) + '</h2><span class="dash"></span></header>' +
+      grid(feat) +
+      '<div class="center mt" data-rv><a class="btn" href="#s-' + (fresh.length ? 'new' : 'all') + '">' + tr('View all products', 'عرض جميع المنتجات') + '</a></div>' +
+    '</div></section>'; },
+    styles:function(){ var tiles = (cfg.tiles && cfg.tiles.length ? cfg.tiles : [{s:'abayas', img:'img/c/c13.jpg'}, {s:'evening', img:'img/c/c15.jpg'}, {s:'everyday', img:'img/c/c19.jpg'}]).filter(function(x){ return find(STYLES, x.s); });
+      return '<section class="sec line"><div class="wrap">' +
+      '<header class="sec-h" data-rv><p class="u-h7">' + tr('Shop by style', 'تسوّقي حسب الفئة') + '</p><h2 class="u-h2">' + tr('Find your piece', 'اكتشفي قطعتك') + '</h2><span class="dash"></span></header>' +
+      '<div class="tiles">' + tiles.map(function(x, i){
+        return '<a class="tile" href="#s-' + esc(x.s) + '" data-rv style="--d:' + i + '"><img src="' + esc(x.img) + '" alt="" loading="lazy"><span><span class="link">' + esc(t(find(STYLES, x.s))) + '</span></span></a>';
+      }).join('') + '</div>' +
+    '</div></section>'; },
+    edit:function(){ var m = cfg.edit || {}, vid = m.type ? m.type === 'video' : true, v = m.v || 'video/abaya-edit.mp4', d = m.d || (vid ? 'video/abaya-edit.jpg' : 'img/c/c13-w.jpg');
+      return '<section class="banner ed-banner" id="edBanner">' + (vid ? '<video muted playsinline loop autoplay preload="metadata" poster="' + esc(d) + '" aria-hidden="true"><source src="' + esc(v) + '" type="video/mp4"></video>' : '<img src="' + esc(d) + '" alt="" loading="lazy" style="object-position:' + esc(m.pos || '50% 30%') + '">') +
+      '<div><p class="u-h7">' + tr('The abaya edit', 'مختارات العبايات') + '</p><h2 class="u-h1" style="margin-top:8px">' + tr('Details you find up close', 'تفاصيل تُرى عن قرب') + '</h2>' +
+      '<div class="rte"><p>' + tr('Black-on-black embroidery, satin lapels and fine copper piping. Abayas that stay quiet from across the room and reward a closer look.', 'تطريز أسود على أسود، وياقات من الساتان، وحواف نحاسية رفيعة. عبايات هادئة من بعيد، تكشف جمالها عن قرب.') + '</p></div>' +
+      '<a class="btn light" href="' + esc(m.href || '#s-abayas') + '" style="margin-top:24px">' + tr('Shop abayas', 'تسوّقي العبايات') + '</a></div></section>'; },
+    featured:function(){ var c = col(cfg.featured) || col('bloom') || COLLECTIONS[0]; if(!c) return ''; var ess = PRODUCTS.filter(function(p){ return p.col === c.id; }).slice(0, 4); if(!ess.length) return '';
+      return '<section class="sec line"><div class="wrap">' +
+      '<header class="sec-h" data-rv><p class="u-h7">' + tr('Featured collection', 'مجموعة مميزة') + '</p><h2 class="u-h2">' + esc(t(c.name)) + '</h2><span class="dash"></span></header>' +
+      grid(ess, ess.length === 3 ? 'c3' : '') +
+      '<div class="center mt" data-rv><a class="btn" href="#' + c.id + '">' + tr('View the collection', 'عرض المجموعة') + '</a></div>' +
+    '</div></section>'; },
+    brand:function(){ return '<section class="sec line"><div class="wrap brand" data-rv>' +
+      '<p class="u-h7 muted">NMH · ' + tr('Dubai', 'دبي') + '</p><h2 class="u-h2" style="margin-top:10px">' + tr('Made for you alone', 'صُنعت لكِ وحدك') + '</h2>' +
+      '<div class="rte"><p>' + tr('NMH designs modest dresses and abayas in Dubai, and cuts each piece only after you order it, in your size and your length. Before anything is cut, we confirm every detail with you.', 'تصمّم NMH الفساتين والعبايات المحتشمة في دبي، ولا تُفصَّل أي قطعة إلا بعد طلبها، وفق مقاسك وطولك. وقبل التفصيل، نؤكد معك جميع التفاصيل.') + '</p></div>' +
+      '<div class="social"><a class="link" href="https://www.instagram.com/_bynmh/" target="_blank" rel="noopener">Instagram</a><a class="link" href="#page-how">' + tr('How ordering works', 'طريقة الطلب') + '</a></div>' +
+    '</div></section>'; }
+  };
+  return order.filter(function(id){ return !hid[id]; }).map(function(id){ return make[id](); }).join('');
+}
+
 function viewHome(){
   var fresh = PRODUCTS.filter(function(p){ return p.isNew; });
   var feat = fresh.length ? fresh.slice(0, 8) : ['B01', 'D01', 'S02', 'D03', 'B02', 'S01', 'B03', 'D02'].map(prod).filter(visible);
-  var ess = PRODUCTS.filter(function(p){ return p.col === 'bloom'; }).slice(0, 4);
   app.innerHTML =
     '<section class="hero" id="hero" aria-roledescription="carousel" aria-label="' + tr('New season', 'الموسم الجديد') + '">' +
       heroSlides().map(function(s, i, all){
@@ -1140,42 +1210,7 @@ function viewHome(){
       (heroSlides().length > 1 ? '<div class="dots" role="group" aria-label="' + tr('Choose slide', 'اختيار الصورة') + '">' + heroSlides().map(function(s, i){ return '<button type="button" data-slide="' + i + '" aria-label="' + tr('Slide ', 'صورة ') + (i + 1) + '"' + (i ? '' : ' aria-current="true"') + '></button>'; }).join('') + '</div>' : '') +
     '</section>' +
 
-    (ONE.length ? '<section class="one-band" aria-labelledby="oneT"><div class="wrap one-in">' +
-      '<div class="one-copy" data-rv><p class="u-h7">' + tr('Signature', 'توقيع الدار') + '</p><h2 class="one-title" id="oneT">' + tr('The One', 'القطعة الواحدة') + '</h2>' +
-        '<p class="one-line">' + tr('One piece. Made once. Never again.', 'قطعة واحدة. تُصنع مرة واحدة. ولا تتكرر.') + '</p>' +
-        '<div class="rte"><p>' + tr('Each dress in this line exists as a single piece. When it finds its owner, it is gone for good.', 'كل فستان في هذا الخط قطعة فريدة. وحين يجد صاحبته، يختفي إلى الأبد.') + '</p></div>' +
-        '<a class="btn light" href="#the-one">' + tr('Discover The One', 'اكتشفي القطعة الواحدة') + '</a></div>' +
-      '<div class="one-grid">' + ONE.slice(0, 4).map(oneTile).join('') + '</div>' +
-    '</div></section>' : '') +
-
-    '<section class="sec"><div class="wrap">' +
-      '<header class="sec-h" data-rv><p class="u-h7">' + (fresh.length ? tr('Just arrived', 'وصل حديثًا') : tr('Featured collection', 'مجموعة مميزة')) + '</p><h2 class="u-h2">' + (fresh.length ? tr('New arrivals', 'وصل حديثًا') : tr('The new season', 'الموسم الجديد')) + '</h2><span class="dash"></span></header>' +
-      grid(feat) +
-      '<div class="center mt" data-rv><a class="btn" href="#s-' + (fresh.length ? 'new' : 'all') + '">' + tr('View all products', 'عرض جميع المنتجات') + '</a></div>' +
-    '</div></section>' +
-
-    '<section class="sec line"><div class="wrap">' +
-      '<header class="sec-h" data-rv><p class="u-h7">' + tr('Shop by style', 'تسوّقي حسب الفئة') + '</p><h2 class="u-h2">' + tr('Find your piece', 'اكتشفي قطعتك') + '</h2><span class="dash"></span></header>' +
-      '<div class="tiles">' + [['abayas', 'img/c/c13.jpg'], ['evening', 'img/c/c15.jpg'], ['everyday', 'img/c/c19.jpg']].map(function(x, i){
-        return '<a class="tile" href="#s-' + x[0] + '" data-rv style="--d:' + i + '"><img src="' + x[1] + '" alt="" loading="lazy"><span><span class="link">' + esc(t(find(STYLES, x[0]))) + '</span></span></a>';
-      }).join('') + '</div>' +
-    '</div></section>' +
-
-    '<section class="banner ed-banner" id="edBanner"><video muted playsinline loop autoplay preload="metadata" poster="video/abaya-edit.jpg" aria-hidden="true"><source src="video/abaya-edit.mp4" type="video/mp4"></video><div><p class="u-h7">' + tr('The abaya edit', 'مختارات العبايات') + '</p><h2 class="u-h1" style="margin-top:8px">' + tr('Details you find up close', 'تفاصيل تُرى عن قرب') + '</h2>' +
-      '<div class="rte"><p>' + tr('Black-on-black embroidery, satin lapels and fine copper piping. Abayas that stay quiet from across the room and reward a closer look.', 'تطريز أسود على أسود، وياقات من الساتان، وحواف نحاسية رفيعة. عبايات هادئة من بعيد، تكشف جمالها عن قرب.') + '</p></div>' +
-      '<a class="btn light" href="#s-abayas" style="margin-top:24px">' + tr('Shop abayas', 'تسوّقي العبايات') + '</a></div></section>' +
-
-    '<section class="sec line"><div class="wrap">' +
-      '<header class="sec-h" data-rv><p class="u-h7">' + tr('Featured collection', 'مجموعة مميزة') + '</p><h2 class="u-h2">' + esc(t(col('bloom').name)) + '</h2><span class="dash"></span></header>' +
-      grid(ess, ess.length === 3 ? 'c3' : '') +
-      '<div class="center mt" data-rv><a class="btn" href="#bloom">' + tr('View the collection', 'عرض المجموعة') + '</a></div>' +
-    '</div></section>' +
-
-    '<section class="sec line"><div class="wrap brand" data-rv>' +
-      '<p class="u-h7 muted">NMH · ' + tr('Dubai', 'دبي') + '</p><h2 class="u-h2" style="margin-top:10px">' + tr('Made for you alone', 'صُنعت لكِ وحدك') + '</h2>' +
-      '<div class="rte"><p>' + tr('NMH designs modest dresses and abayas in Dubai, and cuts each piece only after you order it, in your size and your length. Before anything is cut, we confirm every detail with you.', 'تصمّم NMH الفساتين والعبايات المحتشمة في دبي، ولا تُفصَّل أي قطعة إلا بعد طلبها، وفق مقاسك وطولك. وقبل التفصيل، نؤكد معك جميع التفاصيل.') + '</p></div>' +
-      '<div class="social"><a class="link" href="https://www.instagram.com/_bynmh/" target="_blank" rel="noopener">Instagram</a><a class="link" href="#page-how">' + tr('How ordering works', 'طريقة الطلب') + '</a></div>' +
-    '</div></section>';
+    homeSections(fresh, feat);
   startSlides();
   var eb = $('edBanner'); if(eb && io && !reduce) io.observe(eb); else if(eb) eb.classList.add('in');
 }
@@ -1597,10 +1632,22 @@ var PAGES = {
     en:'<p>[Draft for NMH to confirm.]</p><p>Prices are in UAE dirhams and include VAT. An order is accepted once we confirm the fabric and fit with you. Colours on screen can differ slightly from the real fabric; the fabric photo we send before cutting is the reference.</p>',
     ar:'<p>[مسودة بانتظار تأكيد NMH.]</p><p>الأسعار بالدرهم الإماراتي وشاملة الضريبة. يُعتمد الطلب بعد الاتفاق معك على القماش والمقاس. قد تختلف الألوان على الشاشة قليلًا عن القماش الفعلي، وصورة القماش التي نرسلها قبل التفصيل هي المرجع.</p>'}}
 };
+function pageTitle(id){ var x = PAGEX[id], v = x && x.t && (L === 'ar' ? x.t.ar : x.t.en); return v || t(PAGES[id].t); }
+/* simple text from the control room: blank line = new paragraph, "## " = heading, "- " = bullet */
+function richText(s){
+  return String(s).replace(/\r/g, '').split(/\n{2,}/).map(function(block){
+    block = block.trim(); if(!block) return '';
+    if(/^## /.test(block)) return '<h2>' + esc(block.slice(3)) + '</h2>';
+    var lines = block.split('\n');
+    if(lines.every(function(l){ return /^- /.test(l); })) return '<ul>' + lines.map(function(l){ return '<li>' + esc(l.slice(2)) + '</li>'; }).join('') + '</ul>';
+    return '<p>' + lines.map(esc).join('<br>') + '</p>';
+  }).join('');
+}
 function viewPage(id){
   var pg = PAGES[id]; if(!pg){ location.hash = ''; return; }
-  var body = id === 'size' ? sizeChartHTML().replace('<h2 class="u-h6" id="mdlT">' + tr('Size chart', 'جدول المقاسات') + '</h2>', '') : t(pg.b);
-  app.innerHTML = '<header class="ph-head wrap"><h1 class="u-h1">' + esc(t(pg.t)) + '</h1></header><div class="page">' + body + '</div>';
+  var x = PAGEX[id] || {}, xb = x.b && (L === 'ar' ? x.b.ar : x.b.en);
+  var body = xb ? richText(xb) + (id === 'size' ? sizeChartHTML().replace('<h2 class="u-h6" id="mdlT">' + tr('Size chart', 'جدول المقاسات') + '</h2>', '') : '') : id === 'size' ? sizeChartHTML().replace('<h2 class="u-h6" id="mdlT">' + tr('Size chart', 'جدول المقاسات') + '</h2>', '') : t(pg.b);
+  app.innerHTML = '<header class="ph-head wrap"><h1 class="u-h1">' + esc(pageTitle(id)) + '</h1></header><div class="page">' + body + '</div>';
 }
 
 /* ================= router ================= */
@@ -1642,7 +1689,7 @@ function titleFor(h){
   var m = /^p-(\w+)$/.exec(h); if(m && prod(m[1])) return t(prod(m[1]).name) + ' – ' + base;
   m = /^s-(\w+)$/.exec(h); if(m && STYLE_INFO[m[1]]) return t(STYLE_INFO[m[1]].title) + ' – ' + base;
   if(h === 'checkout') return tr('Checkout', 'إتمام الطلب') + ' – ' + base;
-  m = /^page-(\w+)$/.exec(h); if(m && PAGES[m[1]]) return t(PAGES[m[1]].t) + ' – ' + base;
+  m = /^page-(\w+)$/.exec(h); if(m && PAGES[m[1]]) return pageTitle(m[1]) + ' – ' + base;
   return base;
 }
 var io = 'IntersectionObserver' in window ? new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }); }, {rootMargin:'0px 0px -8% 0px', threshold:.08}) : null;
@@ -1653,11 +1700,11 @@ function headerState(){ document.body.classList.toggle('home-top', !curKey && wi
 
 /* ================= language and theme ================= */
 var staticNodes = document.querySelectorAll('[data-ar]');
-staticNodes.forEach(function(n){ n.setAttribute('data-en', n.innerHTML); });
+staticNodes.forEach(function(n){ n.setAttribute('data-en', n.innerHTML); n.setAttribute('data-k', n.textContent.trim()); });
 function applyLang(){
   var h = document.documentElement; h.lang = L; h.dir = L === 'ar' ? 'rtl' : 'ltr';
-  staticNodes.forEach(function(n){ n.innerHTML = n.getAttribute(L === 'ar' ? 'data-ar' : 'data-en'); });
-  document.querySelectorAll('[data-ph-ar]').forEach(function(n){ if(!n.dataset.phEn) n.dataset.phEn = n.placeholder; n.placeholder = L === 'ar' ? n.dataset.phAr : n.dataset.phEn; });
+  staticNodes.forEach(function(n){ var o = n.id !== 'ann' && TX[n.getAttribute('data-k')], v = o && (L === 'ar' ? o.ar : o.en); n.innerHTML = v ? esc(v) : n.getAttribute(L === 'ar' ? 'data-ar' : 'data-en'); });
+  document.querySelectorAll('[data-ph-ar]').forEach(function(n){ if(!n.dataset.phEn) n.dataset.phEn = n.placeholder; var o = TX[n.dataset.phEn], v = o && (L === 'ar' ? o.ar : o.en); n.placeholder = v || (L === 'ar' ? n.dataset.phAr : n.dataset.phEn); });
   ['lang', 'sideLang', 'ftLang'].forEach(function(id){ var b = $(id); b.textContent = L === 'ar' ? 'English' : 'عربي'; b.lang = L === 'ar' ? 'en' : 'ar'; });
   $('burger').setAttribute('aria-label', tr('Open menu', 'فتح القائمة'));
   $('searchIco').setAttribute('aria-label', tr('Search', 'بحث'));
@@ -1757,7 +1804,7 @@ window.addEventListener('hashchange', route);
 window.addEventListener('storage', function(e){ if(e.key === 'nmh-cart'){ CART = DB.get('cart', []); updateCount(); } });
 
 /* boot */
-applyTheme(); applyLang(); applySite(DB.get('site', {})); route(); READY = true; fbInit();
+applyTexts(DB.get('texts', {})); applyCols(DB.get('cols', {})); applyTheme(); applyLang(); applySite(DB.get('site', {})); route(); READY = true; fbInit();
 })();
 </script>
 </body>
