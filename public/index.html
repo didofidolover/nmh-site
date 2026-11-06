@@ -240,7 +240,8 @@ html[lang="ar"] .card .ttl{font-size:14px}
 
 /* collection tiles */
 .tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}
-@media (max-width:820px){ .tiles{grid-template-columns:1fr;gap:16px} }
+@media (min-width:821px){ .tiles.n2{grid-template-columns:repeat(2,minmax(0,1fr))} .tiles.n4{grid-template-columns:repeat(4,minmax(0,1fr));gap:20px} .tiles.n5,.tiles.n6{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px} }
+@media (max-width:820px){ .tiles{grid-template-columns:1fr;gap:16px} .tiles.n4,.tiles.n5,.tiles.n6{grid-template-columns:1fr 1fr;gap:10px} }
 .tile{position:relative;display:block;overflow:hidden;aspect-ratio:4/5;background:var(--soft);color:#fff}
 .tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 25%;transition:transform 1.4s var(--ease-out)}
 .tile::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.18);transition:background-color .6s var(--ease)}
@@ -633,6 +634,86 @@ html[lang="ar"] .sline b{font-family:var(--head);letter-spacing:.06em}
   .slide.is-video video{object-fit:contain!important;object-position:50% 42%!important}
 }
 .banner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%}
+
+/* ===================== design styles (switch in the control room) ===================== */
+/* ---- Modern: rounded, bold sans, sentence case ---- */
+html[data-style="modern"]{--head:"Manrope","IBM Plex Sans Arabic",Arial,sans-serif;--body:"Manrope","IBM Plex Sans Arabic",Arial,sans-serif;--r:18px}
+html[data-style="modern"] .u-h1{font-size:clamp(28px,3vw,40px);font-weight:700;text-transform:none;letter-spacing:-.02em;line-height:1.15}
+html[data-style="modern"] .u-h2{font-size:clamp(24px,2.4vw,32px);font-weight:700;text-transform:none;letter-spacing:-.02em;line-height:1.2}
+html[data-style="modern"] .u-h3{font-weight:700;text-transform:none;letter-spacing:-.01em}
+html[data-style="modern"] .u-h7,html[data-style="modern"] .u-h6{letter-spacing:.08em;font-weight:600}
+html[data-style="modern"] .slide-t .big,html[data-style="modern"] .one-title{text-transform:none;letter-spacing:-.02em;font-weight:700}
+html[data-style="modern"] .btn{border-radius:999px;isolation:isolate;overflow:hidden;text-transform:none;letter-spacing:0;font-weight:700;font-size:14px;padding:14px 26px}
+html[data-style="modern"] .ph,html[data-style="modern"] .tile,html[data-style="modern"] .li .im,html[data-style="modern"] .pp-th button{border-radius:var(--r)}
+html[data-style="modern"] .card{text-align:start}
+html[data-style="modern"] .card .ttl{text-transform:none;letter-spacing:0;font-weight:700;font-size:14.5px;margin-top:14px}
+html[data-style="modern"] .card .pr{letter-spacing:0;font-weight:600;color:var(--ink)}
+html[data-style="modern"] .card .lbl{border-radius:999px;letter-spacing:.04em;padding:5px 10px;font-weight:700}
+html[data-style="modern"] .tile span{text-align:start}
+html[data-style="modern"] .tile .link{font-size:18px;font-weight:700;letter-spacing:-.01em;text-transform:none}
+html[data-style="modern"] .sec-h .dash{display:none}
+html[data-style="modern"] .fl input,html[data-style="modern"] .fl select,html[data-style="modern"] .fl textarea,html[data-style="modern"] .ft-news .in{border-radius:14px}
+html[data-style="modern"] .chips a[aria-current="page"]{color:var(--btn-ink);background:var(--btn);padding:6px 14px;border-radius:999px}
+html[data-style="modern"] .chips a[aria-current="page"]::after{display:none}
+html[data-style="modern"] .banner,html[data-style="modern"] .one-band{border-radius:28px;margin-inline:var(--g)}
+html[data-style="modern"] .drw-p,html[data-style="modern"] .mdl-p{border-radius:24px 0 0 24px}
+html[data-style="modern"][dir="rtl"] .drw-p{border-radius:0 24px 24px 0}
+
+/* ---- Liquid glass: frosted panels, floating header, glassy buttons ---- */
+html[data-style="glass"]{--glass:color-mix(in srgb,var(--panel) 58%,transparent);--glass-b:color-mix(in srgb,#fff 55%,transparent);--blur:blur(22px) saturate(1.7)}
+html.dark[data-style="glass"]{--glass-b:color-mix(in srgb,#fff 14%,transparent)}
+html[data-style="glass"] body{background:radial-gradient(60vw 60vw at 0% 0%,color-mix(in srgb,var(--btn) 9%,transparent),transparent 70%),radial-gradient(55vw 55vw at 100% 35%,color-mix(in srgb,#C9A98A 26%,transparent),transparent 70%),radial-gradient(50vw 50vw at 20% 100%,color-mix(in srgb,#B9C6D8 24%,transparent),transparent 70%),var(--bg);background-attachment:fixed}
+html[data-style="glass"] .hd{background:transparent!important;box-shadow:none!important;padding:10px 14px}
+html[data-style="glass"] .hd-in{background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--glass-b);border-radius:22px;box-shadow:0 10px 30px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.5);padding-inline:22px;max-width:1540px}
+html[data-style="glass"] body.home-top .hd:not(:hover):not(.menu-on) .hd-in{background:rgba(0,0,0,.14);border-color:rgba(255,255,255,.35)}
+html[data-style="glass"] .mega{background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);margin:8px 14px 0;border-radius:22px;border:1px solid var(--glass-b);inset-inline:0}
+html[data-style="glass"] .btn{border-radius:999px;isolation:isolate;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 20px rgba(0,0,0,.12)}
+html[data-style="glass"] .btn.light{--btn:transparent;--btn-ink:#fff;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6);border:1px solid rgba(255,255,255,.55)}
+html[data-style="glass"] .btn.light:hover{background:rgba(255,255,255,.32)}
+html[data-style="glass"] .ph,html[data-style="glass"] .tile,html[data-style="glass"] .li .im,html[data-style="glass"] .pp-th button{border-radius:22px}
+html[data-style="glass"] .card .lbl:not(.new):not(.out){border-radius:999px;background:color-mix(in srgb,var(--panel) 55%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--glass-b)}
+html[data-style="glass"] .tile span{margin:14px;padding:16px;border-radius:18px;background:rgba(255,255,255,.16);-webkit-backdrop-filter:blur(16px) saturate(1.6);backdrop-filter:blur(16px) saturate(1.6);border:1px solid rgba(255,255,255,.4)}
+html[data-style="glass"] .bar{background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--glass-b);border-radius:18px;margin-inline:var(--g);padding-inline:18px}
+html[data-style="glass"] .drw-p,html[data-style="glass"] .mdl-p,html[data-style="glass"] .srch-p{background:var(--glass);-webkit-backdrop-filter:blur(30px) saturate(1.8);backdrop-filter:blur(30px) saturate(1.8)}
+html[data-style="glass"] .drw-p{inset-block:12px;inset-inline-end:12px;border-radius:26px;border:1px solid var(--glass-b)}
+html[data-style="glass"] .mdl-p{border-radius:26px;border:1px solid var(--glass-b)}
+html[data-style="glass"] .side-p{background:rgba(20,19,18,.72);-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px)}
+html[data-style="glass"] .fl input,html[data-style="glass"] .fl select,html[data-style="glass"] .fl textarea,html[data-style="glass"] .ft-news .in{border-radius:14px;background:var(--glass)}
+html[data-style="glass"] .ft{background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--glass-b);border-radius:28px 28px 0 0}
+html[data-style="glass"] .banner,html[data-style="glass"] .one-band{border-radius:30px;margin-inline:var(--g)}
+html[data-style="glass"] .slide-t{padding:22px 24px;border-radius:24px;background:rgba(0,0,0,.12);-webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);border:1px solid rgba(255,255,255,.28)}
+html[data-style="glass"] .ann{border-radius:0 0 16px 16px;margin-inline:14px}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){html[data-style="glass"]{--glass:var(--panel)}}
+
+/* ---- Editorial: luxury serif titles, magazine feel ---- */
+html[data-style="editorial"]{--serif:"Cormorant Garamond","Amiri",Georgia,serif}
+html[data-style="editorial"] .u-h1,html[data-style="editorial"] .u-h2,html[data-style="editorial"] .u-h3,html[data-style="editorial"] .one-title,html[data-style="editorial"] .slide-t .big{font-family:var(--serif);font-weight:500;text-transform:none;letter-spacing:0;line-height:1.1}
+html[data-style="editorial"] .u-h1{font-size:clamp(36px,4vw,56px)}
+html[data-style="editorial"] .u-h2{font-size:clamp(32px,3.2vw,46px);font-style:italic}
+html[data-style="editorial"] .slide-t .big{font-size:clamp(34px,4.4vw,64px)}
+html[data-style="editorial"] .card .ttl{font-family:var(--serif);font-size:19px;font-weight:500;text-transform:none;letter-spacing:0;margin-top:16px}
+html[data-style="editorial"] .tile .link{font-family:var(--serif);font-size:28px;font-style:italic;text-transform:none;letter-spacing:0}
+html[data-style="editorial"] .sec-h .dash{width:40px}
+html[data-style="editorial"] .btn{letter-spacing:.3em;font-size:11px;padding:16px 34px}
+html[data-style="editorial"] .btn.light{--btn:transparent;--btn-ink:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.8)}
+html[data-style="editorial"] .card .lbl:not(.new):not(.out){background:transparent;border:1px solid currentColor}
+html[data-style="editorial"][lang="ar"] .u-h1,html[data-style="editorial"][lang="ar"] .u-h2,html[data-style="editorial"][lang="ar"] .u-h3,html[data-style="editorial"][lang="ar"] .one-title,html[data-style="editorial"][lang="ar"] .slide-t .big{font-family:"Amiri",serif;font-style:normal;font-weight:700}
+
+/* ---- Minimal: airy, no ornaments, thin lines ---- */
+html[data-style="minimal"] .u-h1,html[data-style="minimal"] .u-h2{font-weight:400;letter-spacing:.32em;font-size:16px}
+html[data-style="minimal"] .sec-h .dash,html[data-style="minimal"] .card .pr{opacity:.8}
+html[data-style="minimal"] .btn{--btn:transparent;--btn-ink:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);font-weight:400}
+html[data-style="minimal"] .btn:hover{--btn-ink:var(--panel)}
+html[data-style="minimal"] .btn::before{background:var(--ink);transform:scale(0,1)}
+html[data-style="minimal"] .btn:hover::before{transform:scale(1,1)}
+html[data-style="minimal"] .btn.light{--btn-ink:#fff;box-shadow:inset 0 0 0 1px #fff}
+html[data-style="minimal"] .btn.light::before{background:#fff}
+html[data-style="minimal"] .btn.light:hover{--btn-ink:#1C1B1B}
+html[data-style="minimal"] .sec{padding-block:clamp(80px,10vw,150px)}
+html[data-style="minimal"] .card .ttl{font-weight:400;font-size:11px}
+html[data-style="minimal"] .card .lbl:not(.new):not(.out){background:transparent;padding:0;color:var(--ink)}
+html[data-style="minimal"] .tiles{gap:4px}
+html[data-style="glass"] .card .lbl{border-radius:999px}
 </style>
 </head>
 <body>
@@ -642,7 +723,7 @@ html[lang="ar"] .sline b{font-family:var(--head);letter-spacing:.06em}
   <filter id="dyeP" color-interpolation-filters="sRGB"><feFlood id="dyePFlood" flood-color="#8A4A47" result="f"/><feComposite in="f" in2="SourceAlpha" operator="in" result="c"/><feBlend in="SourceGraphic" in2="c" mode="multiply"/></filter>
 </defs></svg>
 
-<div class="ann" id="ann" data-ar="توصيل مجاني داخل الإمارات للطلبات التي تتجاوز ٥٠٠ د.إ · كل قطعة تُفصَّل حسب الطلب في دبي">Free UAE delivery over 500 AED · Every piece made to order in Dubai</div>
+<div class="ann" id="ann" data-ar="كل قطعة تُفصَّل حسب الطلب في دبي · التوصيل إلى الإمارات ودول الخليج">Every piece made to order in Dubai · Delivery across the UAE and the GCC</div>
 
 <header class="hd" id="hd">
   <div class="wrap hd-in">
@@ -744,6 +825,13 @@ function applySiteTheme(th){
   if(!THEME_PREF){ DARK = TH === 'midnight'; h.classList.toggle('dark', DARK); }
   var m = document.querySelector('meta[name=theme-color]'); if(m) m.content = DARK ? '#141312' : THEMES[TH];
 }
+var STYLE_FONTS = {modern:'family=Manrope:wght@400;600;700', editorial:'family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Amiri:wght@400;700'};
+function applySiteStyle(st){
+  st = ['modern', 'glass', 'editorial', 'minimal'].indexOf(st) > -1 ? st : 'classic';
+  var h = document.documentElement; if(st === 'classic') h.removeAttribute('data-style'); else h.setAttribute('data-style', st);
+  if(STYLE_FONTS[st] && !document.getElementById('font-' + st)){ var l = document.createElement('link'); l.id = 'font-' + st; l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?' + STYLE_FONTS[st] + '&display=swap'; document.head.appendChild(l); }
+}
+try{ applySiteStyle((JSON.parse(localStorage.getItem('nmh-site') || '{}')).style); }catch(e){}
 function DB_COLORS(){ try{ var s = JSON.parse(localStorage.getItem('nmh-site') || '{}'); return s.colors; }catch(e){ return null; } }
 applySiteTheme(TH);
 function t(o){ return o && typeof o === 'object' ? (o[L] || o.en) : o; }
@@ -869,6 +957,10 @@ COLLECTIONS.unshift({id:'the-one', season:{en:'Signature · One of one',ar:'تو
 
 /* ---- The Courtyard: autumn/winter 2026 campaign (prices are placeholders, editable in the control room) ---- */
 STYLES.splice(1, 0, {id:'abayas', en:'Abayas', ar:'عبايات'});
+STYLES.splice(2, 0, {id:'kaftans', en:'Kaftans', ar:'قفاطين'}, {id:'jalabiyas', en:'Jalabiyas', ar:'جلابيات'}, {id:'girls', en:'Girls', ar:'البنات'});
+STYLE_INFO.kaftans = {title:{en:'Kaftans',ar:'قفاطين'}, intro:{en:'Flowing kaftans in soft fabrics, made for gatherings, Ramadan evenings and easy days at home.',ar:'قفاطين انسيابية بأقمشة ناعمة، للتجمعات وأمسيات رمضان والأيام الهادئة في المنزل.'}, imgs:['img/c/c15.jpg']};
+STYLE_INFO.jalabiyas = {title:{en:'Jalabiyas',ar:'جلابيات'}, intro:{en:'Traditional jalabiyas with a modern cut and quiet detail, for Eid, Ramadan and family occasions.',ar:'جلابيات تقليدية بقصّة عصرية وتفاصيل هادئة، للعيد ورمضان والمناسبات العائلية.'}, imgs:['img/c/c16.jpg']};
+STYLE_INFO.girls = {title:{en:'Girls',ar:'البنات'}, intro:{en:'Modest dresses and abayas for girls, cut to order in her size so mother and daughter can match.',ar:'فساتين وعبايات محتشمة للبنات، تُفصَّل حسب مقاسها لتتناسق الأم مع ابنتها.'}, imgs:['img/c/c19.jpg']};
 STYLE_INFO.abayas = {title:{en:'Abayas',ar:'عبايات'}, intro:{en:'Open and closed abayas with quiet detail: satin lapels, fine piping and hand-placed embroidery.',ar:'عبايات مفتوحة ومغلقة بتفاصيل هادئة: ياقات من الساتان، وحواف رفيعة، وتطريز يدوي.'}};
 COLLECTIONS.splice(1, 0, {id:'courtyard', season:{en:'Autumn/Winter 2026',ar:'خريف وشتاء ٢٠٢٦'}, cover:'img/c/c06-w.jpg', small:'img/c/c13.jpg', tone:'#D9B8A6',
   name:{en:'The Courtyard',ar:'الفناء'},
@@ -944,6 +1036,20 @@ function applyCatalog(over){
   list.sort(function(a, b){ return (a.sort || 0) - (b.sort || 0); });
   ALLP = list; PRODUCTS = list.filter(visible); ONE = PRODUCTS.filter(function(p){ return p.one; });
 }
+var BASESTYLES = JSON.parse(JSON.stringify(STYLES)), BASEINFO = JSON.parse(JSON.stringify(STYLE_INFO));
+/* categories (abayas, kaftans...) can be renamed, hidden, reordered and added from the control room */
+function applyCats(doc){
+  var over = (doc && doc.over) || {}, added = (doc && doc.added) || [], order = (doc && doc.order) || [];
+  var list = JSON.parse(JSON.stringify(BASESTYLES.concat(added.map(function(x){ return {id:x.id, en:x.en, ar:x.ar}; }))));
+  Object.keys(STYLE_INFO).forEach(function(k){ delete STYLE_INFO[k]; }); Object.assign(STYLE_INFO, JSON.parse(JSON.stringify(BASEINFO)));
+  added.forEach(function(x){ STYLE_INFO[x.id] = {title:{en:x.en, ar:x.ar}, intro:x.intro || {en:'', ar:''}, imgs:[]}; });
+  list = list.map(function(s){ var o = over[s.id] || {}; if(o.en) s.en = o.en; if(o.ar) s.ar = o.ar; s.hidden = !!o.hidden && s.id !== 'all';
+    var inf = STYLE_INFO[s.id] = STYLE_INFO[s.id] || {title:{en:s.en, ar:s.ar}, intro:{en:'', ar:''}, imgs:[]};
+    if(o.en || o.ar) inf.title = {en:s.en, ar:s.ar}; if(o.intro && (o.intro.en || o.intro.ar)) inf.intro = {en:o.intro.en || inf.intro.en, ar:o.intro.ar || inf.intro.ar}; return s; });
+  list = list.filter(function(s){ return !s.hidden; });
+  list.sort(function(x, y){ if(x.id === 'all') return -1; if(y.id === 'all') return 1; var i = order.indexOf(x.id), j = order.indexOf(y.id); return (i < 0 ? 999 : i) - (j < 0 ? 999 : j); });
+  STYLES.splice.apply(STYLES, [0, STYLES.length].concat(list));
+}
 var BASECOLS = JSON.parse(JSON.stringify(COLLECTIONS));
 function applyCols(doc){
   var over = (doc && doc.over) || {}, added = (doc && doc.added) || [], order = (doc && doc.order) || [];
@@ -958,7 +1064,7 @@ function annH(){ var a = document.getElementById('ann'); document.documentElemen
 window.addEventListener('resize', annH);
 function applySite(site){
   SITE = site || {};
-  applySiteTheme(SITE.theme || (Object.keys(SITE).length ? 'classic' : TH)); if(typeof applyThemeLabel === 'function' && document.getElementById('ftTheme')) applyThemeLabel();
+  applySiteTheme(SITE.theme || (Object.keys(SITE).length ? 'classic' : TH)); applySiteStyle(SITE.style); if(typeof applyThemeLabel === 'function' && document.getElementById('ftTheme')) applyThemeLabel();
   var a = document.getElementById('ann'); if(!a) return;
   if(SITE.ann && (SITE.ann.en || SITE.ann.ar)){ a.setAttribute('data-en', esc(SITE.ann.en || SITE.ann.ar)); a.setAttribute('data-ar', esc(SITE.ann.ar || SITE.ann.en)); a.innerHTML = a.getAttribute(L === 'ar' ? 'data-ar' : 'data-en'); }
   a.hidden = SITE.annOff === true;
@@ -1043,6 +1149,7 @@ function fbWatch(){
   F.onSnapshot(F.collection(FB.db, 'products'), function(qs){ over = {}; qs.forEach(function(d){ over[d.id] = d.data(); }); apply(); }, fbWarn);
   F.onSnapshot(F.doc(FB.db, 'settings', 'site'), function(d){ site = d.exists() ? d.data() : {}; apply(); }, fbWarn);
   F.onSnapshot(F.doc(FB.db, 'settings', 'texts'), function(d){ var v = d.exists() ? d.data() : {}; if(JSON.stringify(v) === JSON.stringify(DB.get('texts', {}))) return; DB.set('texts', v); applyTexts(v); applyLang(); refreshViews(); }, fbWarn);
+  F.onSnapshot(F.doc(FB.db, 'settings', 'categories'), function(d){ var v = d.exists() ? d.data() : {}; if(JSON.stringify(v) === JSON.stringify(DB.get('cats', {}))) return; DB.set('cats', v); applyCats(v); renderMenus(); refreshViews(); }, fbWarn);
   F.onSnapshot(F.doc(FB.db, 'settings', 'collections'), function(d){ var v = d.exists() ? d.data() : {}; if(JSON.stringify(v) === JSON.stringify(DB.get('cols', {}))) return; DB.set('cols', v); applyCols(v); renderMenus(); refreshViews(); }, fbWarn);
   F.onSnapshot(F.collection(FB.db, 'oneofone'), function(qs){
     var next = {}; qs.forEach(function(d){ next[d.id] = 1; });
@@ -1171,7 +1278,7 @@ function homeSections(fresh, feat){
     styles:function(){ var tiles = (cfg.tiles && cfg.tiles.length ? cfg.tiles : [{s:'abayas', img:'img/c/c13.jpg'}, {s:'evening', img:'img/c/c15.jpg'}, {s:'everyday', img:'img/c/c19.jpg'}]).filter(function(x){ return find(STYLES, x.s); });
       return '<section class="sec line"><div class="wrap">' +
       '<header class="sec-h" data-rv><p class="u-h7">' + tr('Shop by style', 'تسوّقي حسب الفئة') + '</p><h2 class="u-h2">' + tr('Find your piece', 'اكتشفي قطعتك') + '</h2><span class="dash"></span></header>' +
-      '<div class="tiles">' + tiles.map(function(x, i){
+      '<div class="tiles n' + tiles.length + '">' + tiles.map(function(x, i){
         return '<a class="tile" href="#s-' + esc(x.s) + '" data-rv style="--d:' + i + '"><img src="' + esc(x.img) + '" alt="" loading="lazy"><span><span class="link">' + esc(t(find(STYLES, x.s))) + '</span></span></a>';
       }).join('') + '</div>' +
     '</div></section>'; },
@@ -1313,7 +1420,7 @@ function viewProduct(code){
           (p.story && t(p.story) ? acc(tr('The story', 'القصة'), '<p>' + esc(t(p.story)) + '</p>', true) : '') +
           (one ? acc(tr('Why only one', 'لماذا قطعة واحدة'), '<p>' + tr('Some fabrics come in a single length and some designs deserve a single owner. Pieces in The One are made once; after that the pattern is retired and the dress is shown in our archive.', 'بعض الأقمشة تصلنا بقطعة واحدة فقط، وبعض التصاميم تستحق صاحبة واحدة. تُصنع قطع هذا الخط مرة واحدة، ثم يُغلق الباترون ويُعرض الفستان في الأرشيف.') + '</p>') : '') +
           acc(tr('Fabric and care', 'القماش والعناية'), '<p>' + (p.fabric && t(p.fabric) ? esc(t(p.fabric)) : tr('[Fabric to confirm]. Dry clean or hand wash cold. Steam on low; do not tumble dry.', '[سيتم تأكيد نوع القماش]. تنظيف جاف أو غسيل يدوي بماء بارد. كيّ بالبخار على حرارة منخفضة، دون استخدام المجفف.')) + '</p>') +
-          acc(tr('Delivery and returns', 'التوصيل والاسترجاع'), '<p>' + tr('Each piece is cut after you order. Free UAE delivery over 500 AED. Because pieces are made for you, see our refund policy before ordering.', 'تُفصَّل كل قطعة بعد طلبها. التوصيل مجاني داخل الإمارات للطلبات التي تتجاوز ٥٠٠ د.إ. ولأن القطعة تُصنع لكِ خصيصًا، يرجى مراجعة سياسة الاسترجاع قبل الطلب.') + ' <a href="#page-refund" style="text-decoration:underline">' + tr('Refund policy', 'سياسة الاسترجاع') + '</a></p>') +
+          acc(tr('Delivery and returns', 'التوصيل والاسترجاع'), '<p>' + tr('Each piece is cut after you order. We deliver across the UAE, the GCC and worldwide. Because pieces are made for you, see our refund policy before ordering.', 'تُفصَّل كل قطعة بعد طلبها. نوصّل إلى جميع أنحاء الإمارات ودول الخليج والعالم. ولأن القطعة تُصنع لكِ خصيصًا، يرجى مراجعة سياسة الاسترجاع قبل الطلب.') + ' <a href="#page-refund" style="text-decoration:underline">' + tr('Refund policy', 'سياسة الاسترجاع') + '</a></p>') +
         '</div>' +
       '</div>' +
     '</div></div>' +
@@ -1371,10 +1478,10 @@ function cartSub(){ return CART.reduce(function(n, it){ var p = prod(it.code); r
 function updateCount(){ var n = cartCount(); $('cartN').textContent = n; $('cartDot').textContent = n || ''; $('cartIco').setAttribute('aria-label', tr('Cart', 'الحقيبة') + (n ? ', ' + n : '')); }
 function renderDrawer(){
   thumbN = 0;
-  var s = cartSub(), left = 500 - s, P = $('drw').querySelector('.drw-p');
+  var s = cartSub(), left = DLV().min - s, P = $('drw').querySelector('.drw-p');
   P.innerHTML = '<div class="drw-h"><h2 class="u-h6" id="drwT">' + tr('Cart', 'الحقيبة') + '</h2><button type="button" data-close-drw aria-label="' + tr('Close cart', 'إغلاق الحقيبة') + '">' + X + '</button></div>' +
     (CART.length ?
-      '<div class="ship-bar">' + (left > 0 ? tr('Spend ', 'أضيفي') + money(left) + tr(' more for free UAE delivery', ' للحصول على توصيل مجاني داخل الإمارات') : tr('You have free UAE delivery', 'حصلتِ على توصيل مجاني داخل الإمارات')) + '<i style="--p:' + clamp(s / 500, 0, 1) + '"></i></div>' +
+      (DLV().offer ? '<div class="ship-bar">' + (left > 0 ? tr('Spend ', 'أضيفي') + money(left) + tr(' more for free delivery', ' للحصول على توصيل مجاني') : tr('Free delivery offer applied', 'تم تطبيق عرض التوصيل المجاني')) + '<i style="--p:' + (DLV().min ? clamp(s / DLV().min, 0, 1) : 1) + '"></i></div>' : '') +
       '<div class="drw-b">' + CART.map(function(it, i){
         var p = prod(it.code); if(!p) return '';
         return '<div class="li"><a class="im" href="#p-' + p.code + '" data-close-drw style="--tone:' + (p.tone || '') + '">' + lineImg(it) + '</a><div><a class="ttl" href="#p-' + p.code + '" data-close-drw>' + esc(t(p.name)) + '</a>' +
@@ -1439,10 +1546,14 @@ function runSearch(q){
 }
 
 /* ================= checkout (guest, Shopify-style) ================= */
+function DLV(){ var d = SITE.delivery || {}; return {ae:num(d.ae, 25), gcc:num(d.gcc, 60), intl:num(d.intl, 95), express:num(d.express, 40), offer:!!d.offer, min:num(d.min, 0), zones:d.zones || 'ae'}; }
+function num(v, d){ v = parseFloat(v); return isFinite(v) && v >= 0 ? v : d; }
+/* free delivery only while an offer is switched on in the control room */
+function freeShip(z, sub){ var d = DLV(); return d.offer && sub >= d.min && (d.zones === 'all' || (d.zones === 'gcc' ? z !== 'intl' : z === 'ae')); }
 function shipFor(country, method, sub){
-  var z = (find(COUNTRIES, country) || COUNTRIES[0]).zone;
-  var base = z === 'ae' ? (sub >= 500 ? 0 : 25) : z === 'gcc' ? 60 : 95;
-  return base + (method === 'express' ? 40 : 0);
+  var z = (find(COUNTRIES, country) || COUNTRIES[0]).zone, d = DLV();
+  var base = freeShip(z, sub) ? 0 : z === 'ae' ? d.ae : z === 'gcc' ? d.gcc : d.intl;
+  return base + (method === 'express' ? d.express : 0);
 }
 var CO = {country:'AE', method:'standard', pay:'link', bill:'same', sumOpen:false};
 function fl(name, label, type, val, extra, opt){
@@ -1620,8 +1731,8 @@ var PAGES = {
     ar:'<h2>١. اختاري القطعة</h2><p>اختاري الفستان أو العباية، والمقاس والطول المناسبين لكِ.</p><h2>٢. أتمّي الطلب</h2><p>أدخلي بيانات الاتصال والتوصيل. لا يوجد أي دفع في هذه الخطوة.</p><h2>٣. نؤكد معك</h2><p>خلال يوم عمل نتواصل معك عبر واتساب لتأكيد القماش والمقاس، ونرسل لكِ صورة القماش الفعلي.</p><h2>٤. التفصيل والتوصيل</h2><p>نفصّل القطعة في دبي ونوصلها إلى باب بيتك. الدفع عبر رابط بطاقة، أو نقدًا عند الاستلام داخل الإمارات.</p>'}},
   size:{t:{en:'Size guide',ar:'دليل المقاسات'}, b:null},
   shipping:{t:{en:'Shipping policy',ar:'سياسة الشحن'}, b:{
-    en:'<p>Every piece is made to order in Dubai. Production time starts once we confirm your fabric and fit: [X] working days.</p><h2>United Arab Emirates</h2><p>Standard delivery 25 AED, free on orders over 500 AED. Express adds 40 AED.</p><h2>GCC</h2><p>60 AED. Express adds 40 AED.</p><h2>Rest of the world</h2><p>95 AED. Express adds 40 AED. Import duties, if any, are paid on arrival.</p>',
-    ar:'<p>تُفصَّل كل قطعة حسب الطلب في دبي. تبدأ مدة التفصيل بعد تأكيد القماش والمقاس: [X] يوم عمل.</p><h2>الإمارات</h2><p>التوصيل القياسي ٢٥ د.إ، ومجاني للطلبات التي تتجاوز ٥٠٠ د.إ. يضاف ٤٠ د.إ للتوصيل السريع.</p><h2>دول الخليج</h2><p>٦٠ د.إ. يضاف ٤٠ د.إ للتوصيل السريع.</p><h2>باقي الدول</h2><p>٩٥ د.إ. يضاف ٤٠ د.إ للتوصيل السريع. تُدفع الرسوم الجمركية، إن وُجدت، عند الاستلام.</p>'}},
+    en:'<p>Every piece is made to order in Dubai. Production time starts once we confirm your fabric and fit: [X] working days.</p><h2>United Arab Emirates</h2><p>Standard delivery 25 AED. Express adds 40 AED. Free delivery applies only during announced offers.</p><h2>GCC</h2><p>60 AED. Express adds 40 AED.</p><h2>Rest of the world</h2><p>95 AED. Express adds 40 AED. Import duties, if any, are paid on arrival.</p>',
+    ar:'<p>تُفصَّل كل قطعة حسب الطلب في دبي. تبدأ مدة التفصيل بعد تأكيد القماش والمقاس: [X] يوم عمل.</p><h2>الإمارات</h2><p>التوصيل القياسي ٢٥ د.إ. يضاف ٤٠ د.إ للتوصيل السريع. التوصيل المجاني متاح فقط خلال العروض المعلنة.</p><h2>دول الخليج</h2><p>٦٠ د.إ. يضاف ٤٠ د.إ للتوصيل السريع.</p><h2>باقي الدول</h2><p>٩٥ د.إ. يضاف ٤٠ د.إ للتوصيل السريع. تُدفع الرسوم الجمركية، إن وُجدت، عند الاستلام.</p>'}},
   refund:{t:{en:'Refund policy',ar:'سياسة الاسترجاع'}, b:{
     en:'<p>[Draft for NMH to confirm.]</p><p>Because each piece is cut for you in the size and length you choose, we cannot accept returns for a change of mind.</p><h2>Fit</h2><p>If a piece made in a standard size does not fit, message us within 3 days of delivery and we will alter it.</p><h2>Faults</h2><p>If your piece arrives damaged or not as ordered, message us within 3 days with photos and we will repair, remake or refund it.</p>',
     ar:'<p>[مسودة بانتظار تأكيد NMH.]</p><p>لأن كل قطعة تُفصَّل لكِ وفق المقاس والطول الذي اخترتِه، لا نقبل الاسترجاع في حال تغيير الرأي.</p><h2>المقاس</h2><p>إذا كانت القطعة بمقاس قياسي ولم تناسبك، تواصلي معنا خلال ٣ أيام من الاستلام وسنعدّلها لكِ.</p><h2>العيوب</h2><p>إذا وصلتك القطعة بعيب أو بخلاف ما طلبتِ، أرسلي لنا صورًا خلال ٣ أيام وسنصلحها أو نعيد تفصيلها أو نعيد لكِ المبلغ.</p>'}},
@@ -1804,7 +1915,7 @@ window.addEventListener('hashchange', route);
 window.addEventListener('storage', function(e){ if(e.key === 'nmh-cart'){ CART = DB.get('cart', []); updateCount(); } });
 
 /* boot */
-applyTexts(DB.get('texts', {})); applyCols(DB.get('cols', {})); applyTheme(); applyLang(); applySite(DB.get('site', {})); route(); READY = true; fbInit();
+applyTexts(DB.get('texts', {})); applyCats(DB.get('cats', {})); applyCols(DB.get('cols', {})); applyTheme(); applyLang(); applySite(DB.get('site', {})); route(); READY = true; fbInit();
 })();
 </script>
 </body>
