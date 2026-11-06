@@ -351,6 +351,25 @@ textarea.in{height:auto;padding:10px 12px;line-height:1.5;resize:vertical}
 .s-minimal .sm-g{gap:2px}
 .sm-m s{text-decoration:none;font:600 7px/1 var(--head);letter-spacing:.14em;padding:6px 12px}
 .s-modern s{font:700 9px/1 var(--body);letter-spacing:0}
+/* uploads */
+.upw{display:flex;gap:6px;align-items:stretch;min-width:0}
+.upw .in{flex:1;min-width:0}
+.upb{flex:none;height:auto;min-height:40px;gap:5px}
+.upb svg{width:13px;height:13px}
+.upbar{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:90;background:var(--ink);color:#fff;border-radius:10px;padding:12px 16px;width:min(420px,calc(100% - 32px));display:grid;gap:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.upbar.on{opacity:1;transform:translate(-50%,0)}
+.upbar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.upbar i{display:block;height:4px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden}
+.upbar b{display:block;height:100%;width:0;background:#fff;transition:width .2s}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.mitem{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.mitem img,.mitem video{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;background:var(--soft)}
+.mitem .chip{position:absolute;top:8px;left:8px}
+.mi-b{display:grid;gap:6px;padding:8px}
+.mi-b small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.mi-b div{display:flex;gap:6px}
+.steps{margin:0;padding-inline-start:20px;display:grid;gap:8px;line-height:1.5}
+.note{background:var(--warn-bg);color:var(--warn);padding:10px 12px;border-radius:6px;font-size:13px;margin:0}
 </style>
 </head>
 <body>
@@ -658,11 +677,11 @@ function merged(){
 function byCode(c){ return merged().filter(function(p){ return p.code === c; })[0]; }
 function loadAll(){
   $('main').innerHTML = '<div class="spin"></div>';
-  Promise.all([DBX.list('products'), DBX.list('orders', 'created').catch(function(){ return []; }), DBX.list('subscribers', 'created').catch(function(){ return []; }), DBX.list('oneofone').catch(function(){ return []; }), DBX.get('settings', 'site').catch(function(){ return null; }), DBX.get('settings', 'texts').catch(function(){ return null; }), DBX.get('settings', 'collections').catch(function(){ return null; }), DBX.get('settings', 'control').catch(function(){ return null; }), DBX.get('settings', 'categories').catch(function(){ return null; })]).then(function(r){
+  Promise.all([DBX.list('products'), DBX.list('orders', 'created').catch(function(){ return []; }), DBX.list('subscribers', 'created').catch(function(){ return []; }), DBX.list('oneofone').catch(function(){ return []; }), DBX.get('settings', 'site').catch(function(){ return null; }), DBX.get('settings', 'texts').catch(function(){ return null; }), DBX.get('settings', 'collections').catch(function(){ return null; }), DBX.get('settings', 'control').catch(function(){ return null; }), DBX.get('settings', 'categories').catch(function(){ return null; }), DBX.get('settings', 'media').catch(function(){ return null; })]).then(function(r){
     S.over = {}; r[0].forEach(function(p){ var id = p._id; delete p._id; S.over[id] = p; });
     S.orders = r[1]; S.subs = r[2]; S.claims = {}; r[3].forEach(function(c){ S.claims[c._id] = c; }); S.site = r[4] || {}; S.hero = clone(S.site.slides && S.site.slides.length ? S.site.slides : SLIDES); S.heroDirty = false;
     S.tx = {}; ((r[5] && r[5].list) || []).forEach(function(x){ S.tx[x.k] = {en:x.en || '', ar:x.ar || ''}; }); S.pagesX = (r[5] && r[5].pages) || {};
-    S.cols = Object.assign({over:{}, added:[], order:[]}, r[6] || {}); S.labels = (r[7] && r[7].labels) || {}; S.cats = Object.assign({over:{}, added:[], order:[]}, r[8] || {}); S.dirty = {};
+    S.cols = Object.assign({over:{}, added:[], order:[]}, r[6] || {}); S.labels = (r[7] && r[7].labels) || {}; S.cats = Object.assign({over:{}, added:[], order:[]}, r[8] || {}); S.mediaDoc = r[9] || {list:[]}; S.dirty = {};
     S.loaded = true; render();
   }).catch(function(e){ console.error(e); $('main').innerHTML = '<div class="empty">Could not load the data: ' + esc(e.message || e) + '<br><br>If this says "permission", the database rules for the control room have not been published yet.</div>'; });
 }
@@ -670,12 +689,13 @@ function loadAll(){
 /* ================= render ================= */
 function render(){
   var newOrders = S.orders.filter(function(o){ return !o.status; }).length;
-  var V = {delivery:viewDelivery, cats:viewCats, home:viewDash, products:viewProducts, orders:viewOrders, one:viewOne, collections:viewCols, hero:viewHero, sections:viewSections, bar:viewBar, theme:viewTheme, texts:viewTexts, pages:viewPages, subs:viewSubs};
+  var V = {media:viewMedia, delivery:viewDelivery, cats:viewCats, home:viewDash, products:viewProducts, orders:viewOrders, one:viewOne, collections:viewCols, hero:viewHero, sections:viewSections, bar:viewBar, theme:viewTheme, texts:viewTexts, pages:viewPages, subs:viewSubs};
   if(!V[S.tab]) S.tab = 'home';
   $('tabs').innerHTML = S.tab === 'home' ? '' : '<div class="crumbs"><button type="button" data-tab="home"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg>' + esc(lbl('home')) + '</button><span>/</span><b>' + esc(lbl(S.tab)) + '</b></div>' +
     '<div class="quick">' + TILE_ORDER.map(function(k){ return k === 'add' ? '' : '<button type="button" data-tab="' + k + '" aria-current="' + (S.tab === k) + '" title="' + esc(lbl(k)) + '">' + ICONS[k] + (k === 'orders' && newOrders ? '<i>' + newOrders + '</i>' : '') + '</button>'; }).join('') + '</div>';
   document.body.setAttribute('data-page', S.tab);
   V[S.tab]();
+  addUpButtons();
 }
 function status(p){
   var c = [];
@@ -791,7 +811,7 @@ function openEditor(code, one){
 }
 function closeEditor(){ $('ed').classList.remove('open'); $('ed').setAttribute('aria-hidden', 'true'); document.documentElement.style.overflow = ''; E = null; }
 function renderEditor(){
-  var p = E, cfg = window.NMH_CLOUDINARY || {};
+  var p = E, cfg = mediaCfg() || {};
   $('edT').textContent = p._isNew ? (p.one ? 'New 1 of 1 piece' : 'New product') : 'Edit ' + (t(p.name) || p.code);
   $('edB').innerHTML =
     '<div class="card"><h4>Name and price</h4><div class="g2"><label class="f"><span>Name, English</span><input class="in" name="nameEn" value="' + esc(p.name.en) + '" required></label><label class="f"><span>Name, Arabic</span><input class="in" name="nameAr" dir="rtl" value="' + esc(p.name.ar) + '"></label></div>' +
@@ -805,7 +825,7 @@ function renderEditor(){
       '<label class="ph-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg>Upload from<br>phone or computer<input type="file" accept="image/*" multiple id="edUpload" class="sr"></label>' +
       '<button class="ph-add" type="button" data-lib><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>Choose from<br>site photos</button>' +
       '<button class="ph-add" type="button" data-imgurl><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Paste a<br>photo link</button>' +
-    '</div>' + (cfg.cloud && cfg.preset ? '' : '<p class="note" id="upNote" hidden>Photo uploads need the free image hosting to be connected first. Until then, choose from the site photos or paste a photo link.</p>') +
+    '</div>' + (cfg.cloud && cfg.preset ? '' : '<p class="note" id="upNote">Photo uploads are not connected yet. Open <b>Media library</b> on the control room home page to connect them (free, 2 minutes). Until then, choose from the site photos or paste a photo link.</p>') +
       '<div id="libBox" hidden><div class="lib">' + LIB.concat(uploadedImgs()).map(function(src){ return '<button type="button" data-pick="' + esc(src) + '"><img src="' + esc(src) + '" alt="" loading="lazy"></button>'; }).join('') + '</div></div>' +
       '<label class="f" style="max-width:220px"><span>Background behind cut-out photos</span><input class="in" type="color" name="tone" value="' + esc(/^#[0-9a-f]{6}$/i.test(p.tone) ? p.tone : '#F5F0EA') + '" style="padding:4px;height:40px"></label></div>' +
 
@@ -855,20 +875,8 @@ function saveEditor(){
 
 /* ================= image upload (Cloudinary, free plan) ================= */
 function upload(files){
-  var cfg = window.NMH_CLOUDINARY || {};
-  if(!cfg.cloud || !cfg.preset){ var n = $('upNote'); if(n) n.hidden = false; return; }
-  [].slice.call(files).forEach(function(file){
-    toast('Uploading ' + file.name + '…');
-    shrink(file).then(function(blob){
-      var fd = new FormData(); fd.append('file', blob, file.name.replace(/\.\w+$/, '') + '.jpg'); fd.append('upload_preset', cfg.preset); fd.append('folder', 'nmh');
-      return fetch('https://api.cloudinary.com/v1_1/' + cfg.cloud + '/image/upload', {method:'POST', body:fd}).then(function(r){ return r.json(); });
-    }).then(function(j){
-      if(!j.secure_url) throw new Error(j.error && j.error.message || 'upload failed');
-      var url = j.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_1400/');
-      if(E){ readEditor(); E.imgs.push(url); renderEditor(); }
-      toast('Photo added.');
-    }).catch(function(e){ toast('Upload failed: ' + (e.message || e), true); });
-  });
+  var fs = [].slice.call(files), run = function(k){ if(k >= fs.length) return; cloudUpload(fs[k]).then(function(item){ if(E){ readEditor(); E.imgs.push(item.type === 'video' ? item.poster : item.url); renderEditor(); } toast('Photo added.'); run(k + 1); }).catch(function(e){ if(!/not-configured|too-big/.test(e.message)) toast('Upload failed: ' + (e.message || e), true); }); };
+  run(0);
 }
 function shrink(file){
   return new Promise(function(res){
@@ -1046,18 +1054,19 @@ document.addEventListener('click', function(e){
 });
 /* ================= dashboard (cPanel style) ================= */
 var LBL = {home:'Control room', g_shop:'Shop', g_home:'Home page', g_design:'Design and content', g_customers:'Customers',
-  products:'Products', add:'Add a product', delivery:'Delivery and offers', cats:'Categories', d_delivery:'Delivery prices and free delivery offers', d_cats:'Abayas, kaftans, jalabiyas, girls and more', one:'The One', collections:'Collections', hero:'Hero slideshow', sections:'Home sections', bar:'Announcement bar',
+  products:'Products', add:'Add a product', delivery:'Delivery and offers', cats:'Categories', d_delivery:'Delivery prices and free delivery offers', media:'Media library', d_media:'Upload photos and videos', d_cats:'Abayas, kaftans, jalabiyas, girls and more', one:'The One', collections:'Collections', hero:'Hero slideshow', sections:'Home sections', bar:'Announcement bar',
   theme:'Theme and colours', texts:'Site texts', pages:'Info pages', orders:'Orders', subs:'Subscribers',
   d_products:'Sold out, new arrivals, labels, prices', d_add:'Put a new piece in the shop', d_one:'One-of-a-kind pieces and claims', d_collections:'Names, stories, cover photos, add new',
   d_hero:'The big slideshow at the top', d_sections:'Order, show or hide, texts and media', d_bar:'The thin bar above the header',
   d_theme:'Design style, ready themes or your own colours', d_texts:'Every word on the site, English and Arabic', d_pages:'Shipping, refunds, privacy, terms',
   d_orders:'New orders and their status', d_subs:'Newsletter emails'};
-var GROUPS = [['g_shop', ['products', 'add', 'one', 'collections', 'cats', 'delivery']], ['g_home', ['hero', 'sections', 'bar']], ['g_design', ['theme', 'texts', 'pages']], ['g_customers', ['orders', 'subs']]];
-var TILE_ORDER = ['products', 'add', 'one', 'collections', 'cats', 'delivery', 'hero', 'sections', 'bar', 'theme', 'texts', 'pages', 'orders', 'subs'];
+var GROUPS = [['g_shop', ['products', 'add', 'one', 'collections', 'cats', 'delivery']], ['g_home', ['hero', 'sections', 'bar']], ['g_design', ['media', 'theme', 'texts', 'pages']], ['g_customers', ['orders', 'subs']]];
+var TILE_ORDER = ['products', 'add', 'one', 'collections', 'cats', 'delivery', 'hero', 'sections', 'bar', 'media', 'theme', 'texts', 'pages', 'orders', 'subs'];
 function ic(d){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; }
 var ICONS = {
   products:ic('<path d="M8 3h8l1 4-3 2v12H10V9L7 7z"/>'), add:ic('<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>'), one:ic('<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>'),
   collections:ic('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'),
+  media:ic('<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>'),
   delivery:ic('<path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>'), cats:ic('<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4z"/><circle cx="16.5" cy="16.5" r="3.5"/>'),
   hero:ic('<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/>'), sections:ic('<rect x="3" y="3" width="18" height="5" rx="1"/><rect x="3" y="10" width="18" height="5" rx="1"/><rect x="3" y="17" width="18" height="4" rx="1"/>'),
   bar:ic('<path d="M3 10v4h3l6 4V6L6 10z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/>'), theme:ic('<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>'),
@@ -1369,6 +1378,91 @@ document.addEventListener('submit', function(e){
   var data = {delivery:{ae:n('ae'), gcc:n('gcc'), intl:n('intl'), express:n('express'), offer:f.offer.checked, min:n('min'), zones:f.zones.value}, updated:Date.now()};
   if(f.toBar.checked && (f.barEn.value.trim() || f.barAr.value.trim())){ data.ann = {en:f.barEn.value.trim(), ar:f.barAr.value.trim()}; data.annOff = false; }
   DBX.set('settings', 'site', data, true).then(function(){ Object.assign(S.site, data); toast(data.delivery.offer ? 'Saved. Free delivery is ON.' : 'Saved.'); render(); }).catch(function(e2){ toast('Could not save: ' + (e2.message || e2), true); });
+});
+
+/* ================= media uploads (Cloudinary free plan, no card) ================= */
+function mediaCfg(){ var c = Object.assign({}, window.NMH_CLOUDINARY || {}, S.site.media || {}); return c.cloud && c.preset ? c : null; }
+function mediaList(){ return (S.mediaDoc && S.mediaDoc.list) || []; }
+function upProgress(name, p){ var el = $('upBar'); if(!el){ el = document.createElement('div'); el.id = 'upBar'; el.className = 'upbar'; el.innerHTML = '<span></span><i><b></b></i>'; document.body.appendChild(el); }
+  if(p == null){ el.classList.remove('on'); return; } el.classList.add('on'); el.querySelector('span').textContent = (p < 1 ? 'Uploading ' : 'Finishing ') + name + ' · ' + Math.round(p * 100) + '%'; el.querySelector('b').style.width = Math.round(p * 100) + '%'; }
+/* uploads one file and returns {url, type, poster} */
+function cloudUpload(file){
+  var cfg = mediaCfg();
+  if(!cfg){ toast('Uploads are not connected yet. Open Media library to connect them (free, 2 minutes).', true); return Promise.reject(new Error('not-configured')); }
+  var isVid = /^video\//.test(file.type) || /\.(mp4|mov|m4v|webm)$/i.test(file.name);
+  if(isVid && file.size > 100 * 1024 * 1024){ toast('This video is over 100 MB. Export it smaller (1080p, under 30 seconds) and try again.', true); return Promise.reject(new Error('too-big')); }
+  return (isVid ? Promise.resolve(file) : shrink(file)).then(function(blob){
+    return new Promise(function(res, rej){
+      var fd = new FormData(); fd.append('file', blob, isVid ? file.name : file.name.replace(/\.\w+$/, '') + '.jpg'); fd.append('upload_preset', cfg.preset); fd.append('folder', 'nmh');
+      var x = new XMLHttpRequest(); x.open('POST', 'https://api.cloudinary.com/v1_1/' + encodeURIComponent(cfg.cloud) + '/' + (isVid ? 'video' : 'image') + '/upload');
+      x.upload.onprogress = function(ev){ if(ev.lengthComputable) upProgress(file.name, ev.loaded / ev.total); };
+      x.onload = function(){ upProgress(null); var j = {}; try{ j = JSON.parse(x.responseText); }catch(e){}
+        if(!j.secure_url) return rej(new Error(j.error && j.error.message || ('upload failed (' + x.status + ')')));
+        var url = isVid ? j.secure_url.replace('/upload/', '/upload/q_auto,vc_auto,w_1920,c_limit/') : j.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_2000,c_limit/');
+        var poster = isVid ? j.secure_url.replace('/upload/', '/upload/so_1,w_1920,c_limit,q_auto/').replace(/\.\w+$/, '.jpg') : '';
+        var item = {url:url, type:isVid ? 'video' : 'image', poster:poster, name:file.name, w:j.width || 0, h:j.height || 0, at:Date.now()};
+        S.mediaDoc = S.mediaDoc || {list:[]}; S.mediaDoc.list = [item].concat(mediaList()).slice(0, 400);
+        DBX.set('settings', 'media', {list:S.mediaDoc.list, updated:Date.now()}).catch(function(){});
+        res(item); };
+      x.onerror = function(){ upProgress(null); rej(new Error('network error')); };
+      x.send(fd);
+    });
+  });
+}
+function pickFiles(accept, multi, cb){ if(!mediaCfg()){ toast('Uploads are not connected yet. Open Media library on the control room home to connect them (free, 2 minutes).', true); return; } var i = document.createElement('input'); i.type = 'file'; i.accept = accept; i.multiple = !!multi; i.style.display = 'none'; document.body.appendChild(i);
+  i.addEventListener('change', function(){ var fs = [].slice.call(i.files); i.remove(); var run = function(k){ if(k >= fs.length) return; cloudUpload(fs[k]).then(function(item){ cb(item); run(k + 1); }).catch(function(e){ if(!/not-configured|too-big/.test(e.message)) toast('Upload failed: ' + e.message, true); }); }; run(0); });
+  i.click(); }
+/* every photo or video box in the control room gets an Upload button next to it */
+function addUpButtons(){
+  [].forEach.call(document.querySelectorAll('#main input[list^="dl"]'), function(inp){
+    if(inp.parentNode.classList.contains('upw')) return;
+    var vid = inp.getAttribute('list') === 'dlVid', w = document.createElement('div'); w.className = 'upw';
+    inp.parentNode.insertBefore(w, inp); w.appendChild(inp);
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'btn sm ghost upb'; b.setAttribute('data-upvid', vid ? '1' : ''); b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg>Upload'; w.appendChild(b);
+  });
+  var add = function(id, items){ var dl = document.getElementById(id); if(!dl || dl.getAttribute('data-m')) return; dl.setAttribute('data-m', '1'); dl.insertAdjacentHTML('afterbegin', items.map(function(m){ return '<option value="' + esc(m.url) + '" label="Uploaded · ' + esc(m.name) + '">'; }).join('')); };
+  var imgs = mediaList().filter(function(m){ return m.type === 'image'; }), vids = mediaList().filter(function(m){ return m.type === 'video'; });
+  add('dlWide', imgs); add('dlTall', imgs); add('dlVid', vids);
+}
+function setField(inp, val){ inp.value = val; inp.dispatchEvent(new Event('input', {bubbles:true})); inp.dispatchEvent(new Event('change', {bubbles:true})); }
+document.addEventListener('click', function(e){
+  var b = e.target.closest('.upb'); if(!b) return;
+  var inp = b.parentNode.querySelector('input'), vid = b.getAttribute('data-upvid') === '1';
+  pickFiles(vid ? 'video/mp4,video/quicktime,video/webm,video/*' : 'image/*', false, function(item){
+    setField(inp, item.url);
+    if(item.type === 'video' && item.poster){ var card = b.closest('.hcard, .sec-b'), cov = card && card.querySelector('[data-k="d"], [data-hk="edit.d"]'); if(cov) setField(cov, item.poster); }
+    var img = b.closest('.stile') && b.closest('.stile').querySelector('img'); if(img) img.src = item.url;
+    if(S.tab === 'hero') render();
+    toast(vid ? 'Video uploaded. Press Save to publish it.' : 'Photo uploaded. Press Save to publish it.');
+  });
+});
+/* media library page */
+function viewMedia(){
+  var cfg = mediaCfg(), list = mediaList(), m = S.site.media || {};
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('media')) + '</h2>' + (cfg ? '<button class="btn" type="button" data-mupload>Upload photos or videos</button>' : '') + '</div>' +
+    (cfg ? '<p class="muted" style="margin:-8px 0 18px;max-width:820px">Everything you upload lands here. Every photo or video box in the control room also has its own Upload button. Photos are made smaller and sharper automatically; videos up to 100 MB.</p>'
+         : '<div class="card setup" style="max-width:820px"><h4>Connect uploads (free, no card)</h4><p class="muted" style="margin:0">Firebase no longer gives free file storage, so photos and videos are kept on <b>Cloudinary</b>. The free plan is plenty for a shop (25 GB) and needs no credit card.</p>' +
+           '<ol class="steps"><li>Open <a href="https://cloudinary.com/users/register_free" target="_blank" rel="noopener">cloudinary.com</a> and sign up with the brand\'s Google account.</li><li>On the Cloudinary home page, copy the <b>Cloud name</b> (top left, under Product Environment).</li><li>Go to <b>Settings → Upload → Upload presets → Add upload preset</b>. Set <b>Signing mode: Unsigned</b>, name it <b>nmh</b>, and save.</li><li>Paste both below and press Connect.</li></ol></div>') +
+    '<form class="card" id="mediaForm" style="max-width:820px;margin-top:14px"><h4>Upload settings</h4><div class="g2"><label class="f"><span>Cloud name</span><input class="in" name="cloud" dir="ltr" value="' + esc(m.cloud || '') + '" placeholder="e.g. dxyz123ab" autocomplete="off"></label><label class="f"><span>Upload preset (unsigned)</span><input class="in" name="preset" dir="ltr" value="' + esc(m.preset || '') + '" placeholder="nmh" autocomplete="off"></label></div><div><button class="btn' + (cfg ? ' ghost' : '') + '" type="submit">' + (cfg ? 'Update' : 'Connect') + '</button></div></form>' +
+    (list.length ? '<h3 class="cap muted" style="margin:26px 0 12px">Uploaded (' + list.length + ')</h3><div class="mgrid">' + list.map(function(x, i){
+      return '<div class="mitem">' + (x.type === 'video' ? '<video src="' + esc(x.url) + '" poster="' + esc(x.poster) + '" muted loop playsinline preload="none" onmouseenter="this.play()" onmouseleave="this.pause()"></video><span class="chip dark">Video</span>' : '<img src="' + esc(x.url) + '" alt="" loading="lazy">') +
+        '<div class="mi-b"><small title="' + esc(x.name) + '">' + esc(x.name) + '</small><div><button class="btn sm ghost" type="button" data-mcopy="' + i + '">Copy link</button><button class="btn sm ghost" type="button" data-mdel="' + i + '" aria-label="Remove from list">×</button></div></div></div>'; }).join('') + '</div>' : '');
+}
+document.addEventListener('click', function(e){
+  var b = e.target.closest('button'); if(!b) return; var v;
+  if(b.hasAttribute('data-mupload')){ pickFiles('image/*,video/*', true, function(){ if(S.tab === 'media') render(); toast('Uploaded.'); }); return; }
+  if((v = b.getAttribute('data-mcopy')) != null){ var u = mediaList()[+v].url; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(function(){ toast('Link copied.'); }, function(){ prompt('Copy this link', u); }); return; }
+  if((v = b.getAttribute('data-mdel')) != null){ confirmBox('Remove from the list?', 'Anything already using this file keeps working. It only disappears from this list.', 'Remove').then(function(ok){ if(!ok) return; S.mediaDoc.list.splice(+v, 1); DBX.set('settings', 'media', {list:S.mediaDoc.list, updated:Date.now()}).then(render); }); return; }
+});
+document.addEventListener('submit', function(e){
+  if(e.target.id !== 'mediaForm') return; e.preventDefault(); var f = e.target, cloud = f.cloud.value.trim(), preset = f.preset.value.trim();
+  if(!cloud || !preset){ toast('Fill in both boxes.', true); return; }
+  var probe = new FormData(); probe.append('upload_preset', preset); probe.append('file', 'data:image/gif;base64,R0lGODlhAQABAAAAACw=');
+  toast('Checking…');
+  fetch('https://api.cloudinary.com/v1_1/' + encodeURIComponent(cloud) + '/image/upload', {method:'POST', body:probe}).then(function(r){ return r.json(); }).then(function(j){
+    if(!j.secure_url){ var msg = (j.error && j.error.message) || 'unknown error'; throw new Error(/preset/i.test(msg) ? 'The upload preset was not found, or it is not set to Unsigned.' : /cloud/i.test(msg) ? 'That cloud name was not found.' : msg); }
+    return DBX.set('settings', 'site', {media:{cloud:cloud, preset:preset}, updated:Date.now()}, true);
+  }).then(function(){ S.site.media = {cloud:cloud, preset:preset}; render(); toast('Uploads are connected.'); }).catch(function(e2){ toast('Could not connect: ' + (e2.message || e2), true); });
 });
 
 boot();
