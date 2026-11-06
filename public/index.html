@@ -714,6 +714,21 @@ html[data-style="minimal"] .card .ttl{font-weight:400;font-size:11px}
 html[data-style="minimal"] .card .lbl:not(.new):not(.out){background:transparent;padding:0;color:var(--ink)}
 html[data-style="minimal"] .tiles{gap:4px}
 html[data-style="glass"] .card .lbl{border-radius:999px}
+
+/* hero arrows */
+.sl-arr{position:absolute;top:50%;z-index:4;width:52px;height:52px;margin-top:-26px;display:grid;place-items:center;border-radius:50%;color:#fff;background:rgba(0,0,0,.14);border:1px solid rgba(255,255,255,.45);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);cursor:pointer;opacity:.85;transition:opacity .25s,background-color .25s,transform .25s var(--ease)}
+.sl-arr svg{width:20px;height:20px}
+.sl-arr.prev{inset-inline-start:calc(var(--g) - 8px)}
+.sl-arr.next{inset-inline-end:calc(var(--g) - 8px)}
+html[dir="rtl"] .sl-arr svg{transform:scaleX(-1)}
+.sl-arr:hover{opacity:1;background:rgba(255,255,255,.22)}
+.sl-arr.prev:hover{transform:translateX(-3px)}
+.sl-arr.next:hover{transform:translateX(3px)}
+html[dir="rtl"] .sl-arr.prev:hover{transform:translateX(3px)}
+html[dir="rtl"] .sl-arr.next:hover{transform:translateX(-3px)}
+.sl-arr:focus-visible{outline:2px solid #fff;outline-offset:3px}
+html[data-style="classic"] .sl-arr,html:not([data-style]) .sl-arr,html[data-style="editorial"] .sl-arr,html[data-style="minimal"] .sl-arr{border-radius:0}
+@media (max-width:700px){ .sl-arr{width:40px;height:40px;margin-top:-20px;opacity:.75} .sl-arr svg{width:16px;height:16px} .sl-arr.prev{inset-inline-start:10px} .sl-arr.next{inset-inline-end:10px} }
 </style>
 </head>
 <body>
@@ -1314,6 +1329,7 @@ function viewHome(){
         return '<div class="slide' + (i ? '' : ' on') + (s.type === 'video' ? ' is-video' : '') + '" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + ' / ' + all.length + '"' + (i ? ' aria-hidden="true"' : '') + '>' + media +
           '<div class="slide-t">' + (t(s.sub) ? '<p class="u-h7">' + esc(t(s.sub)) + '</p>' : '') + (t(s.big) ? '<' + (i ? 'p' : 'h1') + ' class="big">' + esc(t(s.big)) + '</' + (i ? 'p' : 'h1') + '>' : '') + (t(s.cta) && s.href ? '<a class="btn light" href="' + esc(s.href) + '"' + (i ? ' tabindex="-1"' : '') + '>' + esc(t(s.cta)) + '</a>' : '') + '</div></div>';
       }).join('') +
+      (heroSlides().length > 1 ? '<button type="button" class="sl-arr prev" data-slidestep="-1" aria-label="' + tr('Previous slide', 'الشريحة السابقة') + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M15 4l-8 8 8 8"/></svg></button><button type="button" class="sl-arr next" data-slidestep="1" aria-label="' + tr('Next slide', 'الشريحة التالية') + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M9 4l8 8-8 8"/></svg></button>' : '') +
       (heroSlides().length > 1 ? '<div class="dots" role="group" aria-label="' + tr('Choose slide', 'اختيار الصورة') + '">' + heroSlides().map(function(s, i){ return '<button type="button" data-slide="' + i + '" aria-label="' + tr('Slide ', 'صورة ') + (i + 1) + '"' + (i ? '' : ' aria-current="true"') + '></button>'; }).join('') + '</div>' : '') +
     '</section>' +
 
@@ -1341,6 +1357,15 @@ function startSlides(){
   if(v && !reduce){ v.play().catch(function(){}); if(!isFinite(v.duration)) v.addEventListener('loadedmetadata', scheduleSlide, {once:true}); }
   if(h.querySelectorAll('.slide').length > 1) scheduleSlide();
 }
+/* swipe on phones, arrow keys on computers */
+(function(){
+  var x0 = null, y0 = 0;
+  document.addEventListener('touchstart', function(e){ if(!e.target.closest('#hero')) return; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, {passive:true});
+  document.addEventListener('touchend', function(e){ if(x0 === null) return; var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null;
+    if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3){ var fwd = dx < 0; if(document.documentElement.dir === 'rtl') fwd = !fwd; goSlide(SL.i + (fwd ? 1 : -1)); } }, {passive:true});
+  document.addEventListener('keydown', function(e){ var h = $('hero'); if(!h || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || document.documentElement.style.overflow === 'hidden') return;
+    var r = h.getBoundingClientRect(); if(r.bottom < 80) return; var fwd = e.key === 'ArrowRight'; if(document.documentElement.dir === 'rtl') fwd = !fwd; goSlide(SL.i + (fwd ? 1 : -1)); });
+})();
 function goSlide(n){
   var h = $('hero'); if(!h) return clearTimeout(SL.timer);
   var s = h.querySelectorAll('.slide'), d = h.querySelectorAll('[data-slide]');
@@ -1851,6 +1876,7 @@ document.addEventListener('click', function(e){
   if(id === 'coToggle'){ CO.sumOpen = !CO.sumOpen; a.setAttribute('aria-expanded', String(CO.sumOpen)); $('coSum').classList.toggle('open', CO.sumOpen); return; }
   var v;
   if((v = a.getAttribute('data-slide')) != null){ goSlide(+v); return; }
+  if((v = a.getAttribute('data-slidestep')) != null){ goSlide(SL.i + (+v)); return; }
   if((v = a.getAttribute('data-st')) != null){ ST = +v; dyeTo('dyeSFlood', SHADES[ST].c); $('stSw').querySelectorAll('[data-st]').forEach(function(b){ b.setAttribute('aria-pressed', String(+b.getAttribute('data-st') === ST)); }); $('stName').textContent = t(SHADES[ST]); return; }
   if((v = a.getAttribute('data-sh')) != null && PP){ PP.shade = v === 'o' ? null : +v; paintPP(); return; }
   if((v = a.getAttribute('data-th')) != null && PP){ PP.img = +v; var fig = $('ppMedia').querySelectorAll('figure')[+v]; $('ppTh').querySelectorAll('button').forEach(function(b, i){ if(i === +v) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); }); if(fig) fig.scrollIntoView({behavior:reduce ? 'auto' : 'smooth', block:'start'}); return; }
