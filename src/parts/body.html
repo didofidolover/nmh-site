@@ -1,0 +1,87 @@
+<a class="skip" href="#main" data-ar="انتقلي إلى المحتوى">Skip to content</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <filter id="dyeS" color-interpolation-filters="sRGB"><feFlood id="dyeSFlood" flood-color="#8A4A47" result="f"/><feComposite in="f" in2="SourceAlpha" operator="in" result="c"/><feBlend in="SourceGraphic" in2="c" mode="multiply"/></filter>
+  <filter id="dyeP" color-interpolation-filters="sRGB"><feFlood id="dyePFlood" flood-color="#8A4A47" result="f"/><feComposite in="f" in2="SourceAlpha" operator="in" result="c"/><feBlend in="SourceGraphic" in2="c" mode="multiply"/></filter>
+</defs></svg>
+
+<div class="ann" id="ann" data-ar="كل قطعة تُفصَّل حسب الطلب في دبي · التوصيل إلى الإمارات ودول الخليج">Every piece made to order in Dubai · Delivery across the UAE and the GCC</div>
+
+<header class="hd" id="hd">
+  <div class="wrap hd-in">
+    <div style="display:flex;align-items:center;height:100%">
+      <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="side"><svg viewBox="0 0 20 14" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M0 1h20M0 7h20M0 13h20"/></svg></button>
+      <ul class="nav">
+        <li><button type="button" id="megaBtn" aria-expanded="false" aria-controls="mega" data-ar="المجموعات">Collections</button></li>
+        <li><a href="#s-all" data-ar="تسوّقي">Shop</a></li>
+        <li><a href="#the-one" data-ar="القطعة الواحدة">The One</a></li>
+      </ul>
+    </div>
+    <a class="logo" href="#" data-home aria-label="NMH Dubai, home"><img class="l-d" src="img/logo-dark.png" alt="NMH Dubai" width="80" height="38"><img class="l-w" src="img/logo.png" alt="" width="80" height="38"></a>
+    <div class="hd-r">
+      <button class="wide sub" id="lang" type="button" lang="ar">عربي</button>
+      <button class="wide sub" id="searchBtn" type="button" data-ar="بحث">Search</button>
+      <button class="wide" id="cartBtn" type="button"><span data-ar="الحقيبة">Cart</span> (<span class="cart-n num" id="cartN">0</span>)</button>
+      <button class="ico" id="searchIco" type="button" aria-label="Search"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8.5" cy="8.5" r="6.5"/><path d="M13.5 13.5L19 19"/></svg></button>
+      <button class="ico" id="cartIco" type="button" aria-label="Cart"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 6h14l-1 13H4L3 6z"/><path d="M7 6V4.5a3 3 0 0 1 6 0V6"/></svg><span class="dotn num" id="cartDot"></span></button>
+    </div>
+  </div>
+  <div class="mega" id="mega" role="region" aria-label="Collections">
+    <div class="wrap mega-in">
+      <div><h3 class="u-h7" data-ar="المجموعات">Collections</h3><ul id="megaCols"></ul></div>
+      <div><h3 class="u-h7" data-ar="تسوّقي حسب الفئة">Shop by style</h3><ul id="megaStyles"></ul></div>
+      <div class="mega-pics" id="megaPics"></div>
+    </div>
+  </div>
+</header>
+
+<div class="side" id="side" aria-hidden="true">
+  <div class="side-bg" data-close-side></div>
+  <div class="side-p" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="side-h"><button type="button" data-close-side aria-label="Close menu"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1 1l14 14M15 1L1 15"/></svg></button></div>
+    <nav id="sideNav"></nav>
+    <div class="side-f"><button type="button" id="sideSearch" data-ar="بحث">Search</button><button type="button" id="sideLang" lang="ar">عربي</button><button type="button" id="sideTheme" data-ar="الوضع الداكن">Dark mode</button><a href="https://www.instagram.com/_bynmh/" target="_blank" rel="noopener">Instagram</a></div>
+  </div>
+</div>
+
+<div class="srch" id="srch" aria-hidden="true">
+  <div class="srch-bg" data-close-srch></div>
+  <div class="srch-p" role="dialog" aria-modal="true" aria-label="Search">
+    <div class="wrap">
+      <form class="srch-bar" id="srchForm" role="search"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8.5" cy="8.5" r="6.5"/><path d="M13.5 13.5L19 19"/></svg><label class="sr" for="srchIn" data-ar="البحث">Search</label><input id="srchIn" type="search" autocomplete="off" placeholder="Search..." data-ph-ar="ابحثي..."><button type="button" data-close-srch aria-label="Close search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1 1l14 14M15 1L1 15"/></svg></button></form>
+      <div class="srch-res" id="srchRes"></div>
+    </div>
+  </div>
+</div>
+
+<main id="main"><div id="app"></div></main>
+
+<footer class="ft" id="ft">
+  <div class="wrap">
+    <div class="ft-g">
+      <div><h3 class="u-h7" data-ar="تسوّقي">Shop</h3><ul id="ftShop"></ul></div>
+      <div><h3 class="u-h7" data-ar="المجموعات">Collections</h3><ul id="ftCols"></ul></div>
+      <div><h3 class="u-h7" data-ar="المساعدة">Help</h3><ul>
+        <li><a href="#page-how" data-ar="طريقة الطلب">How ordering works</a></li>
+        <li><a href="#page-size" data-ar="دليل المقاسات">Size guide</a></li>
+        <li><a href="#page-shipping" data-ar="الشحن">Shipping policy</a></li>
+        <li><a href="#page-refund" data-ar="سياسة الاسترجاع">Refund policy</a></li>
+        <li><a href="#page-privacy" data-ar="سياسة الخصوصية">Privacy policy</a></li>
+        <li><a href="#page-terms" data-ar="الشروط والأحكام">Terms of service</a></li>
+      </ul></div>
+      <div class="ft-news"><h3 class="u-h7" data-ar="النشرة البريدية">Newsletter</h3>
+        <p data-ar="كوني أول من يكتشف المجموعات الجديدة وكل قطعة فريدة جديدة.">Be the first to see new collections and every new 1 of 1 piece.</p>
+        <form id="newsForm" novalidate><label class="sr" for="newsIn" data-ar="البريد الإلكتروني">Email</label><input class="in" id="newsIn" type="email" autocomplete="email" placeholder="Your email" data-ph-ar="البريد الإلكتروني" dir="ltr"><button class="btn" type="submit" data-ar="اشتركي">Subscribe</button><p class="ok" id="newsOk" aria-live="polite"></p></form>
+      </div>
+    </div>
+    <div class="ft-b">
+      <span data-ar="© ٢٠٢٦ NMH دبي">© 2026 NMH Dubai</span>
+      <div class="opts2"><button type="button" id="ftTheme" data-ar="الوضع الداكن">Dark mode</button><button type="button" id="ftLang" lang="ar">عربي</button><a href="https://www.instagram.com/_bynmh/" target="_blank" rel="noopener" class="u-h7">Instagram</a></div>
+      <div class="pay" aria-label="Payment methods"><span>VISA</span><span>MASTERCARD</span><span>APPLE PAY</span><span data-ar="نقدًا">CASH</span></div>
+    </div>
+  </div>
+</footer>
+
+<div class="drw" id="drw" aria-hidden="true"><div class="drw-bg" data-close-drw></div><aside class="drw-p" role="dialog" aria-modal="true" aria-labelledby="drwT"></aside></div>
+<div class="mdl" id="mdl" aria-hidden="true"><div class="mdl-bg" data-close-mdl></div><div class="mdl-p" role="dialog" aria-modal="true" aria-labelledby="mdlT"><button class="mdl-x" type="button" data-close-mdl aria-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1 1l14 14M15 1L1 15"/></svg></button><div id="mdlBody"></div></div></div>
+<div class="lb" id="lb" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer"><img id="lbImg" alt=""><button class="x" type="button" data-lb="x" aria-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1 1l14 14M15 1L1 15"/></svg></button><button class="pv" type="button" data-lb="-1" aria-label="Previous"><svg viewBox="0 0 10 18" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M9 1L1 9l8 8"/></svg></button><button class="nx" type="button" data-lb="1" aria-label="Next"><svg viewBox="0 0 10 18" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1 1l8 8-8 8"/></svg></button></div>
+<div class="toast" id="toast" role="status"><p></p></div>

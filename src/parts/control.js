@@ -1,0 +1,884 @@
+(function(){
+'use strict';
+/* Who may enter. The same list is enforced by firestore.rules, which is what actually protects the data. */
+var ADMINS = ['wedoogfx@gmail.com'];
+var L = 'en';
+function t(o){ return o && typeof o === 'object' ? (o.en || o.ar || '') : (o || ''); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function $(id){ return document.getElementById(id); }
+function money(n){ return Number(n || 0).toLocaleString('en') + ' AED'; }
+function isCut(src){ return /\.webp$/.test(src || ''); }
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+function fdate(ts){ try{ return new Date(ts).toLocaleString('en-GB', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}); }catch(e){ return ''; } }
+
+/* ================= catalogue data (same source as the shop) ================= */
+/*@@DATA@@*/
+
+PRODUCTS = PRODUCTS.concat(ONE);
+var BASE = PRODUCTS.slice(), BASEMAP = {};
+BASE.forEach(function(p, i){ BASEMAP[p.code] = Object.assign({sort:i}, p); });
+var STYLE_OPTS = STYLES.filter(function(s){ return s.id !== 'all'; });
+var LIB = ['img/e/e8_03-w.jpg','img/e/e8_04-w.jpg','img/e/e8_05-w.jpg','img/e/e8_02-w.jpg','img/e/e4_02-w.jpg','img/e/e1_01.jpg','img/e/e1_02.jpg','img/e/e1_03.jpg','img/e/e1_04.jpg','img/e/e1_05.jpg','img/e/e1_06.jpg','img/e/e2_01.jpg','img/e/e2_02.jpg','img/e/e2_03.jpg','img/e/e2_04.jpg','img/e/e3_01.jpg','img/e/e3_02.jpg','img/e/e3_03.jpg','img/e/e3_04.jpg','img/e/e4_01.jpg','img/e/e4_02p.jpg','img/e/e4_03.jpg','img/e/e4_04.jpg','img/e/e4_05.jpg','img/e/e5_01.jpg','img/e/e5_02.jpg','img/e/e5_03.jpg','img/e/e5_04.jpg','img/e/e5_05.jpg','img/e/e5_06.jpg','img/e/e5_07.jpg','img/e/e6_01.jpg','img/e/e6_02.jpg','img/e/e7_01.jpg','img/e/e7_02.jpg','img/e/e7_03.jpg','img/e/e8_01.jpg','img/e/e8_02p.jpg','img/e/e8_03p.jpg','img/e/e8_04p.jpg','img/e/e8_05p.jpg','img/e/e8_06.jpg','img/c/c01.jpg','img/c/c02.jpg','img/c/c03.jpg','img/c/c04.jpg','img/c/c05.jpg','img/c/c06.jpg','img/c/c07.jpg','img/c/c08.jpg','img/c/c09.jpg','img/c/c11.jpg','img/c/c12.jpg','img/c/c13.jpg'];
+var PRESET_LABELS = [
+  {en:'Best seller', ar:'الأكثر مبيعًا'}, {en:'Limited', ar:'كمية محدودة'}, {en:'Last pieces', ar:'آخر قطع'}, {en:'Back in stock', ar:'رجع تاني'},
+  {en:'Eid edit', ar:'مختارات العيد'}, {en:'Ramadan', ar:'رمضان'}, {en:'Exclusive', ar:'حصري'}, {en:'Sale', ar:'تخفيض'}
+];
+var STATUS = ['Received', 'Confirmed', 'Being cut', 'Shipped', 'Delivered', 'Cancelled'];
+
+/* ================= Firebase (or a local mock for testing) ================= */
+var MOCK = /^(localhost|127\.)/.test(location.hostname) && /mock=1/.test(location.search);
+var DBX = null, AUTH = null, ME = null;
+function boot(){
+  if(MOCK) return bootMock();
+  var cfg = window.NMH_FIREBASE;
+  if(!cfg || !cfg.apiKey){ gateMsg('Firebase is not configured for this site.', true); return; }
+  var base = 'https://www.gstatic.com/firebasejs/12.19.0/';
+  Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-auth.js'), import(base + 'firebase-firestore.js')]).then(function(m){
+    var app = m[0].initializeApp(cfg), A = m[1], F = m[2], auth = A.getAuth(app), db = F.getFirestore(app);
+    AUTH = {
+      signIn:function(){ var pr = new A.GoogleAuthProvider(); pr.setCustomParameters({prompt:'select_account'}); return A.signInWithPopup(auth, pr); },
+      signOut:function(){ return A.signOut(auth); },
+      watch:function(fn){ A.onAuthStateChanged(auth, fn); }
+    };
+    DBX = {
+      list:function(name, order){ var q = order ? F.query(F.collection(db, name), F.orderBy(order, 'desc'), F.limit(300)) : F.collection(db, name); return F.getDocs(q).then(function(qs){ var a = []; qs.forEach(function(d){ var v = d.data(); v._id = d.id; a.push(v); }); return a; }); },
+      get:function(name, id){ return F.getDoc(F.doc(db, name, id)).then(function(d){ return d.exists() ? d.data() : null; }); },
+      set:function(name, id, data, merge){ return F.setDoc(F.doc(db, name, id), data, merge ? {merge:true} : undefined); },
+      update:function(name, id, data){ return F.updateDoc(F.doc(db, name, id), data); },
+      del:function(name, id){ return F.deleteDoc(F.doc(db, name, id)); }
+    };
+    AUTH.watch(onUser);
+  }).catch(function(e){ console.error(e); gateMsg('Could not load. Check your connection and refresh.', true); });
+}
+function bootMock(){
+  var store = {products:{}, orders:{}, subscribers:{}, oneofone:{}, settings:{}};
+  try{ store = Object.assign(store, JSON.parse(localStorage.getItem('nmh-mock-db') || '{}')); }catch(e){}
+  var save = function(){ localStorage.setItem('nmh-mock-db', JSON.stringify(store)); };
+  var P = function(v){ return new Promise(function(r){ setTimeout(function(){ r(v); }, 60); }); };
+  AUTH = {signIn:function(){ onUser({email:'wedoogfx@gmail.com', emailVerified:true, displayName:'Mock admin'}); return P(); }, signOut:function(){ onUser(null); return P(); }, watch:function(){}};
+  DBX = {
+    list:function(n, order){ var a = Object.keys(store[n] || {}).map(function(k){ var v = clone(store[n][k]); v._id = k; return v; }); if(order) a.sort(function(x, y){ return (y[order] || 0) - (x[order] || 0); }); return P(a); },
+    get:function(n, id){ return P(store[n] && store[n][id] ? clone(store[n][id]) : null); },
+    set:function(n, id, d, merge){ store[n] = store[n] || {}; store[n][id] = merge ? Object.assign({}, store[n][id] || {}, clone(d)) : clone(d); save(); return P(); },
+    update:function(n, id, d){ store[n][id] = Object.assign({}, store[n][id], clone(d)); save(); return P(); },
+    del:function(n, id){ delete store[n][id]; save(); return P(); }
+  };
+  gateMsg('Local test mode', false);
+}
+
+/* ================= sign-in gate ================= */
+function gateMsg(m, err){ var el = $('gateMsg'); el.textContent = m || ''; el.className = 'msg' + (err ? ' err' : ''); }
+function onUser(user){
+  if(user && ADMINS.indexOf(String(user.email || '').toLowerCase()) > -1 && user.emailVerified !== false){
+    ME = user; $('gate').hidden = true; $('shell').hidden = false; $('who').textContent = user.email; loadAll(); return;
+  }
+  ME = null; $('shell').hidden = true; $('gate').hidden = false;
+  if(user){ gateMsg(user.email + ' does not have access to the control room.', true); AUTH.signOut(); }
+}
+$('signIn').addEventListener('click', function(){
+  if(!AUTH) return; gateMsg('Opening Google…');
+  AUTH.signIn().then(function(){ gateMsg(''); }).catch(function(e){ gateMsg(/popup-closed|cancelled/.test(e && e.code) ? '' : /popup-blocked/.test(e && e.code) ? 'Your browser blocked the Google window. Allow pop-ups for this site.' : 'Sign-in failed. Try again.', true); });
+});
+$('signOut').addEventListener('click', function(){ AUTH.signOut(); });
+
+/* ================= state ================= */
+var S = {cats:{over:{}, added:[], order:[]}, tab:(location.hash.slice(1) || 'home'), tx:{}, pagesX:{}, cols:{over:{}, added:[], order:[]}, labels:{}, dirty:{}, over:{}, orders:[], subs:[], claims:{}, site:{}, filter:'all', q:'', open:null, loaded:false};
+function merged(){
+  var list = BASE.map(function(p){ return Object.assign({}, BASEMAP[p.code], S.over[p.code] || {}, {_base:true}); });
+  Object.keys(S.over).forEach(function(c){ if(!BASEMAP[c] && RETIRED.indexOf(c) < 0){ var o = S.over[c]; if(o && o.name) list.push(Object.assign({sort:1000, tone:'#F5F0EA', imgs:[]}, o, {code:c, _base:false})); } });
+  return list.sort(function(a, b){ return (a.sort || 0) - (b.sort || 0); });
+}
+function byCode(c){ return merged().filter(function(p){ return p.code === c; })[0]; }
+function loadAll(){
+  $('main').innerHTML = '<div class="spin"></div>';
+  Promise.all([DBX.list('products'), DBX.list('orders', 'created').catch(function(){ return []; }), DBX.list('subscribers', 'created').catch(function(){ return []; }), DBX.list('oneofone').catch(function(){ return []; }), DBX.get('settings', 'site').catch(function(){ return null; }), DBX.get('settings', 'texts').catch(function(){ return null; }), DBX.get('settings', 'collections').catch(function(){ return null; }), DBX.get('settings', 'control').catch(function(){ return null; }), DBX.get('settings', 'categories').catch(function(){ return null; }), DBX.get('settings', 'media').catch(function(){ return null; })]).then(function(r){
+    S.over = {}; r[0].forEach(function(p){ var id = p._id; delete p._id; S.over[id] = p; });
+    S.orders = r[1]; S.subs = r[2]; S.claims = {}; r[3].forEach(function(c){ S.claims[c._id] = c; }); S.site = r[4] || {}; S.hero = clone(S.site.slides && S.site.slides.length ? S.site.slides : SLIDES); S.heroDirty = false;
+    S.tx = {}; ((r[5] && r[5].list) || []).forEach(function(x){ S.tx[x.k] = {en:x.en || '', ar:x.ar || ''}; }); S.pagesX = (r[5] && r[5].pages) || {};
+    S.cols = Object.assign({over:{}, added:[], order:[]}, r[6] || {}); S.labels = (r[7] && r[7].labels) || {}; S.cats = Object.assign({over:{}, added:[], order:[]}, r[8] || {}); S.mediaDoc = r[9] || {list:[]}; S.dirty = {};
+    S.loaded = true; render();
+  }).catch(function(e){ console.error(e); $('main').innerHTML = '<div class="empty">Could not load the data: ' + esc(e.message || e) + '<br><br>If this says "permission", the database rules for the control room have not been published yet.</div>'; });
+}
+
+/* ================= render ================= */
+function render(){
+  var newOrders = S.orders.filter(function(o){ return !o.status; }).length;
+  var V = {media:viewMedia, delivery:viewDelivery, cats:viewCats, home:viewDash, products:viewProducts, orders:viewOrders, one:viewOne, collections:viewCols, hero:viewHero, sections:viewSections, bar:viewBar, theme:viewTheme, texts:viewTexts, pages:viewPages, subs:viewSubs};
+  if(!V[S.tab]) S.tab = 'home';
+  $('tabs').innerHTML = S.tab === 'home' ? '' : '<div class="crumbs"><button type="button" data-tab="home"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg>' + esc(lbl('home')) + '</button><span>/</span><b>' + esc(lbl(S.tab)) + '</b></div>' +
+    '<div class="quick">' + TILE_ORDER.map(function(k){ return k === 'add' ? '' : '<button type="button" data-tab="' + k + '" aria-current="' + (S.tab === k) + '" title="' + esc(lbl(k)) + '">' + ICONS[k] + (k === 'orders' && newOrders ? '<i>' + newOrders + '</i>' : '') + '</button>'; }).join('') + '</div>';
+  document.body.setAttribute('data-page', S.tab);
+  V[S.tab]();
+  addUpButtons();
+}
+function status(p){
+  var c = [];
+  if(p.removed) c.push(['Removed', 'grey']); else if(p.hidden) c.push(['Hidden', 'grey']);
+  if(p.soldOut) c.push(['Sold out', 'red']);
+  if(p.one && S.claims[p.code]) c.push(['Claimed', 'red']);
+  if(p.isNew) c.push(['New', 'green']);
+  if(p.one) c.push(['1 of 1 · N° ' + (p.no || '?'), 'dark']);
+  (p.labels || []).forEach(function(l){ c.push([t(l), '']); });
+  return c;
+}
+function thumb(p){ var src = (p.imgs || [])[0]; return src ? '<img' + (isCut(src) ? ' class="cut"' : '') + ' src="' + esc(src) + '" alt="">' : ''; }
+
+function viewProducts(){
+  var all = merged(), q = S.q.toLowerCase();
+  var counts = {all:0, live:0, soldout:0, new:0, hidden:0, removed:0};
+  var match = function(p, f){ return f === 'all' ? !p.removed : f === 'live' ? !p.removed && !p.hidden && !p.soldOut : f === 'soldout' ? !p.removed && p.soldOut : f === 'new' ? !p.removed && p.isNew : f === 'hidden' ? !p.removed && p.hidden : p.removed; };
+  Object.keys(counts).forEach(function(f){ counts[f] = all.filter(function(p){ return match(p, f); }).length; });
+  var list = all.filter(function(p){ return match(p, S.filter) && (!q || (t(p.name) + ' ' + (p.name.ar || '') + ' ' + p.code).toLowerCase().indexOf(q) > -1); });
+  $('main').innerHTML =
+    '<div class="head"><h2>' + esc(lbl('products')) + '</h2><input class="in search" id="q" type="search" placeholder="Search name or code" value="' + esc(S.q) + '"><button class="btn" type="button" data-new>+ Add product</button></div>' +
+    '<div class="seg" style="margin-bottom:18px">' + [['all', 'All'], ['live', 'On sale'], ['soldout', 'Sold out'], ['new', 'New arrivals'], ['hidden', 'Hidden'], ['removed', 'Removed']].map(function(f){ return '<button type="button" data-filter="' + f[0] + '" aria-pressed="' + (S.filter === f[0]) + '">' + f[1] + ' (' + counts[f[0]] + ')</button>'; }).join('') + '</div>' +
+    (list.length || S.filter === 'all' ? '<div class="pgrid">' + (S.filter === 'all' && !q ? '<button class="add-card" type="button" data-new><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>Add a new product</button>' : '') +
+      list.map(function(p){
+        return '<article class="pc' + (p.hidden || p.removed ? ' off' : '') + '">' +
+          '<div class="im" style="--tone:' + esc(p.tone || '') + '">' + thumb(p) + '<div class="chips">' + status(p).map(function(c){ return '<span class="chip ' + c[1] + '">' + esc(c[0]) + '</span>'; }).join('') + '</div></div>' +
+          '<div class="b"><div class="nm">' + esc(t(p.name)) + '</div><div class="meta"><span>' + esc(p.code) + ' · ' + esc(t((COLLECTIONS.filter(function(c){ return c.id === p.col; })[0] || {}).name)) + '</span><b>' + money(p.price) + '</b></div>' +
+          (p.removed ? '<div class="acts"><button class="btn ghost sm" type="button" data-restore="' + p.code + '">Restore</button></div>' :
+          '<div class="tg">' +
+            '<label class="sw red"><input type="checkbox" data-flag="soldOut" data-code="' + p.code + '"' + (p.soldOut ? ' checked' : '') + '>Sold out</label>' +
+            '<label class="sw green"><input type="checkbox" data-flag="isNew" data-code="' + p.code + '"' + (p.isNew ? ' checked' : '') + '>New arrival</label>' +
+            '<label class="sw"><input type="checkbox" data-flag="hidden" data-code="' + p.code + '"' + (p.hidden ? ' checked' : '') + '>Hidden from shop</label></div>' +
+          '<div class="acts"><button class="btn sm" type="button" data-edit="' + p.code + '">Edit</button><a class="btn ghost sm" href="/#p-' + p.code + '" target="_blank" rel="noopener">View</a><button class="btn danger sm" type="button" data-remove="' + p.code + '">Remove</button></div>') +
+          '</div></article>';
+      }).join('') + '</div>' : '<div class="empty">Nothing here.</div>');
+}
+
+function viewOrders(){
+  var o = S.orders, sum = function(a){ return a.reduce(function(n, x){ return n + (x.total || 0); }, 0); };
+  var openO = o.filter(function(x){ return (x.status || 0) < 4; });
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('orders')) + '</h2><button class="btn ghost" type="button" data-reload>Refresh</button></div>' +
+    '<div class="stats"><div class="stat"><span class="cap muted">New</span><b>' + o.filter(function(x){ return !x.status; }).length + '</b></div><div class="stat"><span class="cap muted">In progress</span><b>' + openO.length + '</b></div><div class="stat"><span class="cap muted">All orders</span><b>' + o.length + '</b></div><div class="stat"><span class="cap muted">Value of open orders</span><b>' + money(sum(openO.filter(function(x){ return x.status !== 5; }))) + '</b></div></div>' +
+    (o.length ? '<div class="wrapx"><table class="tbl"><thead><tr><th>Order</th><th>Customer</th><th>Pieces</th><th>Total</th><th>Status</th></tr></thead><tbody>' +
+      o.map(function(x){
+        var open = S.open === x.id, st = x.status || 0;
+        return '<tr class="row" data-open="' + esc(x.id) + '"><td><b>' + esc(x.id) + '</b><br><span class="muted">' + fdate(x.created) + '</span></td><td>' + esc(x.contact && x.contact.name) + '<br><a class="link" href="https://wa.me/' + esc(String(x.contact && x.contact.phone || '').replace(/\D/g, '')) + '" target="_blank" rel="noopener">' + esc(x.contact && x.contact.phone) + '</a></td>' +
+          '<td>' + (x.items || []).map(function(it){ return esc(it.qty) + ' × ' + esc(it.name || it.code); }).join('<br>') + '</td><td><b>' + money(x.total) + '</b><br><span class="muted">' + (x.pay === 'cod' ? 'Cash on delivery' : 'Payment link') + '</span></td>' +
+          '<td><select class="sel" data-status="' + esc(x.id) + '" aria-label="Status of ' + esc(x.id) + '">' + STATUS.map(function(s, i){ return '<option value="' + i + '"' + (i === st ? ' selected' : '') + '>' + s + '</option>'; }).join('') + '</select></td></tr>' +
+          (open ? '<tr class="det"><td colspan="5"><div class="kv">' +
+            '<div><h4>Contact</h4><p>' + esc(x.contact.name) + '<br>' + esc(x.contact.email) + '<br>' + esc(x.contact.phone) + '</p></div>' +
+            '<div><h4>Delivery</h4><p>' + esc(x.address.line) + (x.address.apt ? ', ' + esc(x.address.apt) : '') + '<br>' + esc(x.address.city) + (x.address.region ? ', ' + esc(x.address.region) : '') + '<br>' + esc(x.address.country) + ' · ' + esc(x.method) + '</p></div>' +
+            '<div><h4>Pieces</h4><p>' + (x.items || []).map(function(it){ return '<b>' + esc(it.code) + '</b> ' + esc(it.name) + '<br><span class="muted">' + esc(it.variant || '') + (it.hex ? ' · ' + esc(it.hex) : '') + '</span>'; }).join('<br>') + '</p></div>' +
+            (x.measure ? '<div><h4>Measurements (cm)</h4><p>' + Object.keys(x.measure).filter(function(k){ return x.measure[k]; }).map(function(k){ return esc(k) + ': ' + esc(x.measure[k]); }).join('<br>') + '</p></div>' : '') +
+            (x.note ? '<div><h4>Note</h4><p>' + esc(x.note) + '</p></div>' : '') +
+            '<div><h4>Totals</h4><p>Subtotal ' + money(x.sub) + '<br>Shipping ' + money(x.ship) + '<br><b>Total ' + money(x.total) + '</b></p></div>' +
+          '</div></td></tr>' : '');
+      }).join('') + '</tbody></table></div>' : '<div class="empty">No orders yet. New orders appear here, and you also get an email for each one.</div>');
+}
+
+function viewOne(){
+  var list = merged().filter(function(p){ return p.one && !p.removed; });
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('one')) + '</h2><button class="btn" type="button" data-new="one">+ Add a 1 of 1 piece</button></div>' +
+    '<p class="muted" style="margin:-8px 0 18px;max-width:720px">A piece is claimed automatically when someone orders it, so nobody else can buy it. If that order is cancelled, press Release to put the piece back on sale.</p>' +
+    (list.length ? '<div class="wrapx"><table class="tbl"><thead><tr><th></th><th>Piece</th><th>Price</th><th>State</th><th></th></tr></thead><tbody>' + list.map(function(p){
+      var c = S.claims[p.code];
+      return '<tr><td style="width:70px"><div class="ph" style="width:56px;--tone:' + esc(p.tone || '') + '">' + thumb(p) + '</div></td><td><b>N° ' + esc(p.no || '?') + ' · ' + esc(t(p.name)) + '</b><br><span class="muted">' + esc(p.code) + '</span></td><td>' + money(p.price) + '</td>' +
+        '<td>' + (c ? '<span class="st st5">Claimed by ' + esc(c.order) + '</span><br><span class="muted">' + fdate(c.created) + '</span>' : p.soldOut ? '<span class="st st5">Marked sold out</span>' : p.hidden ? '<span class="st st0">Hidden</span>' : '<span class="st st4">Available</span>') + '</td>' +
+        '<td style="text-align:end;white-space:nowrap">' + (c ? '<button class="btn danger sm" type="button" data-release="' + p.code + '">Release</button> ' : '') + '<button class="btn ghost sm" type="button" data-edit="' + p.code + '">Edit</button></td></tr>';
+    }).join('') + '</tbody></table></div>' : '<div class="empty">No 1 of 1 pieces yet.</div>');
+}
+
+function viewSubs(){
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('subs')) + '</h2><button class="btn ghost" type="button" data-copysubs' + (S.subs.length ? '' : ' disabled') + '>Copy all emails</button><button class="btn ghost" type="button" data-csv' + (S.subs.length ? '' : ' disabled') + '>Download CSV</button></div>' +
+    (S.subs.length ? '<div class="wrapx"><table class="tbl"><thead><tr><th>Email</th><th>Signed up</th><th>From</th><th>Language</th><th></th></tr></thead><tbody>' + S.subs.map(function(s){
+      return '<tr><td>' + esc(s.email) + '</td><td>' + fdate(s.created) + '</td><td>' + esc(s.source || '') + '</td><td>' + (s.lang === 'ar' ? 'Arabic' : 'English') + '</td><td style="text-align:end"><button class="btn danger sm" type="button" data-unsub="' + esc(s._id) + '">Remove</button></td></tr>';
+    }).join('') + '</tbody></table></div>' : '<div class="empty">No subscribers yet. Sign-ups from the footer and the checkout land here.</div>');
+}
+
+function viewTheme(){
+  var cur = S.site.theme || 'classic';
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('theme')) + '</h2></div>' + styleCard() +
+    '<div class="card" style="max-width:1100px;margin-bottom:18px"><h4>Theme</h4><p class="muted" style="margin:0">The colours of the whole site. Click one to switch; it goes live straight away for every visitor. Visitors can still switch to dark mode themselves.</p>' +
+      '<div class="themes">' + SITE_THEMES.map(function(x){ var sc = S.site.colors, c = x.id === 'custom' && sc ? [sc.bg, sc.ink, sc.soft, sc.line, sc.panel, '#C9B8A6', sc.btn, sc.btnInk] : x.c; return '<button type="button" class="th' + (x.id === cur ? ' on' : '') + '" data-theme="' + x.id + '" aria-pressed="' + (x.id === cur) + '">' +
+        '<span class="th-mock" style="background:' + c[0] + ';color:' + c[1] + ';border-color:' + c[3] + '"><i style="background:' + c[4] + ';border-color:' + c[3] + '"><b style="color:' + c[1] + '">NMH</b></i><em style="background:' + c[5] + '"></em><span><u style="background:' + c[2] + '"></u><u style="background:' + c[2] + '"></u><u style="background:' + c[2] + '"></u></span><s style="background:' + c[6] + ';color:' + c[7] + '">Shop</s></span>' +
+        '<span class="th-n">' + x.name + (x.id === cur ? ' <span class="chip green">Live</span>' : '') + (x.rec ? ' <span class="chip">Suggested</span>' : '') + '</span><span class="th-d">' + x.d + '</span></button>'; }).join('') + '</div></div>' +
+    customColorsCard();
+}
+function viewBar(){
+  var a = S.site.ann || {};
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('bar')) + '</h2></div>' +
+    '<form class="card" id="siteForm" style="max-width:760px"><h4>Announcement bar</h4><p class="muted" style="margin:0">The thin black bar at the very top of every page. Leave empty to use the default text.</p>' +
+      '<label class="f"><span>English</span><input class="in" name="annEn" value="' + esc(a.en || '') + '" placeholder="Every piece made to order in Dubai · Delivery across the UAE and the GCC"></label>' +
+      '<label class="f"><span>Arabic</span><input class="in" name="annAr" dir="rtl" value="' + esc(a.ar || '') + '" placeholder="كل قطعة تُفصَّل حسب الطلب في دبي · التوصيل إلى الإمارات ودول الخليج"></label>' +
+      '<label class="sw"><input type="checkbox" name="annOff"' + (S.site.annOff ? ' checked' : '') + '>Hide the announcement bar</label>' +
+      '<div><button class="btn" type="submit">Save</button></div></form>';
+}
+
+/* ================= product editor ================= */
+var E = null;
+function blank(one){
+  var ones = merged().filter(function(p){ return p.one; }).map(function(p){ return +p.no || 0; });
+  return {code:'P' + Date.now().toString(36).toUpperCase().slice(-5), name:{en:'', ar:''}, price:0, col:one ? 'the-one' : 'essentials', style:'everyday', tone:'#F5F0EA', imgs:[],
+    desc:{en:'', ar:''}, story:{en:'', ar:''}, fabric:{en:'', ar:''}, labels:[], soldOut:false, isNew:true, hidden:false, one:!!one, no:one ? ('0' + (Math.max.apply(null, ones.concat([0])) + 1)).slice(-2) : '', sort:-Date.now() / 1e13, _base:false};
+}
+function openEditor(code, one){
+  var p = code ? byCode(code) : blank(one);
+  E = clone(p); E._isNew = !code;
+  ['name', 'desc', 'story', 'fabric'].forEach(function(k){ E[k] = Object.assign({en:'', ar:''}, E[k] || {}); });
+  E.labels = E.labels || []; E.imgs = E.imgs || [];
+  renderEditor();
+  $('ed').classList.add('open'); $('ed').setAttribute('aria-hidden', 'false'); document.documentElement.style.overflow = 'hidden';
+  setTimeout(function(){ var f = $('ed').querySelector('[name=nameEn]'); if(f) f.focus(); }, 300);
+}
+function closeEditor(){ $('ed').classList.remove('open'); $('ed').setAttribute('aria-hidden', 'true'); document.documentElement.style.overflow = ''; E = null; }
+function renderEditor(){
+  var p = E, cfg = mediaCfg() || {};
+  $('edT').textContent = p._isNew ? (p.one ? 'New 1 of 1 piece' : 'New product') : 'Edit ' + (t(p.name) || p.code);
+  $('edB').innerHTML =
+    '<div class="card"><h4>Name and price</h4><div class="g2"><label class="f"><span>Name, English</span><input class="in" name="nameEn" value="' + esc(p.name.en) + '" required></label><label class="f"><span>Name, Arabic</span><input class="in" name="nameAr" dir="rtl" value="' + esc(p.name.ar) + '"></label></div>' +
+      '<div class="g3"><label class="f"><span>Price (AED)</span><input class="in" name="price" type="number" min="0" step="1" value="' + esc(p.price) + '"></label>' +
+      '<label class="f"><span>Collection</span><select class="sel" name="col">' + colsList().filter(function(c){ return !c.hidden || c.id === p.col; }).map(function(c){ return '<option value="' + c.id + '"' + (c.id === p.col ? ' selected' : '') + '>' + esc(t(c.name)) + '</option>'; }).join('') + '</select></label>' +
+      '<label class="f"><span>Style</span><select class="sel" name="style">' + catsList().filter(function(s){ return !s.hidden || s.id === p.style; }).map(function(s){ return '<option value="' + s.id + '"' + (s.id === p.style ? ' selected' : '') + '>' + esc(s.en) + '</option>'; }).join('') + '</select></label></div>' +
+      '<div class="f"><span>Code</span><div class="muted">' + esc(p.code) + (p._base ? ' · built-in piece' : '') + '</div></div></div>' +
+
+    '<div class="card"><h4>Photos</h4><p class="muted" style="margin:-6px 0 0;font-size:13px">The first photo is the main one. On the shop, the second photo shows when someone hovers.</p><div class="photos" id="edPhotos">' +
+      p.imgs.map(function(src, i){ return '<div class="ph" style="--tone:' + esc(p.tone) + '"><img' + (isCut(src) ? ' class="cut"' : '') + ' src="' + esc(src) + '" alt="">' + (i === 0 ? '<span class="chip dark first">Main</span>' : '') + '<div class="pa"><button type="button" data-imgmove="' + i + '" data-d="-1" aria-label="Move earlier">‹</button><button type="button" data-imgdel="' + i + '" aria-label="Remove photo">×</button><button type="button" data-imgmove="' + i + '" data-d="1" aria-label="Move later">›</button></div></div>'; }).join('') +
+      '<label class="ph-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg>Upload from<br>phone or computer<input type="file" accept="image/*" multiple id="edUpload" class="sr"></label>' +
+      '<button class="ph-add" type="button" data-lib><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>Choose from<br>site photos</button>' +
+      '<button class="ph-add" type="button" data-imgurl><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Paste a<br>photo link</button>' +
+    '</div>' + (cfg.cloud && cfg.preset ? '' : '<p class="note" id="upNote">Photo uploads are not connected yet. Open <b>Media library</b> on the control room home page to connect them (free, 2 minutes). Until then, choose from the site photos or paste a photo link.</p>') +
+      '<div id="libBox" hidden><div class="lib">' + LIB.concat(uploadedImgs()).map(function(src){ return '<button type="button" data-pick="' + esc(src) + '"><img src="' + esc(src) + '" alt="" loading="lazy"></button>'; }).join('') + '</div></div>' +
+      '<label class="f" style="max-width:220px"><span>Background behind cut-out photos</span><input class="in" type="color" name="tone" value="' + esc(/^#[0-9a-f]{6}$/i.test(p.tone) ? p.tone : '#F5F0EA') + '" style="padding:4px;height:40px"></label></div>' +
+
+    '<div class="card"><h4>Status</h4><div class="row-flex">' +
+      '<label class="sw red"><input type="checkbox" name="soldOut"' + (p.soldOut ? ' checked' : '') + '>Sold out</label>' +
+      '<label class="sw green"><input type="checkbox" name="isNew"' + (p.isNew ? ' checked' : '') + '>New arrival</label>' +
+      '<label class="sw"><input type="checkbox" name="hidden"' + (p.hidden ? ' checked' : '') + '>Hidden from shop</label>' +
+      '<label class="sw"><input type="checkbox" name="one"' + (p.one ? ' checked' : '') + '>1 of 1 piece</label>' +
+      '<label class="f" style="width:110px"' + (p.one ? '' : ' hidden') + ' id="noBox"><span>Number</span><input class="in" name="no" value="' + esc(p.no || '') + '" placeholder="05"></label></div></div>' +
+
+    '<div class="card"><h4>Labels</h4><p class="muted" style="margin:-6px 0 0;font-size:13px">Labels show on the photo in the shop. The first one shows on the card; all of them show on the product page.</p><div class="lbls" id="edLabels">' +
+      PRESET_LABELS.map(function(l){ var on = p.labels.some(function(x){ return x.en === l.en; }); return '<button type="button" data-label="' + esc(l.en) + '" aria-pressed="' + on + '">' + esc(l.en) + ' · ' + esc(l.ar) + '</button>'; }).join('') +
+      p.labels.filter(function(x){ return !PRESET_LABELS.some(function(l){ return l.en === x.en; }); }).map(function(x, i){ return '<button type="button" data-dellabel="' + esc(x.en) + '" aria-pressed="true">' + esc(x.en) + (x.ar ? ' · ' + esc(x.ar) : '') + '<span class="x">×</span></button>'; }).join('') +
+    '</div><div class="g3" style="align-items:end"><label class="f"><span>Your own label, English</span><input class="in" id="lblEn" placeholder="Wedding guest"></label><label class="f"><span>Arabic</span><input class="in" id="lblAr" dir="rtl" placeholder="لضيفة الفرح"></label><div><button class="btn ghost" type="button" data-addlabel>Add label</button></div></div></div>' +
+
+    '<div class="card"><h4>Words</h4>' +
+      '<div class="g2"><label class="f"><span>Short description, English</span><textarea class="in" name="descEn">' + esc(p.desc.en) + '</textarea></label><label class="f"><span>Short description, Arabic</span><textarea class="in" name="descAr" dir="rtl">' + esc(p.desc.ar) + '</textarea></label></div>' +
+      '<div class="g2"><label class="f"><span>The story, English</span><textarea class="in" name="storyEn">' + esc(p.story.en) + '</textarea></label><label class="f"><span>The story, Arabic</span><textarea class="in" name="storyAr" dir="rtl">' + esc(p.story.ar) + '</textarea></label></div>' +
+      '<div class="g2"><label class="f"><span>Fabric and care, English</span><textarea class="in" name="fabricEn" placeholder="Crepe. Dry clean only.">' + esc(p.fabric.en) + '</textarea></label><label class="f"><span>Fabric and care, Arabic</span><textarea class="in" name="fabricAr" dir="rtl" placeholder="كريب. تنظيف جاف فقط.">' + esc(p.fabric.ar) + '</textarea></label></div></div>';
+  $('edDel').hidden = !!p._isNew;
+  $('edDel').textContent = p._base ? 'Remove from shop' : 'Delete product';
+}
+function uploadedImgs(){ var a = []; merged().forEach(function(p){ (p.imgs || []).forEach(function(s){ if(/^https?:/.test(s) && a.indexOf(s) < 0) a.push(s); }); }); return a; }
+function readEditor(){
+  var f = $('edB'), v = function(n){ var el = f.querySelector('[name="' + n + '"]'); return el ? (el.type === 'checkbox' ? el.checked : el.value.trim()) : ''; };
+  E.name = {en:v('nameEn'), ar:v('nameAr')}; E.price = Math.max(0, Math.round(+v('price') || 0)); E.col = v('col'); E.style = v('style'); E.tone = v('tone');
+  E.desc = {en:v('descEn'), ar:v('descAr')}; E.story = {en:v('storyEn'), ar:v('storyAr')}; E.fabric = {en:v('fabricEn'), ar:v('fabricAr')};
+  E.soldOut = v('soldOut'); E.isNew = v('isNew'); E.hidden = v('hidden'); E.one = v('one'); E.no = E.one ? (v('no') || E.no || '') : '';
+  if(E.one && E.col !== 'the-one') E.col = 'the-one';
+}
+function saveEditor(){
+  readEditor();
+  if(!E.name.en && !E.name.ar){ toast('Give the product a name.', true); $('edB').querySelector('[name=nameEn]').focus(); return; }
+  if(!E.imgs.length){ toast('Add at least one photo.', true); return; }
+  if(!E.price){ toast('Add a price.', true); $('edB').querySelector('[name=price]').focus(); return; }
+  if(!E.name.ar) E.name.ar = E.name.en; if(!E.name.en) E.name.en = E.name.ar;
+  var data = {}, keys = ['name', 'price', 'col', 'style', 'tone', 'imgs', 'desc', 'story', 'fabric', 'labels', 'soldOut', 'isNew', 'hidden', 'one', 'no', 'sort'];
+  keys.forEach(function(k){ if(E[k] !== undefined) data[k] = E[k]; });
+  if(E._base && BASEMAP[E.code].dye) data.dye = BASEMAP[E.code].dye;
+  data.removed = false; data.updated = Date.now();
+  var btn = $('edSave'); btn.disabled = true; btn.textContent = 'Saving…';
+  DBX.set('products', E.code, data).then(function(){
+    S.over[E.code] = data; toast(E._isNew ? 'Product added to the shop.' : 'Saved. The shop shows it on the next page load.');
+    btn.disabled = false; btn.textContent = 'Save'; closeEditor(); render();
+  }).catch(function(e){ btn.disabled = false; btn.textContent = 'Save'; toast('Could not save: ' + (e.message || e), true); });
+}
+
+/* ================= image upload (Cloudinary, free plan) ================= */
+function upload(files){
+  var fs = [].slice.call(files), run = function(k){ if(k >= fs.length) return; cloudUpload(fs[k]).then(function(item){ if(E){ readEditor(); E.imgs.push(item.type === 'video' ? item.poster : item.url); renderEditor(); } toast('Photo added.'); run(k + 1); }).catch(function(e){ if(!/not-configured|too-big/.test(e.message)) toast('Upload failed: ' + (e.message || e), true); }); };
+  run(0);
+}
+function shrink(file){
+  return new Promise(function(res){
+    var img = new Image(), url = URL.createObjectURL(file);
+    img.onload = function(){ var s = Math.min(1, 2000 / Math.max(img.width, img.height)), c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); c.toBlob(function(b){ URL.revokeObjectURL(url); res(b || file); }, 'image/jpeg', .9); };
+    img.onerror = function(){ res(file); };
+    img.src = url;
+  });
+}
+
+/* ================= helpers ================= */
+function toast(m, err){ var el = $('toast'); el.querySelector('p').textContent = m; el.classList.toggle('err', !!err); el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function(){ el.classList.remove('on'); }, err ? 6000 : 3200); }
+function confirmBox(title, text, ok){
+  var d = $('confirm'); d.querySelector('h3').textContent = title; d.querySelector('p').textContent = text; d.querySelector('[data-ok]').textContent = ok || 'Confirm';
+  return new Promise(function(res){ d.onclose = function(){ res(d.returnValue === 'ok'); }; d.returnValue = ''; d.showModal(); });
+}
+function setFlag(code, flag, val){
+  var data = {}; data[flag] = val; data.updated = Date.now();
+  if(!BASEMAP[code] && !S.over[code]) return;
+  S.over[code] = Object.assign({}, S.over[code] || {}, data); render();
+  DBX.set('products', code, data, true).then(function(){ toast(({soldOut:val ? 'Marked sold out.' : 'Back on sale.', isNew:val ? 'Added to new arrivals.' : 'Removed from new arrivals.', hidden:val ? 'Hidden from the shop.' : 'Visible in the shop again.'})[flag]); })
+    .catch(function(e){ toast('Could not save: ' + (e.message || e), true); loadAll(); });
+}
+
+/* ================= events ================= */
+document.addEventListener('click', function(e){
+  var b = e.target.closest('button,a,tr.row'); if(!b) return;
+  var v;
+  if((v = b.getAttribute('data-tab'))){ if(dirtyBlock()) return; S.tab = v; S.open = null; var h = v === 'home' ? '' : v; if(location.hash.slice(1) !== h){ history.pushState(null, '', h ? '#' + h : location.pathname + location.search); } render(); window.scrollTo(0, 0); return; }
+  if((v = b.getAttribute('data-filter'))){ S.filter = v; render(); return; }
+  if(b.hasAttribute('data-new')){ openEditor(null, b.getAttribute('data-new') === 'one'); return; }
+  if((v = b.getAttribute('data-edit'))){ openEditor(v); return; }
+  if(b.hasAttribute('data-reload')){ loadAll(); return; }
+  if((v = b.getAttribute('data-remove'))){
+    var p = byCode(v);
+    confirmBox('Remove ' + t(p.name) + '?', p._base ? 'It disappears from the shop. You can bring it back from the Removed filter.' : 'This deletes the product for good.', 'Remove').then(function(ok){
+      if(!ok) return;
+      var job = p._base ? DBX.set('products', v, {removed:true, updated:Date.now()}, true) : DBX.del('products', v);
+      job.then(function(){ if(p._base) S.over[v] = Object.assign({}, S.over[v] || {}, {removed:true}); else delete S.over[v]; render(); toast('Removed from the shop.'); }).catch(function(e2){ toast('Could not remove: ' + (e2.message || e2), true); });
+    });
+    return;
+  }
+  if((v = b.getAttribute('data-restore'))){ DBX.set('products', v, {removed:false, updated:Date.now()}, true).then(function(){ S.over[v].removed = false; render(); toast('Back in the shop.'); }); return; }
+  if((v = b.getAttribute('data-release'))){
+    confirmBox('Release this piece?', 'Only do this if its order was cancelled. The piece goes back on sale and someone else can buy it.', 'Release').then(function(ok){
+      if(ok) DBX.del('oneofone', v).then(function(){ delete S.claims[v]; render(); toast('The piece is back on sale.'); }).catch(function(e2){ toast('Could not release: ' + (e2.message || e2), true); });
+    });
+    return;
+  }
+  if((v = b.getAttribute('data-open')) && !e.target.closest('select,a')){ S.open = S.open === v ? null : v; render(); return; }
+  if(b.hasAttribute('data-copysubs')){ var txt = S.subs.map(function(s){ return s.email; }).join(', '); (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function(){ toast('Copied ' + S.subs.length + ' emails.'); }, function(){ prompt('Copy these emails', txt); }); return; }
+  if(b.hasAttribute('data-csv')){ var csv = 'email,signed_up,source,language\n' + S.subs.map(function(s){ return [s.email, new Date(s.created).toISOString(), s.source || '', s.lang || ''].map(function(x){ return '"' + String(x).replace(/"/g, '""') + '"'; }).join(','); }).join('\n'); var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'nmh-subscribers.csv'; a.click(); return; }
+  if((v = b.getAttribute('data-unsub'))){ confirmBox('Remove this subscriber?', 'They will no longer be on your list.', 'Remove').then(function(ok){ if(ok) DBX.del('subscribers', v).then(function(){ S.subs = S.subs.filter(function(s){ return s._id !== v; }); render(); }); }); return; }
+  /* editor */
+  if(b.hasAttribute('data-close-ed')){ closeEditor(); return; }
+  if(b.id === 'edSave'){ saveEditor(); return; }
+  if(b.id === 'edDel'){ var code = E.code; closeEditor(); var fake = document.createElement('button'); fake.setAttribute('data-remove', code); document.body.appendChild(fake); fake.click(); fake.remove(); return; }
+  if(b.hasAttribute('data-lib')){ $('libBox').hidden = !$('libBox').hidden; return; }
+  if((v = b.getAttribute('data-pick'))){ readEditor(); E.imgs.push(v); renderEditor(); $('libBox').hidden = false; toast('Photo added.'); return; }
+  if(b.hasAttribute('data-imgurl')){ var u = prompt('Paste the photo link (it must start with https://)'); if(u && /^https:\/\//.test(u.trim())){ readEditor(); E.imgs.push(u.trim()); renderEditor(); } else if(u) toast('That is not a https:// link.', true); return; }
+  if((v = b.getAttribute('data-imgdel')) != null){ readEditor(); E.imgs.splice(+v, 1); renderEditor(); return; }
+  if((v = b.getAttribute('data-imgmove')) != null){ readEditor(); var i = +v, j = i + (+b.getAttribute('data-d')); if(j >= 0 && j < E.imgs.length){ var tmp = E.imgs[i]; E.imgs[i] = E.imgs[j]; E.imgs[j] = tmp; } renderEditor(); return; }
+  if((v = b.getAttribute('data-label'))){ readEditor(); var on = E.labels.some(function(x){ return x.en === v; }); if(on) E.labels = E.labels.filter(function(x){ return x.en !== v; }); else E.labels.push(PRESET_LABELS.filter(function(l){ return l.en === v; })[0]); renderEditor(); return; }
+  if((v = b.getAttribute('data-dellabel'))){ readEditor(); E.labels = E.labels.filter(function(x){ return x.en !== v; }); renderEditor(); return; }
+  if(b.hasAttribute('data-addlabel')){ var en = $('lblEn').value.trim(), ar = $('lblAr').value.trim(); if(!en && !ar) return; readEditor(); E.labels.push({en:en || ar, ar:ar || en}); renderEditor(); return; }
+});
+document.addEventListener('change', function(e){
+  var el = e.target, v;
+  if((v = el.getAttribute('data-flag'))){ setFlag(el.getAttribute('data-code'), v, el.checked); return; }
+  if((v = el.getAttribute('data-status'))){
+    var o = S.orders.filter(function(x){ return x.id === v; })[0], st = +el.value;
+    DBX.update('orders', v, {status:st, statusAt:Date.now()}).then(function(){ o.status = st; toast(v + ': ' + STATUS[st]); render(); }).catch(function(e2){ toast('Could not update: ' + (e2.message || e2), true); el.value = o.status || 0; });
+    return;
+  }
+  if(el.id === 'edUpload'){ upload(el.files); el.value = ''; return; }
+  if(el.name === 'one' && E){ readEditor(); renderEditor(); return; }
+  if(el.name === 'tone' && E){ readEditor(); [].forEach.call($('edPhotos').querySelectorAll('.ph'), function(x){ x.style.setProperty('--tone', E.tone); }); }
+});
+document.addEventListener('input', function(e){ if(e.target.id === 'q'){ S.q = e.target.value; var pos = e.target.selectionStart; render(); var q = $('q'); q.focus(); q.setSelectionRange(pos, pos); } });
+document.addEventListener('submit', function(e){
+  if(e.target.id === 'siteForm'){
+    e.preventDefault(); var f = e.target;
+    var data = {ann:{en:f.annEn.value.trim(), ar:f.annAr.value.trim()}, annOff:f.annOff.checked, updated:Date.now()};
+    DBX.set('settings', 'site', data, true).then(function(){ S.site = Object.assign({}, S.site, data); toast('Saved.'); }).catch(function(e2){ toast('Could not save: ' + (e2.message || e2), true); });
+  }
+});
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && E && !$('confirm').open) closeEditor(); });
+/* ================= home hero ================= */
+var VIDEOS = ['video/behind-the-scenes.mp4'];
+/* c: page, ink, card tone, line, header, photo, button, button text */
+var SITE_THEMES = [
+  {id:'classic', name:'Classic cream', d:'The current look. Warm cream, soft black, quiet and calm.', c:['#FDF9F4','#1C1B1B','#F5F0EA','#E7E2DB','#FFFFFF','#C9B8A6','#1C1B1B','#FFFFFF']},
+  {id:'mono', name:'Black and white', d:'Pure white and true black. Sharp, editorial, lets the photos do the talking.', c:['#FFFFFF','#000000','#F3F3F3','#E6E6E6','#FFFFFF','#BDBDBD','#000000','#FFFFFF']},
+  {id:'sand', name:'Desert sand', d:'Warm beige and coffee-brown buttons. Feels like the UAE desert, good for Ramadan and Eid.', c:['#F5EDE2','#2B2118','#ECE1D1','#E3D6C4','#FBF7F1','#C9A98A','#5B4532','#FFFFFF'], rec:1},
+  {id:'blush', name:'Rose blush', d:'Soft pink with a dusty-rose button. Romantic and feminine, good for spring and weddings.', c:['#FBF4F2','#2A1E1E','#F4E6E2','#EEDFDB','#FFFFFF','#D9B3AA','#8A4A47','#FFFFFF'], rec:1},
+  {id:'sage', name:'Sage green', d:'Light sage with deep green buttons. Fresh and natural, good for summer.', c:['#F4F5F0','#1F2620','#E8ECE3','#DEE3D8','#FFFFFF','#A9B8A3','#3F5446','#FFFFFF']},
+  {id:'custom', name:'Your own colours', d:'The colours you pick below.', c:['#FDF9F4','#1C1B1B','#F5F0EA','#E7E2DB','#FFFFFF','#C9B8A6','#1C1B1B','#FFFFFF']},
+  {id:'midnight', name:'Midnight', d:'Opens in dark mode for everyone. Dramatic and luxurious, good for evening and Ramadan nights.', c:['#141312','#F2EDE7','#211F1D','#2C2A28','#1B1A19','#5A524B','#F2EDE7','#141312'], rec:1}
+];
+var POS = [['50% 15%', 'Top'], ['50% 30%', 'Upper'], ['50% 50%', 'Middle'], ['50% 75%', 'Lower'], ['50% 100%', 'Bottom']];
+function heroLinks(){
+  var a = [['#', 'Home'], ['#s-all', 'Shop all'], ['#the-one', 'The One']];
+  colsList().filter(function(c){ return !c.hidden; }).forEach(function(c){ a.push(['#' + c.id, 'Collection · ' + t(c.name)]); });
+  catsOpts().forEach(function(x){ a.push(['#s-' + x.id, 'Category · ' + x.en]); });
+  merged().filter(function(p){ return !p.removed; }).forEach(function(p){ a.push(['#p-' + p.code, 'Product · ' + t(p.name) + ' (' + p.code + ')']); });
+  return a;
+}
+function blankSlide(video){ return video ? {type:'video', v:VIDEOS[0], d:'video/behind-the-scenes.jpg', m:'video/behind-the-scenes.jpg', pos:'50% 50%', sub:{en:'', ar:''}, big:{en:'', ar:''}, href:'#s-all', cta:{en:'Shop now', ar:'تسوّقي الآن'}} : {d:'img/c/c01-w.jpg', m:'img/c/c01.jpg', pos:'50% 30%', sub:{en:'', ar:''}, big:{en:'', ar:''}, href:'#s-all', cta:{en:'Shop now', ar:'تسوّقي الآن'}}; }
+function hf(i, k, label, val, extra){ return '<label class="f"><span>' + label + '</span><input class="in" data-h="' + i + '" data-k="' + k + '" value="' + esc(val) + '"' + (extra || '') + '></label>'; }
+function viewHero(){
+  var H = S.hero, links = heroLinks(), wide = [], tall = [];
+  LIB.forEach(function(x){ tall.push(x); var w = x.replace(/^img\/c\/(c\d\d)\.jpg$/, 'img/c/$1-w.jpg'); if(w !== x) wide.push(w); });
+  var custom = S.site.slides && S.site.slides.length;
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('hero')) + '</h2>' + (S.heroDirty ? '<span class="chip red">Unsaved changes</span>' : '') +
+      '<button class="btn ghost" type="button" data-hadd="img">+ Photo slide</button><button class="btn ghost" type="button" data-hadd="video">+ Video slide</button>' +
+      '<button class="btn" type="button" data-hsave' + (S.heroDirty ? '' : ' disabled') + '>Save and publish</button></div>' +
+    '<p class="muted" style="margin:-8px 0 18px;max-width:760px">The big slideshow at the top of the home page. Slides play in this order; a video slide stays on screen for the length of the video. ' + (custom ? 'You are using your own slides. <button type="button" class="lnk" data-hreset>Go back to the default slides</button>' : 'You are seeing the default slides.') + ' <a href="/#" target="_blank" rel="noopener">Open the site ↗</a></p>' +
+    '<datalist id="dlWide">' + wide.concat(tall).map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist>' +
+    '<datalist id="dlTall">' + tall.concat(wide).map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist>' +
+    '<datalist id="dlVid">' + VIDEOS.map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist>' +
+    (H.length ? '' : '<div class="empty">No slides. Add a photo or video slide, or go back to the default slides.</div>') +
+    '<div class="hlist">' + H.map(function(s, i){
+      var vid = s.type === 'video';
+      s.sub = s.sub || {en:'', ar:''}; s.big = s.big || {en:'', ar:''}; s.cta = s.cta || {en:'', ar:''};
+      var known = links.some(function(l){ return l[0] === s.href; });
+      return '<div class="card hcard">' +
+        '<div class="hprev">' + (vid ? '<video muted loop playsinline autoplay src="' + esc(s.v) + '" poster="' + esc(s.d) + '" style="object-position:' + esc(s.pos || '50% 50%') + '"></video>' : '<img src="' + esc(s.d) + '" alt="" style="object-position:' + esc(s.pos || '50% 30%') + '">') +
+          '<div class="hov"><small>' + esc(s.sub.en) + '</small><b>' + esc(s.big.en) + '</b>' + (s.cta.en ? '<u>' + esc(s.cta.en) + '</u>' : '') + '</div>' +
+          '<span class="chip dark hnum">' + (i + 1) + ' · ' + (vid ? 'Video' : 'Photo') + '</span></div>' +
+        '<div class="hbody">' +
+          '<div class="hact"><button class="btn sm ghost" type="button" data-hmove="' + i + '" data-d="-1"' + (i ? '' : ' disabled') + '>↑ Up</button><button class="btn sm ghost" type="button" data-hmove="' + i + '" data-d="1"' + (i < H.length - 1 ? '' : ' disabled') + '>↓ Down</button><button class="btn sm danger" type="button" data-hdel="' + i + '">Delete</button></div>' +
+          (vid ? '<div class="g2">' + hf(i, 'v', 'Video file or link (.mp4)', s.v, ' list="dlVid" dir="ltr"') + hf(i, 'd', 'Cover photo (shown while it loads)', s.d, ' list="dlWide" dir="ltr"') + '</div>'
+               : '<div class="g2">' + hf(i, 'd', 'Photo, computer (wide)', s.d, ' list="dlWide" dir="ltr"') + hf(i, 'm', 'Photo, phone (tall)', s.m || '', ' list="dlTall" dir="ltr"') + '</div>') +
+          '<div class="g2">' + hf(i, 'sub.en', 'Small line, English', s.sub.en) + hf(i, 'sub.ar', 'Small line, Arabic', s.sub.ar, ' dir="rtl"') + '</div>' +
+          '<div class="g2">' + hf(i, 'big.en', 'Title, English', s.big.en) + hf(i, 'big.ar', 'Title, Arabic', s.big.ar, ' dir="rtl"') + '</div>' +
+          '<div class="g2">' + hf(i, 'cta.en', 'Button, English (empty = no button)', s.cta.en) + hf(i, 'cta.ar', 'Button, Arabic', s.cta.ar, ' dir="rtl"') + '</div>' +
+          '<div class="g2"><label class="f"><span>Button opens</span><select class="sel" data-h="' + i + '" data-k="href">' + links.map(function(l){ return '<option value="' + esc(l[0]) + '"' + (l[0] === s.href ? ' selected' : '') + '>' + esc(l[1]) + '</option>'; }).join('') + (known ? '' : '<option value="' + esc(s.href || '') + '" selected>' + esc(s.href || '(none)') + '</option>') + '</select></label>' +
+          '<label class="f"><span>Photo focus</span><select class="sel" data-h="' + i + '" data-k="pos">' + POS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === (s.pos || '50% 30%') ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + (POS.some(function(o){ return o[0] === s.pos; }) || !s.pos ? '' : '<option value="' + esc(s.pos) + '" selected>Custom</option>') + '</select></label></div>' +
+        '</div></div>';
+    }).join('') + '</div>' +
+    (H.length ? '<div style="margin-top:18px"><button class="btn" type="button" data-hsave' + (S.heroDirty ? '' : ' disabled') + '>Save and publish</button></div>' : '');
+}
+function heroSet(i, k, v){
+  var s = S.hero[i], ks = k.split('.');
+  if(ks.length === 2){ s[ks[0]] = Object.assign({en:'', ar:''}, s[ks[0]]); s[ks[0]][ks[1]] = v; } else s[k] = v;
+  if(k === 'v' && /^https?:|^video\//.test(v)) s.type = 'video';
+}
+function heroDirty(){ if(!S.heroDirty){ S.heroDirty = true; [].forEach.call(document.querySelectorAll('[data-hsave]'), function(b){ b.disabled = false; }); var h = document.querySelector('.head h2'); if(h && !document.querySelector('.head .chip')) h.insertAdjacentHTML('afterend', '<span class="chip red">Unsaved changes</span>'); } }
+function heroSave(){
+  var bad = S.hero.filter(function(s){ return s.type === 'video' ? !s.v : !s.d; });
+  if(bad.length){ toast('Every slide needs a photo or video.', true); return; }
+  var data = {slides:clone(S.hero), updated:Date.now()};
+  DBX.set('settings', 'site', data, true).then(function(){ S.site = Object.assign({}, S.site, data); S.heroDirty = false; render(); toast('Saved. The home page is updated.'); }).catch(function(e2){ toast('Could not save: ' + (e2.message || e2), true); });
+}
+document.addEventListener('click', function(e){
+  var b = e.target.closest('button'); if(!b || S.tab !== 'hero') return; var v;
+  if((v = b.getAttribute('data-hadd'))){ S.hero.push(blankSlide(v === 'video')); S.heroDirty = true; render(); window.scrollTo(0, document.body.scrollHeight); return; }
+  if((v = b.getAttribute('data-hmove')) != null){ var i = +v, j = i + (+b.getAttribute('data-d')); if(j >= 0 && j < S.hero.length){ var tmp = S.hero[i]; S.hero[i] = S.hero[j]; S.hero[j] = tmp; S.heroDirty = true; render(); } return; }
+  if((v = b.getAttribute('data-hdel')) != null){ confirmBox('Delete this slide?', 'It disappears from the home page after you save.', 'Delete').then(function(ok){ if(ok){ S.hero.splice(+v, 1); S.heroDirty = true; render(); } }); return; }
+  if(b.hasAttribute('data-hsave')){ heroSave(); return; }
+  if(b.hasAttribute('data-hreset')){ confirmBox('Go back to the default slides?', 'Your own slides will be replaced by the original ' + SLIDES.length + ' slides.', 'Reset').then(function(ok){ if(!ok) return; DBX.set('settings', 'site', {slides:[], updated:Date.now()}, true).then(function(){ S.site.slides = []; S.hero = clone(SLIDES); S.heroDirty = false; render(); toast('Back to the default slides.'); }).catch(function(e2){ toast('Could not reset: ' + (e2.message || e2), true); }); }); return; }
+});
+document.addEventListener('input', function(e){ var el = e.target, i = el.getAttribute('data-h'); if(i == null || el.tagName === 'SELECT') return; heroSet(+i, el.getAttribute('data-k'), el.value.trim()); heroDirty(); var card = el.closest('.hcard'), s = S.hero[+i]; if(card){ var o = card.querySelector('.hov'); o.innerHTML = '<small>' + esc(s.sub.en) + '</small><b>' + esc(s.big.en) + '</b>' + (s.cta.en ? '<u>' + esc(s.cta.en) + '</u>' : ''); } });
+document.addEventListener('change', function(e){ var el = e.target, i = el.getAttribute('data-h'); if(i == null) return; var k = el.getAttribute('data-k'); heroSet(+i, k, el.value.trim()); heroDirty(); var sl = S.hero[+i], card = el.closest('.hcard'); if(!card) return;
+  var media = card.querySelector('.hprev img, .hprev video'), vid = sl.type === 'video';
+  if(k === 'pos'){ media.style.objectPosition = sl.pos; return; }
+  if(k === 'v' && vid && media.tagName === 'VIDEO'){ media.src = sl.v; return; }
+  if(k === 'd'){ if(vid) media.poster = sl.d; else media.src = sl.d; } });
+
+document.addEventListener('click', function(e){
+  var b = e.target.closest('[data-theme]'); if(!b || S.tab !== 'theme') return;
+  var th = b.getAttribute('data-theme'); if(th === (S.site.theme || 'classic')) return;
+  if(th === 'custom' && !S.site.colors){ toast('Set your colours below first, then press Use these colours.', true); return; }
+  DBX.set('settings', 'site', {theme:th, updated:Date.now()}, true).then(function(){ S.site.theme = th; render(); toast('Theme changed. The site is updated.'); }).catch(function(e2){ toast('Could not save: ' + (e2.message || e2), true); });
+});
+/* ================= dashboard (cPanel style) ================= */
+var LBL = {home:'Control room', g_shop:'Shop', g_home:'Home page', g_design:'Design and content', g_customers:'Customers',
+  products:'Products', add:'Add a product', delivery:'Delivery and offers', cats:'Categories', d_delivery:'Delivery prices and free delivery offers', media:'Media library', d_media:'Upload photos and videos', d_cats:'Abayas, kaftans, jalabiyas, girls and more', one:'The One', collections:'Collections', hero:'Hero slideshow', sections:'Home sections', bar:'Announcement bar',
+  theme:'Theme and colours', texts:'Site texts', pages:'Info pages', orders:'Orders', subs:'Subscribers',
+  d_products:'Sold out, new arrivals, labels, prices', d_add:'Put a new piece in the shop', d_one:'One-of-a-kind pieces and claims', d_collections:'Names, stories, cover photos, add new',
+  d_hero:'The big slideshow at the top', d_sections:'Order, show or hide, texts and media', d_bar:'The thin bar above the header',
+  d_theme:'Design style, ready themes or your own colours', d_texts:'Every word on the site, English and Arabic', d_pages:'Shipping, refunds, privacy, terms',
+  d_orders:'New orders and their status', d_subs:'Newsletter emails'};
+var GROUPS = [['g_shop', ['products', 'add', 'one', 'collections', 'cats', 'delivery']], ['g_home', ['hero', 'sections', 'bar']], ['g_design', ['media', 'theme', 'texts', 'pages']], ['g_customers', ['orders', 'subs']]];
+var TILE_ORDER = ['products', 'add', 'one', 'collections', 'cats', 'delivery', 'hero', 'sections', 'bar', 'media', 'theme', 'texts', 'pages', 'orders', 'subs'];
+function ic(d){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; }
+var ICONS = {
+  products:ic('<path d="M8 3h8l1 4-3 2v12H10V9L7 7z"/>'), add:ic('<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>'), one:ic('<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>'),
+  collections:ic('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'),
+  media:ic('<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>'),
+  delivery:ic('<path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>'), cats:ic('<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4z"/><circle cx="16.5" cy="16.5" r="3.5"/>'),
+  hero:ic('<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/>'), sections:ic('<rect x="3" y="3" width="18" height="5" rx="1"/><rect x="3" y="10" width="18" height="5" rx="1"/><rect x="3" y="17" width="18" height="4" rx="1"/>'),
+  bar:ic('<path d="M3 10v4h3l6 4V6L6 10z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/>'), theme:ic('<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>'),
+  texts:ic('<path d="M4 7V5h12v2M10 5v14M7 19h6M14 12h6M17 12v7M15.5 19h3"/>'), pages:ic('<path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h8M9 17h8M9 9h3"/>'),
+  orders:ic('<path d="M4 7h16l-1.5 13h-13z"/><path d="M8 7a4 4 0 0 1 8 0"/>'), subs:ic('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>')};
+function lbl(k){ return S.labels[k] || LBL[k] || k; }
+function viewDash(){
+  var newOrders = S.orders.filter(function(o){ return !o.status; }).length, all = merged().filter(function(p){ return !p.removed; });
+  var live = all.filter(function(p){ return !p.hidden && !p.soldOut; }).length, sold = all.filter(function(p){ return p.soldOut; }).length;
+  var ed = !!S.editLabels;
+  var stat = function(n, l, tab){ return '<button type="button" class="stat" data-tab="' + tab + '"><b>' + n + '</b><span>' + l + '</span></button>'; };
+  var name = function(k, cls){ return ed ? '<input class="in lblin ' + (cls || '') + '" data-lbl="' + k + '" value="' + esc(lbl(k)) + '" placeholder="' + esc(LBL[k]) + '">' : esc(lbl(k)); };
+  $('main').innerHTML = '<div class="dash-h"><div><p class="cap muted">' + greet() + (ME && ME.displayName ? ', ' + esc(ME.displayName.split(' ')[0]) : '') + '</p><h2>' + name('home') + '</h2></div>' +
+      '<div class="dash-act">' + (ed ? '<button class="btn ghost" type="button" data-lblcancel>Cancel</button><button class="btn" type="button" data-lblsave>Save names</button>' : '<button class="btn ghost sm" type="button" data-lbledit>' + ic('<path d="M4 20h4L19 9l-4-4L4 16z"/>') + 'Rename sections</button><a class="btn ghost sm" href="/" target="_blank" rel="noopener">Open the shop ↗</a>') + '</div></div>' +
+    '<div class="stats">' + stat(newOrders, 'New orders', 'orders') + stat(live, 'Pieces on sale', 'products') + stat(sold, 'Sold out', 'products') + stat(S.subs.length, 'Subscribers', 'subs') + '</div>' +
+    GROUPS.map(function(g){
+      return '<section class="grp"><h3 class="cap">' + name(g[0], 'g') + '</h3><div class="tilesC">' + g[1].map(function(k){
+        var badge = k === 'orders' && newOrders ? '<i class="bdg">' + newOrders + '</i>' : '';
+        var inner = '<span class="ti">' + ICONS[k] + badge + '</span><span class="tt">' + name(k) + '</span><span class="td">' + name('d_' + k, 'd') + '</span>';
+        return ed ? '<div class="tileC ed">' + inner + '</div>' : '<button type="button" class="tileC" ' + (k === 'add' ? 'data-new' : 'data-tab="' + k + '"') + '>' + inner + '</button>';
+      }).join('') + '</div></section>';
+    }).join('');
+}
+function greet(){ var h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; }
+
+/* unsaved changes guard */
+function dirtyBlock(){ var d = Object.keys(S.dirty).filter(function(k){ return S.dirty[k]; }); if(!d.length && !S.heroDirty) return false; if(confirm('You have unsaved changes. Leave without saving?')){ S.dirty = {}; S.heroDirty = false; S.hero = clone(S.site.slides && S.site.slides.length ? S.site.slides : SLIDES); return false; } return true; }
+function markDirty(k){ if(!S.dirty[k]){ S.dirty[k] = true; [].forEach.call(document.querySelectorAll('[data-save="' + k + '"]'), function(b){ b.disabled = false; }); var c = document.querySelector('.head .unsaved'); if(c) c.hidden = false; } }
+function saveBtn(k, label){ return '<span class="chip red unsaved"' + (S.dirty[k] ? '' : ' hidden') + '>Unsaved changes</span><button class="btn" type="button" data-save="' + k + '"' + (S.dirty[k] ? '' : ' disabled') + '>' + (label || 'Save and publish') + '</button>'; }
+window.addEventListener('beforeunload', function(e){ if(Object.keys(S.dirty).some(function(k){ return S.dirty[k]; }) || S.heroDirty){ e.preventDefault(); e.returnValue = ''; } });
+window.addEventListener('popstate', function(){ S.tab = location.hash.slice(1) || 'home'; if(ME && S.loaded) render(); });
+
+/* ================= texts (shared by Site texts, Home sections, Info pages) ================= */
+var TDEF = {}; TEXTS.forEach(function(x){ TDEF[x[0]] = x; });
+function txv(k, l){ var o = S.tx[k]; return (o && o[l]) || ''; }
+function txField(k, opts){
+  opts = opts || {}; var d = TDEF[k] || [k, '', ''], long = d[0].length > 70 || opts.long;
+  var inp = function(l, val, ph){ return long ? '<textarea class="in" rows="3" data-tx="' + esc(k) + '" data-l="' + l + '"' + (l === 'ar' ? ' dir="rtl"' : '') + ' placeholder="' + esc(ph) + '">' + esc(val) + '</textarea>' : '<input class="in" data-tx="' + esc(k) + '" data-l="' + l + '"' + (l === 'ar' ? ' dir="rtl"' : '') + ' value="' + esc(val) + '" placeholder="' + esc(ph) + '">'; };
+  var changed = txv(k, 'en') || txv(k, 'ar');
+  return '<div class="txr' + (changed ? ' ch' : '') + '" data-row="' + esc((d[0] + ' ' + d[1] + ' ' + txv(k, 'en') + ' ' + txv(k, 'ar')).toLowerCase()) + '">' + (opts.label ? '<span class="txl">' + esc(opts.label) + '</span>' : '') +
+    '<div class="g2">' + inp('en', txv(k, 'en'), d[0]) + inp('ar', txv(k, 'ar'), d[1]) + '</div>' +
+    '<button type="button" class="txreset" data-txreset="' + esc(k) + '" title="Back to the original text"' + (changed ? '' : ' hidden') + '>Reset</button></div>';
+}
+function saveTexts(){
+  var list = Object.keys(S.tx).filter(function(k){ return S.tx[k].en || S.tx[k].ar; }).map(function(k){ return {k:k, en:S.tx[k].en, ar:S.tx[k].ar}; });
+  return DBX.set('settings', 'texts', {list:list, pages:S.pagesX, updated:Date.now()});
+}
+function viewTexts(){
+  var groups = []; TEXTS.forEach(function(x){ if(groups.indexOf(x[2]) < 0) groups.push(x[2]); });
+  var g = S.txGroup || 'all', changed = Object.keys(S.tx).filter(function(k){ return S.tx[k].en || S.tx[k].ar; }).length;
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('texts')) + '</h2><input class="in search" id="txq" type="search" placeholder="Search any word, English or Arabic">' + saveBtn('texts') + '</div>' +
+    '<p class="muted" style="margin:-8px 0 16px;max-width:820px">Leave a box empty to keep the original text (shown in grey). Type to replace it. Changes go live for everyone when you press Save. ' + (changed ? '<b>' + changed + ' texts changed.</b>' : '') + '</p>' +
+    '<div class="seg" style="margin-bottom:16px">' + [['all', 'All (' + TEXTS.length + ')'], ['changed', 'Changed (' + changed + ')']].concat(groups.map(function(x){ return [x, x]; })).map(function(x){ return '<button type="button" data-txg="' + esc(x[0]) + '" aria-pressed="' + (g === x[0]) + '">' + esc(x[1]) + '</button>'; }).join('') + '</div>' +
+    '<div class="txhead g2 cap muted"><span>English</span><span>Arabic</span></div>' +
+    '<div class="card txlist">' + TEXTS.filter(function(x){ return g === 'all' || (g === 'changed' ? (txv(x[0], 'en') || txv(x[0], 'ar')) : x[2] === g); }).map(function(x){ return txField(x[0]); }).join('') + '</div>' +
+    '<div style="margin-top:18px">' + saveBtn('texts').replace('chip red unsaved', 'chip red unsaved2') + '</div>';
+}
+/* info pages */
+function htmlToPlain(h){ if(!h) return ''; return h.replace(/<h2[^>]*>(.*?)<\/h2>/g, '\n\n## $1\n\n').replace(/<li[^>]*>(.*?)<\/li>/g, '- $1\n').replace(/<\/p>\s*<p[^>]*>/g, '\n\n').replace(/<br\s*\/?>/g, '\n').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').replace(/\n{3,}/g, '\n\n').trim(); }
+function viewPages(){
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('pages')) + '</h2>' + saveBtn('texts') + '</div>' +
+    '<p class="muted" style="margin:-8px 0 18px;max-width:820px">How to write: leave an empty line between paragraphs. Start a line with <b>## </b> for a heading, and with <b>- </b> for a bullet point.</p>' +
+    Object.keys(SITE_PAGES).map(function(id){
+      var pg = SITE_PAGES[id], x = S.pagesX[id] || {}, tt = x.t || {}, bb = x.b || {};
+      var defB = {en:htmlToPlain(pg.b && pg.b.en), ar:htmlToPlain(pg.b && pg.b.ar)};
+      return '<details class="card pgc"><summary><b>' + esc(tt.en || pg.t.en) + '</b><span class="muted">' + (x.b ? 'Edited' : id === 'size' ? 'Size chart, add an intro text if you like' : 'Original text') + '</span></summary>' +
+        '<div class="g2"><label class="f"><span>Title, English</span><input class="in" data-pg="' + id + '" data-part="t" data-l="en" value="' + esc(tt.en || '') + '" placeholder="' + esc(pg.t.en) + '"></label><label class="f"><span>Title, Arabic</span><input class="in" dir="rtl" data-pg="' + id + '" data-part="t" data-l="ar" value="' + esc(tt.ar || '') + '" placeholder="' + esc(pg.t.ar) + '"></label></div>' +
+        '<div class="g2"><label class="f"><span>Text, English</span><textarea class="in" rows="14" data-pg="' + id + '" data-part="b" data-l="en">' + esc(bb.en != null ? bb.en : defB.en) + '</textarea></label><label class="f"><span>Text, Arabic</span><textarea class="in" rows="14" dir="rtl" data-pg="' + id + '" data-part="b" data-l="ar">' + esc(bb.ar != null ? bb.ar : defB.ar) + '</textarea></label></div>' +
+        (x.b || x.t ? '<div><button class="btn ghost sm" type="button" data-pgreset="' + id + '">Back to the original</button></div>' : '') + '</details>';
+    }).join('');
+}
+
+/* ================= home sections ================= */
+var DEF_TILES = [{s:'abayas', img:'img/e/e1_01.jpg'}, {s:'evening', img:'img/e/e7_01.jpg'}, {s:'everyday', img:'img/e/e5_01.jpg'}];
+var SECS = [
+  {id:'one', name:'The One band', keys:['Signature', 'The One', 'One piece. Made once. Never again.', 'Each dress in this line exists as a single piece. When it finds its owner, it is gone for good.', 'Discover The One'], note:'Shows only when there are 1 of 1 pieces.'},
+  {id:'arrivals', name:'New arrivals', keys:['Just arrived', 'New arrivals', 'View all products'], note:'Shows the 8 newest pieces marked New.'},
+  {id:'styles', name:'Shop by category', keys:['Shop by style', 'Find your piece'], note:'2 to 6 photo tiles that open a category.'},
+  {id:'edit', name:'Abaya edit banner', keys:['The abaya edit', 'Details you find up close', 'Black-on-black embroidery, satin lapels and fine copper piping. Abayas that stay quiet from across the room and reward a closer look.', 'Shop abayas']},
+  {id:'featured', name:'Featured collection', keys:['Featured collection', 'View the collection'], note:'The title is the collection name.'},
+  {id:'brand', name:'About NMH', keys:['Made for you alone', 'NMH designs modest dresses and abayas in Dubai, and cuts each piece only after you order it, in your size and your length. Before anything is cut, we confirm every detail with you.', 'How ordering works']}
+];
+var TXLBL = ['Small line', 'Title', 'Text', 'Button'];
+function homeDraft(){ if(!S.homeD) S.homeD = clone(S.site.home || {}); return S.homeD; }
+function secOrder(){ var h = homeDraft(), o = (h.order || []).filter(function(id){ return SECS.some(function(x){ return x.id === id; }); }); SECS.forEach(function(x){ if(o.indexOf(x.id) < 0) o.push(x.id); }); return o; }
+function viewSections(){
+  var h = homeDraft(), order = secOrder(), hid = h.hidden || {}, links = heroLinks();
+  var wide = LIB.map(function(x){ return x.replace(/^img\/c\/(c\d\d)\.jpg$/, 'img/c/$1-w.jpg'); });
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('sections')) + '</h2>' + saveBtn('home') + '</div>' +
+    '<p class="muted" style="margin:-8px 0 18px;max-width:820px">The home page under the hero slideshow, top to bottom. Move sections up or down, hide the ones you don\'t want, and change their words and media. Empty boxes keep the original text. <a href="/" target="_blank" rel="noopener">Open the site ↗</a></p>' +
+    '<datalist id="dlWide">' + wide.concat(LIB).map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist><datalist id="dlTall">' + LIB.map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist><datalist id="dlVid">' + VIDEOS.concat(['video/abaya-edit.mp4']).map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist>' +
+    '<div class="hero-pin card"><span class="ti">' + ICONS.hero + '</span><div><b>Hero slideshow</b><p class="muted" style="margin:0">Always at the top.</p></div><button class="btn ghost sm" type="button" data-tab="hero">Edit slides</button></div>' +
+    order.map(function(id, i){
+      var sec = SECS.filter(function(x){ return x.id === id; })[0], off = !!hid[id], extra = '';
+      if(id === 'edit'){ var m = h.edit || {}, vid = m.type ? m.type === 'video' : true;
+        extra = '<div class="g3"><label class="f"><span>Background</span><select class="sel" data-hk="edit.type"><option value="video"' + (vid ? ' selected' : '') + '>Video</option><option value="image"' + (vid ? '' : ' selected') + '>Photo</option></select></label>' +
+          (vid ? '<label class="f"><span>Video file or link (.mp4)</span><input class="in" dir="ltr" list="dlVid" data-hk="edit.v" value="' + esc(m.v || '') + '" placeholder="video/abaya-edit.mp4"></label><label class="f"><span>Cover photo while loading</span><input class="in" dir="ltr" list="dlWide" data-hk="edit.d" value="' + esc(m.d || '') + '" placeholder="video/abaya-edit.jpg"></label>'
+               : '<label class="f"><span>Photo (wide)</span><input class="in" dir="ltr" list="dlWide" data-hk="edit.d" value="' + esc(m.d || '') + '" placeholder="img/c/c13-w.jpg"></label><label class="f"><span>Photo focus</span><select class="sel" data-hk="edit.pos">' + POS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === (m.pos || '50% 30%') ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>') + '</div>' +
+          '<label class="f"><span>Button opens</span><select class="sel" data-hk="edit.href">' + links.map(function(l){ return '<option value="' + esc(l[0]) + '"' + (l[0] === (m.href || '#s-abayas') ? ' selected' : '') + '>' + esc(l[1]) + '</option>'; }).join('') + '</select></label>'; }
+      if(id === 'featured') extra = '<label class="f"><span>Which collection</span><select class="sel" data-hk="featured">' + colsList().filter(function(c){ return !c.hidden; }).map(function(c){ return '<option value="' + c.id + '"' + (c.id === (h.featured || 'editorial') ? ' selected' : '') + '>' + esc(t(c.name)) + '</option>'; }).join('') + '</select></label>';
+      if(id === 'styles'){ var tl = h.tiles && h.tiles.length ? h.tiles : DEF_TILES;
+        extra = '<div class="g4">' + tl.map(function(x, j){ return '<div class="stile"><img src="' + esc(x.img) + '" alt=""><select class="sel" data-hk="tiles.' + j + '.s">' + catsOpts().map(function(o){ return '<option value="' + o.id + '"' + (o.id === x.s ? ' selected' : '') + '>' + esc(o.en) + '</option>'; }).join('') + '</select><input class="in" dir="ltr" list="dlTall" data-hk="tiles.' + j + '.img" value="' + esc(x.img) + '">' + (tl.length > 2 ? '<button class="btn sm ghost" type="button" data-tiledel="' + j + '">Remove tile</button>' : '') + '</div>'; }).join('') + '</div>' + (tl.length < 6 ? '<div><button class="btn ghost sm" type="button" data-tileadd>+ Add a tile</button></div>' : ''); }
+      return '<div class="card sec-c' + (off ? ' off' : '') + '"><div class="sec-top"><span class="num">' + (i + 1) + '</span><div class="sec-n"><b>' + esc(sec.name) + '</b>' + (sec.note ? '<small class="muted">' + esc(sec.note) + '</small>' : '') + '</div>' +
+        '<label class="sw green"><input type="checkbox" data-secshow="' + id + '"' + (off ? '' : ' checked') + '>' + (off ? 'Hidden' : 'Showing') + '</label>' +
+        '<button class="btn sm ghost" type="button" data-secmove="' + i + '" data-d="-1"' + (i ? '' : ' disabled') + ' aria-label="Move up">↑</button><button class="btn sm ghost" type="button" data-secmove="' + i + '" data-d="1"' + (i < order.length - 1 ? '' : ' disabled') + ' aria-label="Move down">↓</button>' +
+        '<button class="btn sm ghost" type="button" data-secopen="' + id + '">' + (S.secOpen === id ? 'Close' : 'Edit') + '</button></div>' +
+        (S.secOpen === id ? '<div class="sec-b"><div class="txhead g2 cap muted"><span>English</span><span>Arabic</span></div>' + sec.keys.map(function(k, j){ return txField(k, {label:(id === 'arrivals' ? ['Small line', 'Title', 'Button'] : id === 'featured' ? ['Small line', 'Button'] : id === 'brand' ? ['Title', 'Text', 'Link'] : TXLBL)[j] || ''}); }).join('') + extra + '</div>' : '') + '</div>';
+    }).join('') +
+    '<div style="margin-top:18px">' + saveBtn('home').replace('chip red unsaved', 'chip red unsaved2') + '</div>';
+}
+function setPath(o, path, v){ var ks = path.split('.'); for(var i = 0; i < ks.length - 1; i++){ var k = ks[i]; if(o[k] == null) o[k] = /^\d+$/.test(ks[i + 1]) ? [] : {}; o = o[k]; } o[ks[ks.length - 1]] = v; }
+function saveHome(){
+  var jobs = [DBX.set('settings', 'site', {home:clone(homeDraft()), updated:Date.now()}, true)];
+  if(S.dirty.texts) jobs.push(saveTexts());
+  return Promise.all(jobs).then(function(){ S.site.home = clone(homeDraft()); });
+}
+
+/* ================= collections ================= */
+function colsList(){
+  var o = S.cols.over || {}, ord = S.cols.order || [];
+  var list = BASECOLS_C.concat(S.cols.added || []).map(function(c){ var x = Object.assign({}, c, o[c.id] || {}); x._added = !BASECOLS_C.some(function(b){ return b.id === c.id; }); return x; });
+  return list.sort(function(x, y){ var i = ord.indexOf(x.id), j = ord.indexOf(y.id); return (i < 0 ? 999 : i) - (j < 0 ? 999 : j); });
+}
+var BASECOLS_C = clone(COLLECTIONS);
+function viewCols(){
+  var list = colsList(), counts = {}; merged().forEach(function(p){ if(!p.removed) counts[p.col] = (counts[p.col] || 0) + 1; });
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('collections')) + '</h2><button class="btn ghost" type="button" data-coladd>+ New collection</button>' + saveBtn('cols') + '</div>' +
+    '<p class="muted" style="margin:-8px 0 18px;max-width:820px">The order here is the order in the menu and footer. To put a piece in a collection, open it in Products and choose the collection.</p>' +
+    '<datalist id="dlWide">' + LIB.map(function(x){ return x.replace(/^img\/c\/(c\d\d)\.jpg$/, 'img/c/$1-w.jpg'); }).concat(LIB).map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist><datalist id="dlTall">' + LIB.map(function(x){ return '<option value="' + x + '">'; }).join('') + '</datalist>' +
+    '<div class="hlist">' + list.map(function(c, i){
+      var open = S.colOpen === c.id, img = c.cover || c.small || (c.album && c.album[0]) || (c.cut && c.cut[0]) || '';
+      return '<div class="card col-c' + (c.hidden ? ' off' : '') + '"><div class="sec-top">' + (img ? '<img class="cthumb" src="' + esc(img) + '" alt="">' : '<span class="cthumb"></span>') +
+        '<div class="sec-n"><b>' + esc(t(c.name) || '(no name)') + '</b><small class="muted">' + (counts[c.id] || 0) + ' pieces · #' + esc(c.id) + (c._added ? ' · added by you' : '') + '</small></div>' +
+        '<label class="sw green"><input type="checkbox" data-colshow="' + c.id + '"' + (c.hidden ? '' : ' checked') + '>' + (c.hidden ? 'Hidden' : 'Showing') + '</label>' +
+        '<button class="btn sm ghost" type="button" data-colmove="' + i + '" data-d="-1"' + (i ? '' : ' disabled') + ' aria-label="Move up">↑</button><button class="btn sm ghost" type="button" data-colmove="' + i + '" data-d="1"' + (i < list.length - 1 ? '' : ' disabled') + ' aria-label="Move down">↓</button>' +
+        '<button class="btn sm ghost" type="button" data-colopen="' + c.id + '">' + (open ? 'Close' : 'Edit') + '</button></div>' +
+        (open ? '<div class="sec-b">' +
+          '<label class="f"><span>Name (shown in English on both languages, like Kamin)</span><input class="in" data-cf="' + c.id + '" data-k="name" value="' + esc(c.name && c.name.en || '') + '"></label>' +
+          '<div class="g2"><label class="f"><span>Season, English</span><input class="in" data-cf="' + c.id + '" data-k="season.en" value="' + esc(c.season && c.season.en || '') + '" placeholder="Autumn/Winter 2026"></label><label class="f"><span>Season, Arabic</span><input class="in" dir="rtl" data-cf="' + c.id + '" data-k="season.ar" value="' + esc(c.season && c.season.ar || '') + '"></label></div>' +
+          '<div class="g2"><label class="f"><span>Story, English</span><textarea class="in" rows="4" data-cf="' + c.id + '" data-k="story.en">' + esc(c.story && c.story.en || '') + '</textarea></label><label class="f"><span>Story, Arabic</span><textarea class="in" rows="4" dir="rtl" data-cf="' + c.id + '" data-k="story.ar">' + esc(c.story && c.story.ar || '') + '</textarea></label></div>' +
+          '<div class="g2"><label class="f"><span>Cover photo, wide (top of the collection page; empty = no photo)</span><input class="in" dir="ltr" list="dlWide" data-cf="' + c.id + '" data-k="cover" value="' + esc(c.cover || '') + '"></label><label class="f"><span>Small photo, tall (menu)</span><input class="in" dir="ltr" list="dlTall" data-cf="' + c.id + '" data-k="small" value="' + esc(c.small || '') + '"></label></div>' +
+          (c._added ? '<div><button class="btn danger sm" type="button" data-coldel="' + c.id + '">Delete this collection</button></div>' : '') +
+        '</div>' : '') + '</div>';
+    }).join('') + '</div>' +
+    '<div style="margin-top:18px">' + saveBtn('cols').replace('chip red unsaved', 'chip red unsaved2') + '</div>';
+}
+function colEdit(id){ var a = (S.cols.added || []).filter(function(c){ return c.id === id; })[0]; if(a) return a; S.cols.over = S.cols.over || {}; return S.cols.over[id] = S.cols.over[id] || {}; }
+
+/* ================= custom colours ================= */
+var CVARS = [['bg', 'Page background', '#FDF9F4'], ['panel', 'Header, footer and cards', '#FFFFFF'], ['soft', 'Soft background (photo frames)', '#F5F0EA'], ['ink', 'Text and titles', '#1C1B1B'], ['muted', 'Small grey text', '#6A6A6A'], ['line', 'Thin lines', '#E7E2DB'], ['line2', 'Borders of boxes', '#D6D0C8'], ['btn', 'Buttons', '#1C1B1B'], ['btnInk', 'Button text', '#FFFFFF'], ['ann', 'Announcement bar', '#1C1B1B'], ['annInk', 'Announcement bar text', '#FFFFFF'], ['newL', 'New label', '#2F6B4A'], ['outL', 'Sold out label', '#A3302A']];
+function colorsDraft(){ if(!S.colD) S.colD = Object.assign({}, S.site.colors || {}); return S.colD; }
+function cval(k){ var d = colorsDraft(); return d[k] || CVARS.filter(function(x){ return x[0] === k; })[0][2]; }
+function customColorsCard(){
+  var on = S.site.theme === 'custom';
+  return '<div class="card" style="max-width:1100px"><h4>Your own colours ' + (on ? '<span class="chip green">Live</span>' : '') + '</h4><p class="muted" style="margin:0">Pick any colour for each part of the site. The preview updates as you go. Press <b>Use these colours</b> to publish.</p>' +
+    '<div class="cc"><div class="cgrid">' + CVARS.map(function(x){ return '<label class="cpick"><input type="color" data-cv="' + x[0] + '" value="' + esc(cval(x[0])) + '"><span>' + esc(x[1]) + '<small dir="ltr">' + esc(cval(x[0])).toUpperCase() + '</small></span></label>'; }).join('') + '</div>' +
+    '<div class="cprev" id="cprev">' + cprev() + '</div></div>' +
+    '<div class="r" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" type="button" data-cuse>Use these colours</button><button class="btn ghost" type="button" data-cfrom>Start from the live theme</button></div></div>';
+}
+function cprev(){
+  var c = cval;
+  return '<div class="pv" style="background:' + c('bg') + ';color:' + c('ink') + ';border-color:' + c('line') + '">' +
+    '<div style="background:' + c('ann') + ';color:' + c('annInk') + '" class="pv-ann">FREE UAE DELIVERY</div>' +
+    '<div class="pv-hd" style="background:' + c('panel') + ';border-color:' + c('line') + '"><span>SHOP</span><b>NMH</b><span>CART (1)</span></div>' +
+    '<div class="pv-b"><p style="color:' + c('muted') + '">JUST ARRIVED</p><h5>NEW ARRIVALS</h5><div class="pv-g">' + [0, 1, 2].map(function(i){ return '<div><div class="pv-ph" style="background:' + c('soft') + '"><i style="background:' + (i === 2 ? c('outL') : c('newL')) + '">' + (i === 2 ? 'SOLD OUT' : 'NEW') + '</i></div><small>NOOR ABAYA</small><small style="color:' + c('muted') + '">780 AED</small></div>'; }).join('') + '</div>' +
+    '<span class="pv-btn" style="background:' + c('btn') + ';color:' + c('btnInk') + '">VIEW ALL</span><div class="pv-in" style="border-color:' + c('line2') + ';color:' + c('muted') + '">Your email</div></div></div>';
+}
+var THEME_VALS = {classic:{}, mono:{bg:'#FFFFFF', ink:'#000000', muted:'#5C5C5C', line:'#E6E6E6', line2:'#CCCCCC', btn:'#000000', soft:'#F3F3F3', ann:'#000000'}, sand:{bg:'#F5EDE2', panel:'#FBF7F1', ink:'#2B2118', muted:'#6B5D4F', line:'#E3D6C4', line2:'#CFBFA9', btn:'#5B4532', soft:'#ECE1D1', ann:'#5B4532'}, blush:{bg:'#FBF4F2', ink:'#2A1E1E', muted:'#6E5D5B', line:'#EEDFDB', line2:'#DCC6C0', btn:'#8A4A47', soft:'#F4E6E2', ann:'#8A4A47'}, sage:{bg:'#F4F5F0', ink:'#1F2620', muted:'#5E665E', line:'#DEE3D8', line2:'#C6CFBF', btn:'#3F5446', soft:'#E8ECE3', ann:'#3F5446'}, midnight:{bg:'#141312', panel:'#1B1A19', ink:'#F2EDE7', muted:'#A29C95', line:'#2C2A28', line2:'#3A3735', btn:'#F2EDE7', btnInk:'#141312', soft:'#211F1D', ann:'#F2EDE7', annInk:'#141312', newL:'#2F6B4A', outL:'#A3302A'}};
+
+/* ================= events for the new pages ================= */
+document.addEventListener('click', function(e){
+  var b = e.target.closest('button'); if(!b) return; var v;
+  /* dashboard names */
+  if(b.hasAttribute('data-lbledit')){ S.editLabels = true; render(); return; }
+  if(b.hasAttribute('data-lblcancel')){ S.editLabels = false; render(); return; }
+  if(b.hasAttribute('data-lblsave')){ var lab = {}; [].forEach.call(document.querySelectorAll('[data-lbl]'), function(i){ var k = i.getAttribute('data-lbl'), val = i.value.trim(); if(val && val !== LBL[k]) lab[k] = val; });
+    DBX.set('settings', 'control', {labels:lab, updated:Date.now()}).then(function(){ S.labels = lab; S.editLabels = false; render(); toast('Names saved.'); }).catch(function(e2){ toast('Could not save: ' + (e2.message || e2), true); }); return; }
+  /* save buttons */
+  if((v = b.getAttribute('data-save'))){
+    var job = v === 'texts' ? saveTexts() : v === 'home' ? saveHome() : v === 'cols' ? DBX.set('settings', 'collections', {over:S.cols.over || {}, added:S.cols.added || [], order:colsList().map(function(c){ return c.id; }), updated:Date.now()}) : null;
+    if(!job) return; b.disabled = true;
+    job.then(function(){ S.dirty[v] = false; if(v === 'home') S.dirty.texts = false; render(); toast('Saved. The site is updated.'); }).catch(function(e2){ b.disabled = false; toast('Could not save: ' + (e2.message || e2), true); }); return; }
+  /* texts */
+  if((v = b.getAttribute('data-txg'))){ S.txGroup = v; render(); return; }
+  if((v = b.getAttribute('data-txreset'))){ delete S.tx[v]; markDirty('texts'); var row = b.closest('.txr'); [].forEach.call(row.querySelectorAll('[data-tx]'), function(i){ i.value = ''; }); row.classList.remove('ch'); b.hidden = true; return; }
+  if((v = b.getAttribute('data-pgreset'))){ delete S.pagesX[v]; markDirty('texts'); render(); return; }
+  /* sections */
+  if((v = b.getAttribute('data-secopen'))){ S.secOpen = S.secOpen === v ? null : v; render(); return; }
+  if((v = b.getAttribute('data-secmove')) != null){ var o = secOrder(), i = +v, j = i + (+b.getAttribute('data-d')); if(j < 0 || j >= o.length) return; var tmp = o[i]; o[i] = o[j]; o[j] = tmp; homeDraft().order = o; markDirty('home'); render(); return; }
+  /* collections */
+  if((v = b.getAttribute('data-colopen'))){ S.colOpen = S.colOpen === v ? null : v; render(); return; }
+  if((v = b.getAttribute('data-colmove')) != null){ var l = colsList().map(function(c){ return c.id; }), i2 = +v, j2 = i2 + (+b.getAttribute('data-d')); if(j2 < 0 || j2 >= l.length) return; var t2 = l[i2]; l[i2] = l[j2]; l[j2] = t2; S.cols.order = l; markDirty('cols'); render(); return; }
+  if(b.hasAttribute('data-coladd')){ var n = prompt('Name of the new collection'); if(!n || !n.trim()) return; var id = n.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || ('col-' + Date.now().toString(36));
+    if(colsList().some(function(c){ return c.id === id; })) id += '-' + Date.now().toString(36).slice(-3);
+    S.cols.added = (S.cols.added || []).concat([{id:id, name:{en:n.trim(), ar:n.trim()}, season:{en:'', ar:''}, story:{en:'', ar:''}, cover:'', small:'', tone:'#EFE8E0'}]); S.colOpen = id; markDirty('cols'); render(); return; }
+  if((v = b.getAttribute('data-coldel'))){ var cnt = merged().filter(function(p){ return p.col === v && !p.removed; }).length;
+    confirmBox('Delete this collection?', cnt ? cnt + ' pieces are in it. They stay in the shop, but move them to another collection first.' : 'It disappears from the menu after you save.', 'Delete').then(function(ok){ if(!ok) return; S.cols.added = S.cols.added.filter(function(c){ return c.id !== v; }); markDirty('cols'); render(); }); return; }
+  /* colours */
+  if(b.hasAttribute('data-cuse')){ var data = {theme:'custom', colors:clone(colorsDraft()), updated:Date.now()}; CVARS.forEach(function(x){ if(!data.colors[x[0]]) data.colors[x[0]] = x[2]; });
+    DBX.set('settings', 'site', data, true).then(function(){ Object.assign(S.site, data); S.colD = null; render(); toast('Your colours are live.'); }).catch(function(e2){ toast('Could not save: ' + (e2.message || e2), true); }); return; }
+  if(b.hasAttribute('data-cfrom')){ var base = {}; CVARS.forEach(function(x){ base[x[0]] = x[2]; }); Object.assign(base, THEME_VALS[S.site.theme] || {}); if(S.site.theme === 'custom') Object.assign(base, S.site.colors || {}); S.colD = base; render(); return; }
+});
+document.addEventListener('input', function(e){
+  var el = e.target, v;
+  if(el.id === 'txq'){ var q = el.value.trim().toLowerCase(); [].forEach.call(document.querySelectorAll('.txlist .txr'), function(r){ r.hidden = !!q && r.getAttribute('data-row').indexOf(q) < 0 && !Array.prototype.some.call(r.querySelectorAll('[data-tx]'), function(i){ return i.value.toLowerCase().indexOf(q) > -1; }); }); return; }
+  if((v = el.getAttribute('data-tx')) != null){ var o = S.tx[v] = S.tx[v] || {en:'', ar:''}; o[el.getAttribute('data-l')] = el.value.trim(); if(!o.en && !o.ar) delete S.tx[v]; var row = el.closest('.txr'), ch = !!S.tx[v]; row.classList.toggle('ch', ch); row.querySelector('.txreset').hidden = !ch; markDirty('texts'); if(S.tab === 'sections') markDirty('home'); return; }
+  if((v = el.getAttribute('data-pg'))){ var pg = S.pagesX[v] = S.pagesX[v] || {}, part = el.getAttribute('data-part'); pg[part] = pg[part] || {}; pg[part][el.getAttribute('data-l')] = part === 't' ? el.value.trim() : el.value; if(part === 'b'){ var other = el.getAttribute('data-l') === 'en' ? 'ar' : 'en', oth = document.querySelector('[data-pg="' + v + '"][data-part="b"][data-l="' + other + '"]'); if(pg.b[other] == null && oth) pg.b[other] = oth.value; } markDirty('texts'); return; }
+  if((v = el.getAttribute('data-hk')) && el.tagName === 'INPUT'){ setPath(homeDraft(), v, el.value.trim()); markDirty('home'); var im = el.closest('.stile') && el.closest('.stile').querySelector('img'); if(im && /\.img$/.test(v)) im.src = el.value.trim(); return; }
+  if((v = el.getAttribute('data-cf'))){ var tgt = colEdit(v), k = el.getAttribute('data-k'), val = el.tagName === 'TEXTAREA' ? el.value : el.value.trim();
+    if(k === 'name') tgt.name = {en:val, ar:val}; else if(k.indexOf('.') > -1){ var p2 = k.split('.'), cur = colsList().filter(function(c){ return c.id === v; })[0]; tgt[p2[0]] = Object.assign({en:'', ar:''}, (cur && cur[p2[0]]) || {}, tgt[p2[0]] || {}); tgt[p2[0]][p2[1]] = val; } else tgt[k] = val;
+    markDirty('cols'); return; }
+  if((v = el.getAttribute('data-cv'))){ colorsDraft()[v] = el.value; var sm = el.parentNode.querySelector('small'); if(sm) sm.textContent = el.value.toUpperCase(); $('cprev').innerHTML = cprev(); return; }
+});
+document.addEventListener('change', function(e){
+  var el = e.target, v;
+  if((v = el.getAttribute('data-secshow'))){ var h = homeDraft(); h.hidden = h.hidden || {}; if(el.checked) delete h.hidden[v]; else h.hidden[v] = true; markDirty('home'); render(); return; }
+  if((v = el.getAttribute('data-hk')) && el.tagName === 'SELECT'){ setPath(homeDraft(), v, el.value); markDirty('home'); if(v === 'edit.type') render(); return; }
+  if((v = el.getAttribute('data-colshow'))){ colEdit(v).hidden = !el.checked; markDirty('cols'); render(); return; }
+});
+
+/* ================= design style ================= */
+var DSTYLES = [
+  {id:'classic', name:'Classic', d:'The current look. Sharp edges, spaced-out capital letters, quiet luxury like Kamin.'},
+  {id:'modern', name:'Modern', d:'Rounded photos and pill buttons, bold clean titles in normal case. Fresh and friendly.'},
+  {id:'glass', name:'Liquid glass', d:'Frosted see-through header, panels and buttons over a soft colour glow. Trendy, like iOS.'},
+  {id:'editorial', name:'Editorial', d:'Big elegant serif titles in italic, like a fashion magazine. Very high-end.'},
+  {id:'minimal', name:'Minimal', d:'Lots of white space, thin outline buttons, nothing extra. Lets the photos lead.'}
+];
+function styleMock(id){
+  var r = id === 'modern' ? '10px' : id === 'glass' ? '12px' : '0', pill = id === 'modern' || id === 'glass';
+  var title = id === 'editorial' ? '<b style="font:italic 500 15px Georgia,serif;letter-spacing:0">New arrivals</b>' : id === 'modern' ? '<b style="font:700 13px var(--body);letter-spacing:-.01em">New arrivals</b>' : '<b style="font:500 9px var(--head);letter-spacing:' + (id === 'minimal' ? '.35em;font-weight:400' : '.22em') + '">NEW ARRIVALS</b>';
+  var btn = id === 'minimal' ? 'background:transparent;color:#1C1B1B;box-shadow:inset 0 0 0 1px #1C1B1B' : id === 'glass' ? 'background:rgba(28,27,27,.85);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)' : 'background:#1C1B1B;color:#fff';
+  return '<span class="sm-m s-' + id + '">' + (id === 'glass' ? '<i class="sm-glow"></i>' : '') + '<span class="sm-hd" style="border-radius:' + (id === 'glass' ? '10px;margin:5px' : '0') + '">NMH</span>' + title +
+    '<span class="sm-g">' + [0, 1, 2].map(function(){ return '<u style="border-radius:' + r + '"></u>'; }).join('') + '</span><s style="' + btn + ';border-radius:' + (pill ? '999px' : '0') + '">' + (id === 'modern' ? 'Shop now' : 'SHOP NOW') + '</s></span>';
+}
+function styleCard(){
+  var cur = S.site.style || 'classic';
+  return '<div class="card" style="max-width:1100px;margin-bottom:18px"><h4>Design style</h4><p class="muted" style="margin:0">The shape and feel of the whole site: fonts, corners, buttons, panels. Works with any colour theme below. Click one to switch; it goes live straight away.</p>' +
+    '<div class="themes">' + DSTYLES.map(function(x){ return '<button type="button" class="th' + (x.id === cur ? ' on' : '') + '" data-dstyle="' + x.id + '" aria-pressed="' + (x.id === cur) + '">' + styleMock(x.id) +
+      '<span class="th-n">' + x.name + (x.id === cur ? ' <span class="chip green">Live</span>' : '') + '</span><span class="th-d">' + x.d + '</span></button>'; }).join('') + '</div></div>';
+}
+
+/* ================= delivery and offers ================= */
+function viewDelivery(){
+  var d = Object.assign({ae:25, gcc:60, intl:95, express:40, offer:false, min:0, zones:'ae'}, S.site.delivery || {});
+  var nf = function(n, l, v, hint){ return '<label class="f"><span>' + l + '</span><input class="in" type="number" min="0" step="1" name="' + n + '" value="' + esc(v) + '">' + (hint ? '<small>' + hint + '</small>' : '') + '</label>'; };
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('delivery')) + '</h2></div>' +
+    '<form class="card" id="dlvForm" style="max-width:820px"><h4>Delivery prices (AED)</h4><div class="g2">' + nf('ae', 'Inside the UAE', d.ae) + nf('gcc', 'GCC countries', d.gcc) + nf('intl', 'Rest of the world', d.intl) + nf('express', 'Extra for express delivery', d.express) + '</div>' +
+    '<h4 style="margin-top:8px">Free delivery offer</h4><p class="muted" style="margin:0">Delivery is always charged. Switch this on only while you run an offer, then switch it off when the offer ends.</p>' +
+    '<label class="sw green"><input type="checkbox" name="offer"' + (d.offer ? ' checked' : '') + '>' + (d.offer ? 'Offer is ON: free delivery now' : 'Offer is off') + '</label>' +
+    '<div class="g2">' + nf('min', 'Only for orders above (AED)', d.min, '0 = free delivery on every order during the offer') +
+    '<label class="f"><span>Where</span><select class="sel" name="zones"><option value="ae"' + (d.zones === 'ae' ? ' selected' : '') + '>UAE only</option><option value="gcc"' + (d.zones === 'gcc' ? ' selected' : '') + '>UAE and GCC</option><option value="all"' + (d.zones === 'all' ? ' selected' : '') + '>Everywhere</option></select></label></div>' +
+    '<label class="sw"><input type="checkbox" name="toBar">Also put the offer in the announcement bar</label>' +
+    '<div class="g2" id="barTxt" hidden><label class="f"><span>Bar text, English</span><input class="in" name="barEn" placeholder="Free delivery this week on every order"></label><label class="f"><span>Bar text, Arabic</span><input class="in" dir="rtl" name="barAr" placeholder="توصيل مجاني هذا الأسبوع على جميع الطلبات"></label></div>' +
+    '<div><button class="btn" type="submit">Save and publish</button></div></form>';
+}
+
+/* ================= categories ================= */
+var BASESTYLES_C = clone(STYLES.filter(function(s){ return s.id !== 'all'; })), BASEINFO_C = clone(STYLE_INFO);
+function catsList(){
+  var c = S.cats || {}, o = c.over || {}, ord = c.order || [];
+  var list = BASESTYLES_C.concat((c.added || []).map(function(x){ return {id:x.id, en:x.en, ar:x.ar, _added:true, intro:x.intro}; })).map(function(s){
+    var x = Object.assign({}, s, o[s.id] || {}), inf = BASEINFO_C[s.id] || {}; x.intro = Object.assign({en:'', ar:''}, s.intro || inf.intro || {}, (o[s.id] || {}).intro || {}); x.en = (o[s.id] || {}).en || s.en; x.ar = (o[s.id] || {}).ar || s.ar; return x; });
+  return list.sort(function(x, y){ var i = ord.indexOf(x.id), j = ord.indexOf(y.id); return (i < 0 ? 999 : i) - (j < 0 ? 999 : j); });
+}
+function catsOpts(){ return catsList().filter(function(c){ return !c.hidden; }); }
+function catEdit(id){ var a = (S.cats.added || []).filter(function(c){ return c.id === id; })[0]; if(a) return a; S.cats.over = S.cats.over || {}; return S.cats.over[id] = S.cats.over[id] || {}; }
+function viewCats(){
+  var list = catsList(), counts = {}; merged().forEach(function(p){ if(!p.removed) counts[p.style] = (counts[p.style] || 0) + 1; });
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('cats')) + '</h2><button class="btn ghost" type="button" data-catadd>+ New category</button>' + saveBtn('cats') + '</div>' +
+    '<p class="muted" style="margin:-8px 0 18px;max-width:820px">Categories are the shop filters (Abayas, Kaftans, Jalabiyas...). They show in the menu, the footer and the Shop page. Put a piece in a category from Products → Edit → Style. A category with no pieces shows a "nothing here yet" message.</p>' +
+    '<div class="hlist">' + list.map(function(c, i){ var open = S.catOpen === c.id;
+      return '<div class="card col-c' + (c.hidden ? ' off' : '') + '"><div class="sec-top"><span class="num">' + (i + 1) + '</span><div class="sec-n"><b>' + esc(c.en) + ' · <span dir="rtl">' + esc(c.ar) + '</span></b><small class="muted">' + (counts[c.id] || 0) + ' pieces · #s-' + esc(c.id) + (c._added ? ' · added by you' : '') + '</small></div>' +
+        '<label class="sw green"><input type="checkbox" data-catshow="' + c.id + '"' + (c.hidden ? '' : ' checked') + '>' + (c.hidden ? 'Hidden' : 'Showing') + '</label>' +
+        '<button class="btn sm ghost" type="button" data-catmove="' + i + '" data-d="-1"' + (i ? '' : ' disabled') + ' aria-label="Move up">↑</button><button class="btn sm ghost" type="button" data-catmove="' + i + '" data-d="1"' + (i < list.length - 1 ? '' : ' disabled') + ' aria-label="Move down">↓</button>' +
+        '<button class="btn sm ghost" type="button" data-catopen="' + c.id + '">' + (open ? 'Close' : 'Edit') + '</button></div>' +
+        (open ? '<div class="sec-b"><div class="g2"><label class="f"><span>Name, English</span><input class="in" data-ct="' + c.id + '" data-k="en" value="' + esc(c.en) + '"></label><label class="f"><span>Name, Arabic</span><input class="in" dir="rtl" data-ct="' + c.id + '" data-k="ar" value="' + esc(c.ar) + '"></label></div>' +
+          '<div class="g2"><label class="f"><span>Intro on the category page, English</span><textarea class="in" rows="3" data-ct="' + c.id + '" data-k="intro.en">' + esc(c.intro.en) + '</textarea></label><label class="f"><span>Intro, Arabic</span><textarea class="in" rows="3" dir="rtl" data-ct="' + c.id + '" data-k="intro.ar">' + esc(c.intro.ar) + '</textarea></label></div>' +
+          (c._added ? '<div><button class="btn danger sm" type="button" data-catdel="' + c.id + '">Delete this category</button></div>' : '') + '</div>' : '') + '</div>';
+    }).join('') + '</div><div style="margin-top:18px">' + saveBtn('cats').replace('chip red unsaved', 'chip red unsaved2') + '</div>';
+}
+
+document.addEventListener('click', function(e){
+  var b = e.target.closest('button'); if(!b) return; var v;
+  if((v = b.getAttribute('data-dstyle'))){ if(v === (S.site.style || 'classic')) return; DBX.set('settings', 'site', {style:v, updated:Date.now()}, true).then(function(){ S.site.style = v; render(); toast('Design style changed. The site is updated.'); }).catch(function(e2){ toast('Could not save: ' + (e2.message || e2), true); }); return; }
+  if((v = b.getAttribute('data-save')) === 'cats'){ b.disabled = true; DBX.set('settings', 'categories', {over:S.cats.over || {}, added:S.cats.added || [], order:catsList().map(function(c){ return c.id; }), updated:Date.now()}).then(function(){ S.dirty.cats = false; render(); toast('Saved. The site is updated.'); }).catch(function(e2){ b.disabled = false; toast('Could not save: ' + (e2.message || e2), true); }); return; }
+  if((v = b.getAttribute('data-catopen'))){ S.catOpen = S.catOpen === v ? null : v; render(); return; }
+  if((v = b.getAttribute('data-catmove')) != null){ var l = catsList().map(function(c){ return c.id; }), i = +v, j = i + (+b.getAttribute('data-d')); if(j < 0 || j >= l.length) return; var t2 = l[i]; l[i] = l[j]; l[j] = t2; S.cats.order = l; markDirty('cats'); render(); return; }
+  if(b.hasAttribute('data-catadd')){ var n = prompt('Name of the new category, in English'); if(!n || !n.trim()) return; var ar = prompt('Arabic name') || n; var id = n.trim().toLowerCase().replace(/[^a-z0-9]+/g, '') || ('cat' + Date.now().toString(36));
+    if(catsList().some(function(c){ return c.id === id; }) || id === 'all' || id === 'new') id += Date.now().toString(36).slice(-3);
+    S.cats.added = (S.cats.added || []).concat([{id:id, en:n.trim(), ar:ar.trim(), intro:{en:'', ar:''}}]); S.catOpen = id; markDirty('cats'); render(); return; }
+  if((v = b.getAttribute('data-catdel'))){ confirmBox('Delete this category?', 'Pieces in it stay in the shop. Move them to another category first.', 'Delete').then(function(ok){ if(!ok) return; S.cats.added = S.cats.added.filter(function(c){ return c.id !== v; }); markDirty('cats'); render(); }); return; }
+  if(b.hasAttribute('data-tileadd')){ var h = homeDraft(); h.tiles = (h.tiles && h.tiles.length ? h.tiles : clone(DEF_TILES)); h.tiles.push({s:catsOpts()[0].id, img:'img/c/c01.jpg'}); markDirty('home'); render(); return; }
+  if((v = b.getAttribute('data-tiledel')) != null){ var h2 = homeDraft(); h2.tiles = (h2.tiles && h2.tiles.length ? h2.tiles : clone(DEF_TILES)); h2.tiles.splice(+v, 1); markDirty('home'); render(); return; }
+});
+document.addEventListener('input', function(e){
+  var el = e.target, v;
+  if((v = el.getAttribute('data-ct'))){ var tg = catEdit(v), k = el.getAttribute('data-k'), val = el.tagName === 'TEXTAREA' ? el.value : el.value.trim();
+    if(k.indexOf('intro.') === 0){ tg.intro = Object.assign({en:'', ar:''}, tg.intro || {}); tg.intro[k.slice(6)] = val; } else tg[k] = val; markDirty('cats'); }
+});
+document.addEventListener('change', function(e){
+  var el = e.target, v;
+  if((v = el.getAttribute('data-catshow'))){ catEdit(v).hidden = !el.checked; markDirty('cats'); render(); return; }
+  if(el.name === 'offer' && el.closest('#dlvForm')){ el.parentNode.lastChild.textContent = el.checked ? 'Offer is ON: free delivery now' : 'Offer is off'; return; }
+  if(el.name === 'toBar' && el.closest('#dlvForm')){ $('barTxt').hidden = !el.checked; return; }
+});
+document.addEventListener('submit', function(e){
+  if(e.target.id !== 'dlvForm') return; e.preventDefault(); var f = e.target, n = function(k){ var x = parseFloat(f[k].value); return isFinite(x) && x >= 0 ? x : 0; };
+  var data = {delivery:{ae:n('ae'), gcc:n('gcc'), intl:n('intl'), express:n('express'), offer:f.offer.checked, min:n('min'), zones:f.zones.value}, updated:Date.now()};
+  if(f.toBar.checked && (f.barEn.value.trim() || f.barAr.value.trim())){ data.ann = {en:f.barEn.value.trim(), ar:f.barAr.value.trim()}; data.annOff = false; }
+  DBX.set('settings', 'site', data, true).then(function(){ Object.assign(S.site, data); toast(data.delivery.offer ? 'Saved. Free delivery is ON.' : 'Saved.'); render(); }).catch(function(e2){ toast('Could not save: ' + (e2.message || e2), true); });
+});
+
+/* ================= media uploads (Cloudinary free plan, no card) ================= */
+function mediaCfg(){ var c = Object.assign({}, window.NMH_CLOUDINARY || {}, S.site.media || {}); return c.cloud && c.preset ? c : null; }
+function mediaList(){ return (S.mediaDoc && S.mediaDoc.list) || []; }
+function upProgress(name, p){ var el = $('upBar'); if(!el){ el = document.createElement('div'); el.id = 'upBar'; el.className = 'upbar'; el.innerHTML = '<span></span><i><b></b></i>'; document.body.appendChild(el); }
+  if(p == null){ el.classList.remove('on'); return; } el.classList.add('on'); el.querySelector('span').textContent = (p < 1 ? 'Uploading ' : 'Finishing ') + name + ' · ' + Math.round(p * 100) + '%'; el.querySelector('b').style.width = Math.round(p * 100) + '%'; }
+/* uploads one file and returns {url, type, poster} */
+function cloudUpload(file){
+  var cfg = mediaCfg();
+  if(!cfg){ toast('Uploads are not connected yet. Open Media library to connect them (free, 2 minutes).', true); return Promise.reject(new Error('not-configured')); }
+  var isVid = /^video\//.test(file.type) || /\.(mp4|mov|m4v|webm)$/i.test(file.name);
+  if(isVid && file.size > 100 * 1024 * 1024){ toast('This video is over 100 MB. Export it smaller (1080p, under 30 seconds) and try again.', true); return Promise.reject(new Error('too-big')); }
+  return (isVid ? Promise.resolve(file) : shrink(file)).then(function(blob){
+    return new Promise(function(res, rej){
+      var fd = new FormData(); fd.append('file', blob, isVid ? file.name : file.name.replace(/\.\w+$/, '') + '.jpg'); fd.append('upload_preset', cfg.preset); fd.append('folder', 'nmh');
+      var x = new XMLHttpRequest(); x.open('POST', 'https://api.cloudinary.com/v1_1/' + encodeURIComponent(cfg.cloud) + '/' + (isVid ? 'video' : 'image') + '/upload');
+      x.upload.onprogress = function(ev){ if(ev.lengthComputable) upProgress(file.name, ev.loaded / ev.total); };
+      x.onload = function(){ upProgress(null); var j = {}; try{ j = JSON.parse(x.responseText); }catch(e){}
+        if(!j.secure_url) return rej(new Error(j.error && j.error.message || ('upload failed (' + x.status + ')')));
+        var url = isVid ? j.secure_url.replace('/upload/', '/upload/q_auto,vc_auto,w_1920,c_limit/') : j.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_2000,c_limit/');
+        var poster = isVid ? j.secure_url.replace('/upload/', '/upload/so_1,w_1920,c_limit,q_auto/').replace(/\.\w+$/, '.jpg') : '';
+        var item = {url:url, type:isVid ? 'video' : 'image', poster:poster, name:file.name, w:j.width || 0, h:j.height || 0, at:Date.now()};
+        S.mediaDoc = S.mediaDoc || {list:[]}; S.mediaDoc.list = [item].concat(mediaList()).slice(0, 400);
+        DBX.set('settings', 'media', {list:S.mediaDoc.list, updated:Date.now()}).catch(function(){});
+        res(item); };
+      x.onerror = function(){ upProgress(null); rej(new Error('network error')); };
+      x.send(fd);
+    });
+  });
+}
+function pickFiles(accept, multi, cb){ if(!mediaCfg()){ toast('Uploads are not connected yet. Open Media library on the control room home to connect them (free, 2 minutes).', true); return; } var i = document.createElement('input'); i.type = 'file'; i.accept = accept; i.multiple = !!multi; i.style.display = 'none'; document.body.appendChild(i);
+  i.addEventListener('change', function(){ var fs = [].slice.call(i.files); i.remove(); var run = function(k){ if(k >= fs.length) return; cloudUpload(fs[k]).then(function(item){ cb(item); run(k + 1); }).catch(function(e){ if(!/not-configured|too-big/.test(e.message)) toast('Upload failed: ' + e.message, true); }); }; run(0); });
+  i.click(); }
+/* every photo or video box in the control room gets an Upload button next to it */
+function addUpButtons(){
+  [].forEach.call(document.querySelectorAll('#main input[list^="dl"]'), function(inp){
+    if(inp.parentNode.classList.contains('upw')) return;
+    var vid = inp.getAttribute('list') === 'dlVid', w = document.createElement('div'); w.className = 'upw';
+    inp.parentNode.insertBefore(w, inp); w.appendChild(inp);
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'btn sm ghost upb'; b.setAttribute('data-upvid', vid ? '1' : ''); b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg>Upload'; w.appendChild(b);
+  });
+  var add = function(id, items){ var dl = document.getElementById(id); if(!dl || dl.getAttribute('data-m')) return; dl.setAttribute('data-m', '1'); dl.insertAdjacentHTML('afterbegin', items.map(function(m){ return '<option value="' + esc(m.url) + '" label="Uploaded · ' + esc(m.name) + '">'; }).join('')); };
+  var imgs = mediaList().filter(function(m){ return m.type === 'image'; }), vids = mediaList().filter(function(m){ return m.type === 'video'; });
+  add('dlWide', imgs); add('dlTall', imgs); add('dlVid', vids);
+}
+function setField(inp, val){ inp.value = val; inp.dispatchEvent(new Event('input', {bubbles:true})); inp.dispatchEvent(new Event('change', {bubbles:true})); }
+document.addEventListener('click', function(e){
+  var b = e.target.closest('.upb'); if(!b) return;
+  var inp = b.parentNode.querySelector('input'), vid = b.getAttribute('data-upvid') === '1';
+  pickFiles(vid ? 'video/mp4,video/quicktime,video/webm,video/*' : 'image/*', false, function(item){
+    setField(inp, item.url);
+    if(item.type === 'video' && item.poster){ var card = b.closest('.hcard, .sec-b'), cov = card && card.querySelector('[data-k="d"], [data-hk="edit.d"]'); if(cov) setField(cov, item.poster); }
+    var img = b.closest('.stile') && b.closest('.stile').querySelector('img'); if(img) img.src = item.url;
+    if(S.tab === 'hero') render();
+    toast(vid ? 'Video uploaded. Press Save to publish it.' : 'Photo uploaded. Press Save to publish it.');
+  });
+});
+/* media library page */
+function viewMedia(){
+  var cfg = mediaCfg(), list = mediaList(), m = S.site.media || {};
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('media')) + '</h2>' + (cfg ? '<button class="btn" type="button" data-mupload>Upload photos or videos</button>' : '') + '</div>' +
+    (cfg ? '<p class="muted" style="margin:-8px 0 18px;max-width:820px">Everything you upload lands here. Every photo or video box in the control room also has its own Upload button. Photos are made smaller and sharper automatically; videos up to 100 MB.</p>'
+         : '<div class="card setup" style="max-width:820px"><h4>Connect uploads (free, no card)</h4><p class="muted" style="margin:0">Firebase no longer gives free file storage, so photos and videos are kept on <b>Cloudinary</b>. The free plan is plenty for a shop (25 GB) and needs no credit card.</p>' +
+           '<ol class="steps"><li>Open <a href="https://cloudinary.com/users/register_free" target="_blank" rel="noopener">cloudinary.com</a> and sign up with the brand\'s Google account.</li><li>On the Cloudinary home page, copy the <b>Cloud name</b> (top left, under Product Environment).</li><li>Go to <b>Settings → Upload → Upload presets → Add upload preset</b>. Set <b>Signing mode: Unsigned</b>, name it <b>nmh_site</b>, and save.</li><li>Paste both below and press Connect.</li></ol></div>') +
+    '<form class="card" id="mediaForm" style="max-width:820px;margin-top:14px"><h4>Upload settings</h4><div class="g2"><label class="f"><span>Cloud name</span><input class="in" name="cloud" dir="ltr" value="' + esc(m.cloud || '') + '" placeholder="e.g. dxyz123ab" autocomplete="off"></label><label class="f"><span>Upload preset (unsigned)</span><input class="in" name="preset" dir="ltr" value="' + esc(m.preset || '') + '" placeholder="nmh_site" autocomplete="off"></label></div><div><button class="btn' + (cfg ? ' ghost' : '') + '" type="submit">' + (cfg ? 'Update' : 'Connect') + '</button></div></form>' +
+    (list.length ? '<h3 class="cap muted" style="margin:26px 0 12px">Uploaded (' + list.length + ')</h3><div class="mgrid">' + list.map(function(x, i){
+      return '<div class="mitem">' + (x.type === 'video' ? '<video src="' + esc(x.url) + '" poster="' + esc(x.poster) + '" muted loop playsinline preload="none" onmouseenter="this.play()" onmouseleave="this.pause()"></video><span class="chip dark">Video</span>' : '<img src="' + esc(x.url) + '" alt="" loading="lazy">') +
+        '<div class="mi-b"><small title="' + esc(x.name) + '">' + esc(x.name) + '</small><div><button class="btn sm ghost" type="button" data-mcopy="' + i + '">Copy link</button><button class="btn sm ghost" type="button" data-mdel="' + i + '" aria-label="Remove from list">×</button></div></div></div>'; }).join('') + '</div>' : '');
+}
+document.addEventListener('click', function(e){
+  var b = e.target.closest('button'); if(!b) return; var v;
+  if(b.hasAttribute('data-mupload')){ pickFiles('image/*,video/*', true, function(){ if(S.tab === 'media') render(); toast('Uploaded.'); }); return; }
+  if((v = b.getAttribute('data-mcopy')) != null){ var u = mediaList()[+v].url; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(function(){ toast('Link copied.'); }, function(){ prompt('Copy this link', u); }); return; }
+  if((v = b.getAttribute('data-mdel')) != null){ confirmBox('Remove from the list?', 'Anything already using this file keeps working. It only disappears from this list.', 'Remove').then(function(ok){ if(!ok) return; S.mediaDoc.list.splice(+v, 1); DBX.set('settings', 'media', {list:S.mediaDoc.list, updated:Date.now()}).then(render); }); return; }
+});
+document.addEventListener('submit', function(e){
+  if(e.target.id !== 'mediaForm') return; e.preventDefault(); var f = e.target, cloud = f.cloud.value.trim(), preset = f.preset.value.trim();
+  if(!cloud || !preset){ toast('Fill in both boxes.', true); return; }
+  var probe = new FormData(); probe.append('upload_preset', preset); probe.append('file', 'data:text/plain;base64,AA==');
+  toast('Checking…');
+  fetch('https://api.cloudinary.com/v1_1/' + encodeURIComponent(cloud) + '/image/upload', {method:'POST', body:probe}).then(function(r){ return r.json(); }).then(function(j){
+    if(!j.secure_url && /invalid image file/i.test((j.error && j.error.message) || '')) j.secure_url = 'ok';
+    if(!j.secure_url){ var msg = (j.error && j.error.message) || 'unknown error'; throw new Error(/preset/i.test(msg) ? 'The upload preset was not found, or it is not set to Unsigned.' : /cloud/i.test(msg) ? 'That cloud name was not found.' : msg); }
+    return DBX.set('settings', 'site', {media:{cloud:cloud, preset:preset}, updated:Date.now()}, true);
+  }).then(function(){ S.site.media = {cloud:cloud, preset:preset}; render(); toast('Uploads are connected.'); }).catch(function(e2){ toast('Could not connect: ' + (e2.message || e2), true); });
+});
+
+boot();
+})();
