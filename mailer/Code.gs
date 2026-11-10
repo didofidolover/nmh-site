@@ -7,7 +7,7 @@
  */
 var CFG = {
   project: 'nmh-dubai',
-  site: 'https://nmh-dubai.web.app',
+  site: 'https://www.bynmh.ae',
   brandTo: 'wedoogfx@gmail.com',          // who gets the new-order alert
   replyTo: 'wedoogfx@gmail.com',          // where customers' replies go
   fromName: 'NMH Dubai',
@@ -130,7 +130,7 @@ function customerHtml(o){
     '<tr><td align="center" style="padding:30px 40px 40px"><a href="' + CFG.instagram + '" style="display:inline-block;background:#1C1B1B;color:#FFFFFF;text-decoration:none;font-family:' + font + ';font-size:12px;letter-spacing:' + (ar ? '0' : '2.4px') + ';text-transform:uppercase;padding:15px 30px">' + T('Message us on Instagram', 'تواصلي معنا عبر إنستغرام') + '</a>' +
       '<p style="margin:18px 0 0;font-family:' + body + ';font-size:13px;color:#6A6A6A">' + T('Questions? Just reply to this email.', 'لديكِ سؤال؟ ردّي على هذه الرسالة.') + '</p></td></tr>' +
     '<tr><td style="background:#FFFFFF;border-top:1px solid #E7E2DB;padding:24px 40px;text-align:center;font-family:' + body + ';font-size:12px;line-height:1.7;color:#6A6A6A">' +
-      '<a href="' + CFG.site + '" style="color:#1C1B1B;text-decoration:none;' + cap + 'color:#1C1B1B">nmh-dubai.web.app</a><br>' + T('Modest dresses, made to order in Dubai.', 'فساتين وعبايات محتشمة، تُفصَّل حسب الطلب في دبي.') + '<br>' +
+      '<a href="' + CFG.site + '" style="color:#1C1B1B;text-decoration:none;' + cap + 'color:#1C1B1B">www.bynmh.ae</a><br>' + T('Modest dresses, made to order in Dubai.', 'فساتين وعبايات محتشمة، تُفصَّل حسب الطلب في دبي.') + '<br>' +
       '<a href="' + CFG.site + '/#page-refund" style="color:#6A6A6A">' + T('Refund policy', 'سياسة الاسترجاع') + '</a> · <a href="' + CFG.site + '/#page-privacy" style="color:#6A6A6A">' + T('Privacy policy', 'سياسة الخصوصية') + '</a></td></tr>' +
   '</table></td></tr></table></body></html>';
 }
