@@ -514,7 +514,7 @@ html[lang="ar"] .ft-b button{letter-spacing:0;font-family:"IBM Plex Sans Arabic"
 .pay{display:flex;gap:8px;flex-wrap:wrap}
 .pay{align-items:center;color:var(--muted);direction:ltr}
 .pay svg text{direction:ltr;unicode-bidi:plaintext}
-.pay svg{display:block;width:46px;height:30px}
+.pay svg{display:block;width:46px;height:29px}
 .ft-tag{margin:56px 0 0;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center;font:500 11px var(--head);letter-spacing:.2em;text-transform:uppercase;color:var(--ink)}
 html[lang="ar"] .ft-tag{letter-spacing:0;text-transform:none;font-family:"IBM Plex Sans Arabic";font-size:13px}
 .ft-tag+.ft-b{margin-top:28px}
