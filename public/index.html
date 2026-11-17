@@ -749,6 +749,13 @@ html[dir="rtl"] .sl-arr.next:hover{transform:translateX(-3px)}
 html[data-style="classic"] .sl-arr,html:not([data-style]) .sl-arr,html[data-style="editorial"] .sl-arr,html[data-style="minimal"] .sl-arr{border-radius:0}
 @media (max-width:700px){ .sl-arr{width:40px;height:40px;margin-top:-20px;opacity:.75} .sl-arr svg{width:16px;height:16px} .sl-arr.prev{inset-inline-start:10px} .sl-arr.next{inset-inline-end:10px} }
 [hidden]{display:none!important}
+
+/* ---------- live try-on (beta) ---------- */
+.try{display:grid;gap:10px;margin:18px 0 6px}
+.try .btn{display:flex;align-items:center;justify-content:center;gap:10px}
+.try .btn svg{width:20px;height:20px;flex:none}
+.try-n{display:flex;align-items:center;justify-content:center;gap:6px;margin:0;font-size:12px;color:var(--muted)}
+.try-n svg{width:13px;height:13px}
 </style>
 </head>
 <body>
@@ -910,6 +917,11 @@ var COLLECTIONS = [];
 var PRODUCTS = [];
 
 var ONE = [];
+/* Live try-on (beta). mode: 'off' | 'preview' (only with the private link ?try=1) | 'on'. The control room overrides this from settings/tryon. */
+var TRYON = {mode:'preview', items:{
+  E01:{live:true, snap:'', img:'img/tryon/E01.webp', a:{s:[0.5641,0.0746], h:[0.5843,0.4057], k:[0.5584,0.9064], sw:0.3913}},
+  E02:{live:true, snap:'', img:'img/tryon/E02.webp', a:{s:[0.651,0.0692], h:[0.6159,0.4205], k:[0.7134,0.9188], sw:0.3594}}
+}};
 COLLECTIONS.unshift({id:'the-one', season:{en:'Signature · One of one',ar:'توقيع الدار · قطعة واحدة'}, cover:'img/bloom-3.jpg', small:'img/desert-4.jpg', tone:'#1C1B1B',
   name:{en:'The One',ar:'القطعة الواحدة'},
   story:{en:'One piece. Made once. Never again. Each dress in this line exists as a single piece; when it finds its owner, it is gone for good.',ar:'قطعة واحدة. تُصنع مرة واحدة. ولا تتكرر. كل فستان في هذا الخط قطعة فريدة، وحين يجد صاحبته يختفي إلى الأبد.'}});
@@ -1093,6 +1105,24 @@ function pruneSold(){
 }
 
 /* ================= Firebase: orders and newsletter only (no accounts) ================= */
+/* ---------- live try-on (beta) ---------- */
+var TRY = TRYON, TRYPV = false;
+try{ if(/[?&]try=1\b/.test(location.search)) sessionStorage.setItem('nmh-try', '1'); if(/[?&]try=0\b/.test(location.search)) sessionStorage.removeItem('nmh-try'); TRYPV = sessionStorage.getItem('nmh-try') === '1'; }catch(e){ TRYPV = /[?&]try=1\b/.test(location.search); }
+function tryItem(code){ var m = TRY && TRY.mode; if(m !== 'on' && !(m === 'preview' && TRYPV)) return null; var it = TRY.items && TRY.items[code]; return it && (it.live || it.snap) ? it : null; }
+function tryHTML(code){
+  var it = tryItem(code); if(!it) return '';
+  return '<div class="try">' +
+    (it.live ? '<button class="btn ghost full" type="button" id="tryLive"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="9" r="2.5"/><path d="M8 18c.6-3 2-4.5 4-4.5s3.4 1.5 4 4.5"/></svg><span>' + tr('Try it on, live', 'جرّبيها لايف') + '</span></button>' : '') +
+    (it.snap ? '<a class="btn ghost full" href="' + esc(it.snap) + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 3c3 0 5 2.2 5 5.2v2.3l1.6.5c.5.2.4.9-.1 1l-1.7.5c.6 1.6 1.8 2.7 3.2 3.1-.4.7-1.6.9-2.6 1-.3.7-.5 1.1-1.2 1-1-.2-1.7.1-2.6.8-.6.4-1 .6-1.6.6s-1-.2-1.6-.6c-.9-.7-1.6-1-2.6-.8-.7.1-.9-.3-1.2-1-1-.1-2.2-.3-2.6-1 1.4-.4 2.6-1.5 3.2-3.1l-1.7-.5c-.5-.1-.6-.8-.1-1L7 10.5V8.2C7 5.2 9 3 12 3z"/></svg><span>' + tr('Try it on Snapchat', 'جرّبيها على سناب شات') + '</span></a>' : '') +
+    (it.live ? '<p class="try-n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>' + tr('Runs only on your phone. Nothing is uploaded or saved.', 'يعمل على هاتفكِ فقط. لا يُرفع أو يُحفظ أي شيء.') + '</p>' : '') +
+  '</div>';
+}
+function openTry(code){
+  var it = tryItem(code), p = prod(code); if(!it || !p) return;
+  var go = function(){ window.NMHTry.open({L:L, name:t(p.name), img:it.img, a:it.a}); };
+  if(window.NMHTry) return go();
+  var s = document.createElement('script'); s.src = '/js/tryon.js?v=1'; s.onload = go; document.head.appendChild(s);
+}
 var FBCFG = (window.NMH_FIREBASE && window.NMH_FIREBASE.apiKey) ? window.NMH_FIREBASE : null, FB = null, fbQueue = [];
 function fbInit(){
   if(!FBCFG) return;
@@ -1127,6 +1157,7 @@ function fbWatch(){
   F.onSnapshot(F.doc(FB.db, 'settings', 'texts'), function(d){ var v = d.exists() ? d.data() : {}; if(JSON.stringify(v) === JSON.stringify(DB.get('texts', {}))) return; DB.set('texts', v); applyTexts(v); applyLang(); refreshViews(); }, fbWarn);
   F.onSnapshot(F.doc(FB.db, 'settings', 'categories'), function(d){ var v = d.exists() ? d.data() : {}; if(JSON.stringify(v) === JSON.stringify(DB.get('cats', {}))) return; DB.set('cats', v); applyCats(v); renderMenus(); refreshViews(); }, fbWarn);
   F.onSnapshot(F.doc(FB.db, 'settings', 'collections'), function(d){ var v = d.exists() ? d.data() : {}; if(JSON.stringify(v) === JSON.stringify(DB.get('cols', {}))) return; DB.set('cols', v); applyCols(v); renderMenus(); refreshViews(); }, fbWarn);
+  F.onSnapshot(F.doc(FB.db, 'settings', 'tryon'), function(d){ var v = d.exists() ? d.data() : TRYON; if(JSON.stringify(v) === JSON.stringify(TRY)) return; TRY = v; if(/^p-/.test(curKey || '')) rerender(); }, fbWarn);
   F.onSnapshot(F.collection(FB.db, 'oneofone'), function(qs){
     var next = {}; qs.forEach(function(d){ next[d.id] = 1; });
     if(JSON.stringify(next) === JSON.stringify(SOLD)) return;
@@ -1391,6 +1422,7 @@ function viewProduct(code){
         '<h1 class="u-h1">' + esc(t(p.name)) + '</h1><p class="pp-pr num">' + (sold ? soldText(p) : money(p.price)) + '</p><hr>' +
         '<div class="rte"><p>' + esc(t(p.desc)) + '</p>' + (one ? '<p>' + tr('This dress exists as a single piece. Once claimed, it is cut to your size and the design is never made again.', 'هذا الفستان قطعة فريدة. فور حجزه يُفصَّل وفق مقاسك، ولا يتكرر التصميم بعدها.') + '</p>' : '<p>' + tr('Collection: ', 'المجموعة:') + esc(t(c.name)) + '</p>') + '<p>' + (one ? tr('Made once in Dubai. Code ', 'يُصنع مرة واحدة في دبي. الرمز') : tr('Made to order in Dubai. Code ', 'يُفصَّل حسب الطلب في دبي. الرمز')) + p.code + '</p></div>' +
         '<button class="size-link" type="button" id="sizeChart"><svg viewBox="0 0 18 12" fill="none" stroke="currentColor"><rect x=".5" y=".5" width="17" height="11"/><path d="M4 1v4M7 1v6M10 1v4M13 1v6"/></svg>' + tr('Size chart', 'جدول المقاسات') + '</button>' +
+        (sold ? '' : tryHTML(p.code)) +
         (sold ? '<div class="buy"><button class="btn full" type="button" disabled><span>' + soldText(p, true) + '</span></button><a class="link" href="#' + (one ? 'the-one' : p.col) + '" style="justify-self:center;margin-top:8px">' + tr('See the pieces still available', 'عرض القطع المتوفرة') + '</a></div>' : '<form id="buy" novalidate>' +
           (true ? '' : '<div class="opt"><div class="opt-l"><span class="u-h7">' + tr('Colour', 'اللون') + '</span><span class="muted" id="ppShadeN"></span></div>' +
             '<ul class="sw" id="ppSw" aria-label="' + tr('Colour', 'اللون') + '"><li><button type="button" class="orig" data-sh="o" aria-label="' + tr('As shown', 'كما في الصورة') + '"></button></li>' +
@@ -1836,6 +1868,7 @@ document.addEventListener('click', function(e){
   if(id === 'lang' || id === 'sideLang' || id === 'ftLang'){ toggleLang(); return; }
   if(id === 'sideTheme' || id === 'ftTheme'){ toggleTheme(); return; }
   if(id === 'sizeChart'){ openModal(sizeChartHTML()); return; }
+  if(id === 'tryLive'){ openTry(PP && PP.code); return; }
   if(id === 'coToggle'){ CO.sumOpen = !CO.sumOpen; a.setAttribute('aria-expanded', String(CO.sumOpen)); $('coSum').classList.toggle('open', CO.sumOpen); return; }
   var v;
   if((v = a.getAttribute('data-slide')) != null){ goSlide(+v); return; }

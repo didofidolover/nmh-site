@@ -718,3 +718,10 @@ html[dir="rtl"] .sl-arr.next:hover{transform:translateX(-3px)}
 html[data-style="classic"] .sl-arr,html:not([data-style]) .sl-arr,html[data-style="editorial"] .sl-arr,html[data-style="minimal"] .sl-arr{border-radius:0}
 @media (max-width:700px){ .sl-arr{width:40px;height:40px;margin-top:-20px;opacity:.75} .sl-arr svg{width:16px;height:16px} .sl-arr.prev{inset-inline-start:10px} .sl-arr.next{inset-inline-end:10px} }
 [hidden]{display:none!important}
+
+/* ---------- live try-on (beta) ---------- */
+.try{display:grid;gap:10px;margin:18px 0 6px}
+.try .btn{display:flex;align-items:center;justify-content:center;gap:10px}
+.try .btn svg{width:20px;height:20px;flex:none}
+.try-n{display:flex;align-items:center;justify-content:center;gap:6px;margin:0;font-size:12px;color:var(--muted)}
+.try-n svg{width:13px;height:13px}

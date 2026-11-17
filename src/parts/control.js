@@ -91,11 +91,11 @@ function merged(){
 function byCode(c){ return merged().filter(function(p){ return p.code === c; })[0]; }
 function loadAll(){
   $('main').innerHTML = '<div class="spin"></div>';
-  Promise.all([DBX.list('products'), DBX.list('orders', 'created').catch(function(){ return []; }), DBX.list('subscribers', 'created').catch(function(){ return []; }), DBX.list('oneofone').catch(function(){ return []; }), DBX.get('settings', 'site').catch(function(){ return null; }), DBX.get('settings', 'texts').catch(function(){ return null; }), DBX.get('settings', 'collections').catch(function(){ return null; }), DBX.get('settings', 'control').catch(function(){ return null; }), DBX.get('settings', 'categories').catch(function(){ return null; }), DBX.get('settings', 'media').catch(function(){ return null; })]).then(function(r){
+  Promise.all([DBX.list('products'), DBX.list('orders', 'created').catch(function(){ return []; }), DBX.list('subscribers', 'created').catch(function(){ return []; }), DBX.list('oneofone').catch(function(){ return []; }), DBX.get('settings', 'site').catch(function(){ return null; }), DBX.get('settings', 'texts').catch(function(){ return null; }), DBX.get('settings', 'collections').catch(function(){ return null; }), DBX.get('settings', 'control').catch(function(){ return null; }), DBX.get('settings', 'categories').catch(function(){ return null; }), DBX.get('settings', 'media').catch(function(){ return null; }), DBX.get('settings', 'tryon').catch(function(){ return null; })]).then(function(r){
     S.over = {}; r[0].forEach(function(p){ var id = p._id; delete p._id; S.over[id] = p; });
     S.orders = r[1]; S.subs = r[2]; S.claims = {}; r[3].forEach(function(c){ S.claims[c._id] = c; }); S.site = r[4] || {}; S.hero = clone(S.site.slides && S.site.slides.length ? S.site.slides : SLIDES); S.heroDirty = false;
     S.tx = {}; ((r[5] && r[5].list) || []).forEach(function(x){ S.tx[x.k] = {en:x.en || '', ar:x.ar || ''}; }); S.pagesX = (r[5] && r[5].pages) || {};
-    S.cols = Object.assign({over:{}, added:[], order:[]}, r[6] || {}); S.labels = (r[7] && r[7].labels) || {}; S.cats = Object.assign({over:{}, added:[], order:[]}, r[8] || {}); S.mediaDoc = r[9] || {list:[]}; S.dirty = {};
+    S.cols = Object.assign({over:{}, added:[], order:[]}, r[6] || {}); S.labels = (r[7] && r[7].labels) || {}; S.cats = Object.assign({over:{}, added:[], order:[]}, r[8] || {}); S.mediaDoc = r[9] || {list:[]}; S.tryon = r[10] || clone(TRYON); S.tryD = null; S.dirty = {};
     S.loaded = true; render();
   }).catch(function(e){ console.error(e); $('main').innerHTML = '<div class="empty">Could not load the data: ' + esc(e.message || e) + '<br><br>If this says "permission", the database rules for the control room have not been published yet.</div>'; });
 }
@@ -103,7 +103,7 @@ function loadAll(){
 /* ================= render ================= */
 function render(){
   var newOrders = S.orders.filter(function(o){ return !o.status; }).length;
-  var V = {media:viewMedia, delivery:viewDelivery, cats:viewCats, home:viewDash, products:viewProducts, orders:viewOrders, one:viewOne, collections:viewCols, hero:viewHero, sections:viewSections, bar:viewBar, theme:viewTheme, texts:viewTexts, pages:viewPages, subs:viewSubs};
+  var V = {tryon:viewTryon, media:viewMedia, delivery:viewDelivery, cats:viewCats, home:viewDash, products:viewProducts, orders:viewOrders, one:viewOne, collections:viewCols, hero:viewHero, sections:viewSections, bar:viewBar, theme:viewTheme, texts:viewTexts, pages:viewPages, subs:viewSubs};
   if(!V[S.tab]) S.tab = 'home';
   $('tabs').innerHTML = S.tab === 'home' ? '' : '<div class="crumbs"><button type="button" data-tab="home"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg>' + esc(lbl('home')) + '</button><span>/</span><b>' + esc(lbl(S.tab)) + '</b></div>' +
     '<div class="quick">' + TILE_ORDER.map(function(k){ return k === 'add' ? '' : '<button type="button" data-tab="' + k + '" aria-current="' + (S.tab === k) + '" title="' + esc(lbl(k)) + '">' + ICONS[k] + (k === 'orders' && newOrders ? '<i>' + newOrders + '</i>' : '') + '</button>'; }).join('') + '</div>';
@@ -473,9 +473,10 @@ var LBL = {home:'Control room', g_shop:'Shop', g_home:'Home page', g_design:'Des
   d_products:'Sold out, new arrivals, labels, prices', d_add:'Put a new piece in the shop', d_one:'One-of-a-kind pieces and claims', d_collections:'Names, stories, cover photos, add new',
   d_hero:'The big slideshow at the top', d_sections:'Order, show or hide, texts and media', d_bar:'The thin bar above the header',
   d_theme:'Design style, ready themes or your own colours', d_texts:'Every word on the site, English and Arabic', d_pages:'Shipping, refunds, privacy, terms',
+  tryon:'Live try-on', d_tryon:'Camera try-on and Snapchat, beta',
   d_orders:'New orders and their status', d_subs:'Newsletter emails'};
-var GROUPS = [['g_shop', ['products', 'add', 'one', 'collections', 'cats', 'delivery']], ['g_home', ['hero', 'sections', 'bar']], ['g_design', ['media', 'theme', 'texts', 'pages']], ['g_customers', ['orders', 'subs']]];
-var TILE_ORDER = ['products', 'add', 'one', 'collections', 'cats', 'delivery', 'hero', 'sections', 'bar', 'media', 'theme', 'texts', 'pages', 'orders', 'subs'];
+var GROUPS = [['g_shop', ['products', 'add', 'one', 'collections', 'cats', 'delivery', 'tryon']], ['g_home', ['hero', 'sections', 'bar']], ['g_design', ['media', 'theme', 'texts', 'pages']], ['g_customers', ['orders', 'subs']]];
+var TILE_ORDER = ['products', 'add', 'one', 'collections', 'cats', 'delivery', 'tryon', 'hero', 'sections', 'bar', 'media', 'theme', 'texts', 'pages', 'orders', 'subs'];
 function ic(d){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; }
 var ICONS = {
   products:ic('<path d="M8 3h8l1 4-3 2v12H10V9L7 7z"/>'), add:ic('<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>'), one:ic('<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>'),
@@ -485,6 +486,7 @@ var ICONS = {
   hero:ic('<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/>'), sections:ic('<rect x="3" y="3" width="18" height="5" rx="1"/><rect x="3" y="10" width="18" height="5" rx="1"/><rect x="3" y="17" width="18" height="4" rx="1"/>'),
   bar:ic('<path d="M3 10v4h3l6 4V6L6 10z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/>'), theme:ic('<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>'),
   texts:ic('<path d="M4 7V5h12v2M10 5v14M7 19h6M14 12h6M17 12v7M15.5 19h3"/>'), pages:ic('<path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h8M9 17h8M9 9h3"/>'),
+  tryon:ic('<path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="9" r="2.5"/><path d="M8 18c.6-3 2-4.5 4-4.5s3.4 1.5 4 4.5"/>'),
   orders:ic('<path d="M4 7h16l-1.5 13h-13z"/><path d="M8 7a4 4 0 0 1 8 0"/>'), subs:ic('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>')};
 function lbl(k){ return S.labels[k] || LBL[k] || k; }
 function viewDash(){
@@ -507,7 +509,7 @@ function viewDash(){
 function greet(){ var h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; }
 
 /* unsaved changes guard */
-function dirtyBlock(){ var d = Object.keys(S.dirty).filter(function(k){ return S.dirty[k]; }); if(!d.length && !S.heroDirty) return false; if(confirm('You have unsaved changes. Leave without saving?')){ S.dirty = {}; S.heroDirty = false; S.hero = clone(S.site.slides && S.site.slides.length ? S.site.slides : SLIDES); return false; } return true; }
+function dirtyBlock(){ var d = Object.keys(S.dirty).filter(function(k){ return S.dirty[k]; }); if(!d.length && !S.heroDirty) return false; if(confirm('You have unsaved changes. Leave without saving?')){ S.dirty = {};  S.tryD = null; S.heroDirty = false; S.hero = clone(S.site.slides && S.site.slides.length ? S.site.slides : SLIDES); return false; } return true; }
 function markDirty(k){ if(!S.dirty[k]){ S.dirty[k] = true; [].forEach.call(document.querySelectorAll('[data-save="' + k + '"]'), function(b){ b.disabled = false; }); var c = document.querySelector('.head .unsaved'); if(c) c.hidden = false; } }
 function saveBtn(k, label){ return '<span class="chip red unsaved"' + (S.dirty[k] ? '' : ' hidden') + '>Unsaved changes</span><button class="btn" type="button" data-save="' + k + '"' + (S.dirty[k] ? '' : ' disabled') + '>' + (label || 'Save and publish') + '</button>'; }
 window.addEventListener('beforeunload', function(e){ if(Object.keys(S.dirty).some(function(k){ return S.dirty[k]; }) || S.heroDirty){ e.preventDefault(); e.returnValue = ''; } });
@@ -879,6 +881,90 @@ document.addEventListener('submit', function(e){
     return DBX.set('settings', 'site', {media:{cloud:cloud, preset:preset}, updated:Date.now()}, true);
   }).then(function(){ S.site.media = {cloud:cloud, preset:preset}; render(); toast('Uploads are connected.'); }).catch(function(e2){ toast('Could not connect: ' + (e2.message || e2), true); });
 });
+
+
+/* ================= live try-on (beta) ================= */
+function tryDraft(){ if(!S.tryD) S.tryD = clone(S.tryon || TRYON); S.tryD.items = S.tryD.items || {}; return S.tryD; }
+function tryLib(){ return window.NMHTry ? Promise.resolve() : new Promise(function(res, rej){ var s = document.createElement('script'); s.src = '/js/tryon.js?v=1'; s.onload = res; s.onerror = function(){ rej(new Error('Could not load the try-on module.')); }; document.head.appendChild(s); }); }
+function viewTryon(){
+  var d = tryDraft(), codes = Object.keys(d.items), prods = merged().filter(function(p){ return !p.removed && !p.one; });
+  var pname = function(code){ var p = byCode(code); return p ? t(p.name) : code; };
+  var mode = function(v, title, text){ return '<label class="tmode"><input type="radio" name="tryMode" value="' + v + '"' + (d.mode === v ? ' checked' : '') + '><span><b>' + title + '</b><small class="muted">' + text + '</small></span></label>'; };
+  var link = 'https://www.bynmh.ae/?try=1' + (codes[0] ? '#p-' + codes[0] : '');
+  $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('tryon')) + ' <span class="chip dark">Beta</span></h2>' + saveBtn('tryon') + '</div>' +
+    '<div class="card" style="max-width:860px"><h4>Who can see it</h4>' +
+      mode('off', 'Off', 'Hidden everywhere.') +
+      mode('preview', 'Preview only', 'Only people who open the private link below. Customers do not see it.') +
+      mode('on', 'On for everyone', 'Every customer sees the buttons on the products switched on below.') +
+      '<div class="f"><span>Private preview link</span><div class="tlink"><input class="in" readonly value="' + esc(link) + '" id="tryLink"><button class="btn ghost sm" type="button" data-trycopy>Copy</button></div><small class="muted">Opening this link once turns the preview on in that browser. To turn it off there, open the site with ?try=0.</small></div></div>' +
+    '<div class="card" style="max-width:860px"><h4>Products</h4><p class="muted" style="margin:0">Live camera runs only on the customer\'s phone: nothing is uploaded or saved. Snapchat: paste the link of your Snapchat lens for this piece once it is published.</p>' +
+      (codes.length ? codes.map(function(code){ var it = d.items[code];
+        return '<div class="trow" data-tc="' + esc(code) + '"><div class="tcut"><img src="' + esc(it.img) + '" alt=""></div><div class="tmain"><b>' + esc(pname(code)) + '</b> <span class="muted">' + esc(code) + '</span>' +
+          '<label class="sw"><input type="checkbox" data-tk="live"' + (it.live ? ' checked' : '') + '>Live camera</label>' +
+          '<label class="f"><span>Snapchat lens link</span><input class="in" data-tk="snap" placeholder="https://www.snapchat.com/lens/…" value="' + esc(it.snap || '') + '"></label></div>' +
+          '<div class="tact"><button class="btn ghost sm" type="button" data-trytest>Test</button><button class="btn ghost sm" type="button" data-tryrm>Remove</button></div></div>';
+      }).join('') : '<p class="muted">No products yet.</p>') + '</div>' +
+    '<div class="card" style="max-width:860px"><h4>Add to another product</h4><p class="muted" style="margin:0">Choose the product, then a straight front photo where the whole piece is visible. The cut-out is made automatically in this browser; check it before saving. For the cleanest result, ask Claude to prepare the cut-out.</p>' +
+      '<label class="f"><span>Product</span><select class="in" id="tryAddP"><option value="">Choose a product</option>' + prods.filter(function(p){ return codes.indexOf(p.code) < 0; }).map(function(p){ return '<option value="' + esc(p.code) + '">' + esc(t(p.name)) + ' (' + esc(p.code) + ')</option>'; }).join('') + '</select></label>' +
+      '<div id="tryAddPh" class="tphotos"></div><div id="tryAddOut"></div></div>';
+}
+function tryDirty(){ markDirty('tryon'); }
+function tryRun(code){ var it = tryDraft().items[code], p = byCode(code); tryLib().then(function(){ window.NMHTry.open({L:'en', name:p ? t(p.name) : code, img:it.img, a:it.a}); }).catch(function(e){ toast(e.message, true); }); }
+function tryPrepare(code, src){
+  var out = $('tryAddOut'); out.innerHTML = '<p class="muted">Preparing the cut-out…</p>';
+  tryLib().then(function(){ return window.NMHTry.fromPhoto(src); }).then(function(r){
+    S.tryNew = {code:code, r:r};
+    out.innerHTML = '<div class="tprev"><div class="tchk"></div><div><p style="margin:0 0 10px">Check the cut-out: it should show only the piece, with no face, background or floor. Hands may remain.</p><button class="btn" type="button" data-tryuse>Use this cut-out</button> <button class="btn ghost" type="button" data-trycancel>Cancel</button></div></div>';
+    out.querySelector('.tchk').appendChild(r.canvas);
+  }).catch(function(e){ out.innerHTML = '<p class="msg err">' + esc(e.message || e) + '</p>'; });
+}
+function cloudUploadBlob(blob, name){
+  var cfg = mediaCfg();
+  if(!cfg) return Promise.reject(new Error('Uploads are not connected yet. Open Media library to connect them.'));
+  return new Promise(function(res, rej){
+    var fd = new FormData(); fd.append('file', blob, name); fd.append('upload_preset', cfg.preset); fd.append('folder', 'nmh/tryon');
+    var x = new XMLHttpRequest(); x.open('POST', 'https://api.cloudinary.com/v1_1/' + encodeURIComponent(cfg.cloud) + '/image/upload');
+    x.onload = function(){ var j = {}; try{ j = JSON.parse(x.responseText); }catch(e){} if(!j.secure_url) return rej(new Error(j.error && j.error.message || 'upload failed')); res(j.secure_url.replace('/upload/', '/upload/f_auto,q_auto,h_1100,c_limit/')); };
+    x.onerror = function(){ rej(new Error('network error')); }; x.send(fd);
+  });
+}
+function tryUse(){
+  var n = S.tryNew; if(!n) return;
+  var c = n.r.canvas, s = Math.min(1, 1100 / c.height), o = document.createElement('canvas'); o.width = Math.round(c.width * s); o.height = Math.round(c.height * s); o.getContext('2d').drawImage(c, 0, 0, o.width, o.height);
+  $('tryAddOut').innerHTML = '<p class="muted">Uploading…</p>';
+  o.toBlob(function(blob){
+    cloudUploadBlob(blob, n.code + '-tryon.png').then(function(url){
+      tryDraft().items[n.code] = {live:true, snap:'', img:url, a:n.r.a}; S.tryNew = null; tryDirty(); render(); toast('Added. Press "Save and publish" to put it live.');
+    }).catch(function(e){ $('tryAddOut').innerHTML = '<p class="msg err">' + esc(e.message) + '</p>'; });
+  }, 'image/png');
+}
+function saveTryon(){
+  var d = clone(tryDraft()); d.updated = Date.now();
+  return DBX.set('settings', 'tryon', d).then(function(){ S.tryon = d; S.dirty.tryon = false; toast('Saved and published.'); render(); }).catch(function(e){ toast('Could not save: ' + (e.message || e), true); });
+}
+document.addEventListener('click', function(e){
+  if(S.tab !== 'tryon') return;
+  var b = e.target.closest('button, [data-tph]'); if(!b) return;
+  var row = b.closest('[data-tc]'), code = row && row.getAttribute('data-tc');
+  if(b.hasAttribute('data-trytest')) return tryRun(code);
+  if(b.hasAttribute('data-tryrm')){ confirmBox('Remove try-on from this product?', 'The cut-out stays in your media; you can add the product again later.', function(){ delete tryDraft().items[code]; tryDirty(); render(); }); return; }
+  if(b.hasAttribute('data-trycopy')){ var i = $('tryLink'); i.select(); try{ navigator.clipboard.writeText(i.value); }catch(err){ document.execCommand('copy'); } toast('Link copied.'); return; }
+  if(b.hasAttribute('data-tph')) return tryPrepare($('tryAddP').value, b.getAttribute('data-tph'));
+  if(b.hasAttribute('data-tryuse')) return tryUse();
+  if(b.hasAttribute('data-trycancel')){ S.tryNew = null; $('tryAddOut').innerHTML = ''; return; }
+  if(b.getAttribute('data-save') === 'tryon') return saveTryon();
+});
+document.addEventListener('change', function(e){
+  if(S.tab !== 'tryon') return;
+  var el = e.target;
+  if(el.name === 'tryMode'){ tryDraft().mode = el.value; tryDirty(); return; }
+  if(el.id === 'tryAddP'){ var p = byCode(el.value), box = $('tryAddPh'); $('tryAddOut').innerHTML = ''; box.innerHTML = p ? '<p class="muted" style="margin:0 0 8px">Choose the front photo:</p>' + (p.imgs || []).map(function(src){ return '<button type="button" data-tph="' + esc(src) + '"><img src="' + esc(src) + '" alt=""></button>'; }).join('') : ''; return; }
+  var row = el.closest('[data-tc]'); if(!row) return;
+  var it = tryDraft().items[row.getAttribute('data-tc')], k = el.getAttribute('data-tk');
+  if(k === 'live'){ it.live = el.checked; tryDirty(); }
+  if(k === 'snap'){ var v = el.value.trim(); if(v && !/^https:\/\/(www\.)?snapchat\.com\//.test(v)){ toast('Paste a link that starts with https://www.snapchat.com/', true); el.value = it.snap || ''; return; } it.snap = v; tryDirty(); }
+});
+
 
 boot();
 })();

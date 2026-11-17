@@ -23,6 +23,11 @@ var COLLECTIONS = [];
 var PRODUCTS = [];
 
 var ONE = [];
+/* Live try-on (beta). mode: 'off' | 'preview' (only with the private link ?try=1) | 'on'. The control room overrides this from settings/tryon. */
+var TRYON = {mode:'preview', items:{
+  E01:{live:true, snap:'', img:'img/tryon/E01.webp', a:{s:[0.5641,0.0746], h:[0.5843,0.4057], k:[0.5584,0.9064], sw:0.3913}},
+  E02:{live:true, snap:'', img:'img/tryon/E02.webp', a:{s:[0.651,0.0692], h:[0.6159,0.4205], k:[0.7134,0.9188], sw:0.3594}}
+}};
 COLLECTIONS.unshift({id:'the-one', season:{en:'Signature · One of one',ar:'توقيع الدار · قطعة واحدة'}, cover:'img/bloom-3.jpg', small:'img/desert-4.jpg', tone:'#1C1B1B',
   name:{en:'The One',ar:'القطعة الواحدة'},
   story:{en:'One piece. Made once. Never again. Each dress in this line exists as a single piece; when it finds its owner, it is gone for good.',ar:'قطعة واحدة. تُصنع مرة واحدة. ولا تتكرر. كل فستان في هذا الخط قطعة فريدة، وحين يجد صاحبته يختفي إلى الأبد.'}});
