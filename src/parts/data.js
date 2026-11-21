@@ -24,7 +24,7 @@ var PRODUCTS = [];
 
 var ONE = [];
 /* Live try-on (beta). mode: 'off' | 'preview' (only with the private link ?try=1) | 'on'. The control room overrides this from settings/tryon. */
-var TRYON = {mode:'preview', items:{
+var TRYON = {mode:'off', items:{
   E01:{live:true, snap:'', img:'img/tryon/E01.webp', a:{s:[0.5641,0.0746], h:[0.5843,0.4057], k:[0.5584,0.9064], sw:0.3913}},
   E02:{live:true, snap:'', img:'img/tryon/E02.webp', a:{s:[0.651,0.0692], h:[0.6159,0.4205], k:[0.7134,0.9188], sw:0.3594}}
 }};

@@ -201,8 +201,8 @@ function viewBar(){
   var a = S.site.ann || {};
   $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('bar')) + '</h2></div>' +
     '<form class="card" id="siteForm" style="max-width:760px"><h4>Announcement bar</h4><p class="muted" style="margin:0">The thin black bar at the very top of every page. Leave empty to use the default text.</p>' +
-      '<label class="f"><span>English</span><input class="in" name="annEn" value="' + esc(a.en || '') + '" placeholder="Every piece made to order in Dubai · Delivery across the UAE and the GCC"></label>' +
-      '<label class="f"><span>Arabic</span><input class="in" name="annAr" dir="rtl" value="' + esc(a.ar || '') + '" placeholder="كل قطعة تُفصَّل حسب الطلب في دبي · التوصيل إلى الإمارات ودول الخليج"></label>' +
+      '<label class="f"><span>English</span><input class="in" name="annEn" value="' + esc(a.en || '') + '" placeholder="Every piece made to order in Dubai · Delivery across the UAE"></label>' +
+      '<label class="f"><span>Arabic</span><input class="in" name="annAr" dir="rtl" value="' + esc(a.ar || '') + '" placeholder="كل قطعة تُفصَّل حسب الطلب في دبي · التوصيل إلى جميع أنحاء الإمارات"></label>' +
       '<label class="sw"><input type="checkbox" name="annOff"' + (S.site.annOff ? ' checked' : '') + '>Hide the announcement bar</label>' +
       '<div><button class="btn" type="submit">Save</button></div></form>';
 }
@@ -475,8 +475,8 @@ var LBL = {home:'Control room', g_shop:'Shop', g_home:'Home page', g_design:'Des
   d_theme:'Design style, ready themes or your own colours', d_texts:'Every word on the site, English and Arabic', d_pages:'Shipping, refunds, privacy, terms',
   tryon:'Live try-on', d_tryon:'Camera try-on and Snapchat, beta',
   d_orders:'New orders and their status', d_subs:'Newsletter emails'};
-var GROUPS = [['g_shop', ['products', 'add', 'one', 'collections', 'cats', 'delivery', 'tryon']], ['g_home', ['hero', 'sections', 'bar']], ['g_design', ['media', 'theme', 'texts', 'pages']], ['g_customers', ['orders', 'subs']]];
-var TILE_ORDER = ['products', 'add', 'one', 'collections', 'cats', 'delivery', 'tryon', 'hero', 'sections', 'bar', 'media', 'theme', 'texts', 'pages', 'orders', 'subs'];
+var GROUPS = [['g_shop', ['products', 'add', 'one', 'collections', 'cats', 'delivery']], ['g_home', ['hero', 'sections', 'bar']], ['g_design', ['media', 'theme', 'texts', 'pages']], ['g_customers', ['orders', 'subs']]];
+var TILE_ORDER = ['products', 'add', 'one', 'collections', 'cats', 'delivery', 'hero', 'sections', 'bar', 'media', 'theme', 'texts', 'pages', 'orders', 'subs'];
 function ic(d){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; }
 var ICONS = {
   products:ic('<path d="M8 3h8l1 4-3 2v12H10V9L7 7z"/>'), add:ic('<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>'), one:ic('<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>'),
@@ -730,11 +730,11 @@ function viewDelivery(){
   var d = Object.assign({ae:25, gcc:60, intl:95, express:40, offer:false, min:0, zones:'ae'}, S.site.delivery || {});
   var nf = function(n, l, v, hint){ return '<label class="f"><span>' + l + '</span><input class="in" type="number" min="0" step="1" name="' + n + '" value="' + esc(v) + '">' + (hint ? '<small>' + hint + '</small>' : '') + '</label>'; };
   $('main').innerHTML = '<div class="head"><h2>' + esc(lbl('delivery')) + '</h2></div>' +
-    '<form class="card" id="dlvForm" style="max-width:820px"><h4>Delivery prices (AED)</h4><div class="g2">' + nf('ae', 'Inside the UAE', d.ae) + nf('gcc', 'GCC countries', d.gcc) + nf('intl', 'Rest of the world', d.intl) + nf('express', 'Extra for express delivery', d.express) + '</div>' +
+    '<form class="card" id="dlvForm" style="max-width:820px"><h4>Delivery prices (AED)</h4><div class="g2">' + nf('ae', 'Inside the UAE', d.ae) + '<div hidden>' + nf('gcc', 'GCC countries', d.gcc) + nf('intl', 'Rest of the world', d.intl) + '</div>' + nf('express', 'Extra for express delivery', d.express) + '</div>' +
     '<h4 style="margin-top:8px">Free delivery offer</h4><p class="muted" style="margin:0">Delivery is always charged. Switch this on only while you run an offer, then switch it off when the offer ends.</p>' +
     '<label class="sw green"><input type="checkbox" name="offer"' + (d.offer ? ' checked' : '') + '>' + (d.offer ? 'Offer is ON: free delivery now' : 'Offer is off') + '</label>' +
     '<div class="g2">' + nf('min', 'Only for orders above (AED)', d.min, '0 = free delivery on every order during the offer') +
-    '<label class="f"><span>Where</span><select class="sel" name="zones"><option value="ae"' + (d.zones === 'ae' ? ' selected' : '') + '>UAE only</option><option value="gcc"' + (d.zones === 'gcc' ? ' selected' : '') + '>UAE and GCC</option><option value="all"' + (d.zones === 'all' ? ' selected' : '') + '>Everywhere</option></select></label></div>' +
+    '<label class="f" hidden><span>Where</span><select class="sel" name="zones"><option value="ae"' + (d.zones === 'ae' ? ' selected' : '') + '>UAE only</option><option value="gcc"' + (d.zones === 'gcc' ? ' selected' : '') + '>UAE and GCC</option><option value="all"' + (d.zones === 'all' ? ' selected' : '') + '>Everywhere</option></select></label></div>' +
     '<label class="sw"><input type="checkbox" name="toBar">Also put the offer in the announcement bar</label>' +
     '<div class="g2" id="barTxt" hidden><label class="f"><span>Bar text, English</span><input class="in" name="barEn" placeholder="Free delivery this week on every order"></label><label class="f"><span>Bar text, Arabic</span><input class="in" dir="rtl" name="barAr" placeholder="توصيل مجاني هذا الأسبوع على جميع الطلبات"></label></div>' +
     '<div><button class="btn" type="submit">Save and publish</button></div></form>';
