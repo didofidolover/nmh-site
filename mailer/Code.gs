@@ -8,7 +8,7 @@
 var CFG = {
   project: 'nmh-dubai',
   site: 'https://www.bynmh.ae',
-  brandTo: 'wedoogfx@gmail.com',          // who gets the new-order alert
+  brandTo: 'hello@bynmh.ae',              // who gets the new-order alert (brand mailbox)
   replyTo: 'hello@bynmh.ae',              // where customers' replies go (Zoho mailbox)
   fromName: 'NMH Dubai',
   from: 'orders@bynmh.ae',                 // used when a Resend API key is saved (Project settings > Script properties > RESEND_API_KEY)
