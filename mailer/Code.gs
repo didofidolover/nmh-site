@@ -11,6 +11,7 @@ var CFG = {
   brandTo: 'wedoogfx@gmail.com',          // who gets the new-order alert
   replyTo: 'wedoogfx@gmail.com',          // where customers' replies go
   fromName: 'NMH Dubai',
+  from: 'orders@bynmh.ae',                 // used when a Resend API key is saved (Project settings > Script properties > RESEND_API_KEY)
   instagram: 'https://www.instagram.com/_bynmh/'
 };
 
@@ -35,16 +36,32 @@ function doPost(e){
 function doGet(){ return out({ok:true, service:'NMH order emails'}); }
 function out(obj){ return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON); }
 
+/* Sends through Resend (from orders@bynmh.ae) when RESEND_API_KEY is set in Script properties;
+   otherwise falls back to the Google account's own mail, as before. */
+function sendMail(m){
+  var key = PropertiesService.getScriptProperties().getProperty('RESEND_API_KEY');
+  if(key){
+    var res = UrlFetchApp.fetch('https://api.resend.com/emails', {
+      method:'post', contentType:'application/json', muteHttpExceptions:true,
+      headers:{Authorization:'Bearer ' + key},
+      payload:JSON.stringify({from:(m.name || CFG.fromName) + ' <' + CFG.from + '>', to:[m.to], subject:m.subject, html:m.htmlBody, reply_to:m.replyTo || CFG.replyTo})
+    });
+    if(res.getResponseCode() < 300) return;
+    console.warn('Resend failed ' + res.getResponseCode() + ': ' + res.getContentText().slice(0, 300) + ' — falling back to Gmail');
+  }
+  MailApp.sendEmail(m);
+}
+
 function sendOrderEmails(o){
   var ar = o.lang === 'ar';
-  MailApp.sendEmail({
+  sendMail({
     to: o.contact.email,
     subject: ar ? 'استلمنا طلبك' + o.id + ' | NMH Dubai' : 'We received your order ' + o.id + ' | NMH Dubai',
     htmlBody: customerHtml(o),
     name: CFG.fromName,
     replyTo: CFG.replyTo
   });
-  MailApp.sendEmail({
+  sendMail({
     to: CFG.brandTo,
     subject: 'New order ' + o.id + ' · ' + o.contact.name + ' · ' + o.total + ' AED',
     htmlBody: brandHtml(o),
@@ -164,8 +181,8 @@ function sendTestToBrand(){
     address:{country:'AE', region:'Dubai', city:'Jumeirah', line:'Building 4, Al Wasl Road', apt:'Apt 12'},
     items:[{code:'S02', name:'Olive Drape Gown', name_ar:'فستان أوليف درايب', img:'img/front-olive.webp', tone:'#E2E0D4', hex:'#24304F', variant:'Midnight / Medium / 58″', qty:1, price:590},
            {code:'B01', name:'Layla Pleated Maxi', name_ar:'فستان ليلى المكسّر', img:'img/bloom-1.jpg', variant:'As shown / Small / 56″', qty:1, price:520}]};
-  MailApp.sendEmail({to:CFG.brandTo, subject:'[Test] Customer email preview', htmlBody:customerHtml(o), name:CFG.fromName});
+  sendMail({to:CFG.brandTo, subject:'[Test] Customer email preview', htmlBody:customerHtml(o), name:CFG.fromName});
   o.lang = 'ar';
-  MailApp.sendEmail({to:CFG.brandTo, subject:'[Test] Customer email preview (Arabic)', htmlBody:customerHtml(o), name:CFG.fromName});
-  MailApp.sendEmail({to:CFG.brandTo, subject:'[Test] New order alert preview', htmlBody:brandHtml(o), name:'NMH website'});
+  sendMail({to:CFG.brandTo, subject:'[Test] Customer email preview (Arabic)', htmlBody:customerHtml(o), name:CFG.fromName});
+  sendMail({to:CFG.brandTo, subject:'[Test] New order alert preview', htmlBody:brandHtml(o), name:'NMH website'});
 }
