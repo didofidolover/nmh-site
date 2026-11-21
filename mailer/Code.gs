@@ -135,12 +135,6 @@ function customerHtml(o){
     '<tr><td style="padding:28px 40px 8px;text-align:center"><div style="' + cap + '">' + T('Order ', 'طلب ') + '<span dir="ltr">' + esc(o.id) + '</span></div>' +
       '<h1 style="margin:14px 0 0;font-family:' + font + ';font-weight:500;font-size:22px;line-height:1.4;letter-spacing:' + (ar ? '0' : '4px') + ';text-transform:' + (ar ? 'none' : 'uppercase') + ';color:#1C1B1B">' + esc(T('Thank you, ', 'شكرًا لكِ،') + first) + '</h1>' +
       '<p style="margin:16px auto 0;max-width:440px;font-family:' + body + ';font-size:15px;line-height:1.7;color:#333333">' + T('We have received your order request. Nothing has been charged yet.', 'استلمنا طلبك. لم يُخصم أي مبلغ حتى الآن.') + '</p></td></tr>' +
-    '<tr><td style="padding:28px 40px 4px"><div style="border-top:1px solid #E6E6E6;padding-top:26px;' + cap + 'color:#1C1B1B;text-align:' + al + '">' + T('What happens next', 'الخطوات التالية') + '</div></td></tr>' +
-    '<tr><td style="padding:16px 40px 8px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">' +
-      step(1, T('We confirm with you', 'نؤكد معك'), T('Within one working day we message you on WhatsApp at ', 'خلال يوم عمل نتواصل معك عبر واتساب على الرقم') + '<span dir="ltr">' + esc(o.contact.phone) + '</span>' + T(' to confirm the fabric and fit.', ' لتأكيد القماش والمقاس.')) +
-      step(2, T('You see the real fabric', 'تشاهدين القماش الفعلي'), T('We send a photo of the fabric before anything is cut.', 'نرسل لكِ صورة القماش قبل أي تفصيل.')) +
-      step(3, T('Cut in Dubai, then delivered', 'التفصيل في دبي والتوصيل'), o.pay === 'cod' ? T('You pay in cash or by card when your piece arrives.', 'تدفعين نقدًا أو بالبطاقة عند استلام القطعة.') : T('Once you approve, we send a secure card payment link, then start cutting.', 'بعد موافقتك نرسل لكِ رابط دفع آمنًا، ثم نبدأ التفصيل.')) +
-    '</table></td></tr>' +
     '<tr><td style="padding:12px 40px 0"><div style="border-top:1px solid #E6E6E6;padding-top:26px;' + cap + 'color:#1C1B1B;text-align:' + al + '">' + T('Your order', 'طلبك') + '</div></td></tr>' +
     '<tr><td style="padding:4px 40px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">' + items + '</table></td></tr>' +
     '<tr><td style="padding:16px 40px 8px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">' +
