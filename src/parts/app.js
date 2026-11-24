@@ -269,19 +269,21 @@ function sizeName(z){ var s = find(SIZES, z); return s ? (z === 'custom' ? tr('C
 function variant(it){ return [it.hex ? shadeName(it) : '', sizeName(it.size), it.len ? (it.len === 'unsure' ? tr('Length to confirm', 'سيتم تأكيد الطول معك') : it.len + '″') : ''].filter(Boolean).join(' / '); }
 
 /* ================= cards and grids ================= */
+function smSrc(src){ var k = String(src || '').replace(/\.(jpe?g|png|webp)$/i, ''); return (typeof SMALL === 'object' && SMALL[k]) ? 'img/sm/' + k.slice(4) + '.webp' : ''; }
+function srcset(src){ var sm = smSrc(src); return sm ? ' srcset="' + sm + ' 700w, ' + src + ' 1400w" sizes="(max-width:700px) 50vw, 25vw"' : ''; }
 function card(p, i){
   var a = p.imgs[0], b = p.imgs[1], sold = isSold(p);
   var lcls = sold ? ' out' : (p.labels && p.labels.length) ? '' : p.isNew ? ' new' : p.one ? ' one' : '';
   var lbl = sold ? soldText(p) : (p.labels && p.labels.length) ? t(p.labels[0]) : p.isNew ? tr('New', 'جديد') : p.one ? tr('1 of 1', 'قطعة واحدة') : '';
   return '<a class="card' + (sold ? ' sold' : '') + '" href="#p-' + p.code + '" data-rv style="--d:' + (i % 4) + '">' +
     '<div class="ph" style="--tone:' + (p.tone || '') + '">' + (lbl ? '<span class="lbl' + lcls + '">' + lbl + '</span>' : '') +
-    '<img class="a' + (b ? ' has-b' : '') + (isCut(a) ? ' cut' : '') + '" src="' + a + '" alt="' + esc(t(p.name)) + '" loading="lazy">' +
-    (b ? '<img class="b' + (isCut(b) ? ' cut' : '') + '" src="' + b + '" alt="" loading="lazy">' : '') + '</div>' +
+    '<img class="a' + (b ? ' has-b' : '') + (isCut(a) ? ' cut' : '') + '" src="' + a + '"' + srcset(a) + ' alt="' + esc(t(p.name)) + '" loading="lazy">' +
+    (b ? '<img class="b' + (isCut(b) ? ' cut' : '') + '" src="' + b + '"' + srcset(b) + ' alt="' + esc(t(p.name)) + tr(', second view', '، صورة ثانية') + '" loading="lazy">' : '') + '</div>' +
     '<span class="ttl">' + (p.one ? 'N° ' + p.no + ' · ' : '') + esc(t(p.name)) + '</span><span class="pr num">' + (sold ? soldText(p, true) : money(p.price)) + '</span></a>';
 }
 function oneTile(p, i){
   var sold = isSold(p);
-  return '<a class="ot' + (sold ? ' sold' : '') + '" href="#p-' + p.code + '" data-rv style="--d:' + i + '"><div class="ph" style="--tone:' + p.tone + '"><img src="' + p.imgs[0] + '" alt="' + esc(t(p.name)) + '" loading="lazy">' + (sold ? '<span class="sold-tag">' + soldText(p) + '</span>' : '') + '</div>' +
+  return '<a class="ot' + (sold ? ' sold' : '') + '" href="#p-' + p.code + '" data-rv style="--d:' + i + '"><div class="ph" style="--tone:' + p.tone + '"><img src="' + p.imgs[0] + '"' + srcset(p.imgs[0]) + ' alt="' + esc(t(p.name)) + '" loading="lazy">' + (sold ? '<span class="sold-tag">' + soldText(p) + '</span>' : '') + '</div>' +
     '<span class="ot-m"><span class="no num">N° ' + p.no + '</span><span>' + (sold ? soldText(p) : money(p.price)) + '</span></span><span class="ot-n">' + esc(t(p.name)) + '</span></a>';
 }
 function grid(list, cls){ return '<div class="grid' + (cls ? ' ' + cls : '') + '">' + list.map(card).join('') + '</div>'; }
@@ -325,7 +327,7 @@ function homeSections(fresh, feat){
       return '<section class="sec line"><div class="wrap">' +
       '<header class="sec-h" data-rv><p class="u-h7">' + tr('Shop by style', 'تسوّقي حسب الفئة') + '</p><h2 class="u-h2">' + tr('Find your piece', 'اكتشفي قطعتك') + '</h2><span class="dash"></span></header>' +
       '<div class="tiles n' + tiles.length + '">' + tiles.map(function(x, i){
-        return '<a class="tile" href="#s-' + esc(x.s) + '" data-rv style="--d:' + i + '"><img src="' + esc(x.img) + '" alt="" loading="lazy"><span><span class="link">' + esc(t(find(STYLES, x.s))) + '</span></span></a>';
+        return '<a class="tile" href="#s-' + esc(x.s) + '" data-rv style="--d:' + i + '"><img src="' + esc(x.img) + '" alt="' + esc(t(find(STYLES, x.s))) + '" loading="lazy"><span><span class="link">' + esc(t(find(STYLES, x.s))) + '</span></span></a>';
       }).join('') + '</div>' +
     '</div></section>'; },
     edit:function(){ var m = cfg.edit || {}, vid = m.type ? m.type === 'video' : true, v = m.v || 'video/abaya-edit.mp4', d = m.d || (vid ? 'video/abaya-edit.jpg' : 'img/c/c13-w.jpg');
@@ -356,7 +358,7 @@ function viewHome(){
       heroSlides().map(function(s, i, all){
         var media = s.type === 'video' && s.v
           ? '<div class="vbg" style="background-image:url(' + esc(s.d || '') + ')" aria-hidden="true"></div><video muted playsinline loop preload="' + (i ? 'none' : 'auto') + '" poster="' + esc(s.d || '') + '" style="object-position:' + esc(s.pos || '50% 50%') + '"' + (i || reduce ? '' : ' autoplay') + ' aria-hidden="true"><source src="' + esc(s.v) + '" type="video/mp4"></video>'
-          : '<picture><source media="(max-width:700px)" srcset="' + esc(s.m || s.d) + '"><img src="' + esc(s.d) + '" alt="" style="object-position:' + esc(s.pos || '50% 30%') + '"' + (i ? ' loading="lazy"' : ' fetchpriority="high"') + '></picture>';
+          : '<picture><source media="(max-width:700px)" srcset="' + esc(s.m || s.d) + '"><img src="' + esc(s.d) + '" alt="' + esc(t(s.big) || t(s.sub) || 'NMH Dubai') + '" style="object-position:' + esc(s.pos || '50% 30%') + '"' + (i ? ' loading="lazy"' : ' fetchpriority="high"') + '></picture>';
         return '<div class="slide' + (i ? '' : ' on') + (s.type === 'video' ? ' is-video' : '') + '" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + ' / ' + all.length + '"' + (i ? ' aria-hidden="true"' : '') + '>' + media +
           '<div class="slide-t">' + (t(s.sub) ? '<p class="u-h7">' + esc(t(s.sub)) + '</p>' : '') + (t(s.big) ? '<' + (i ? 'p' : 'h1') + ' class="big">' + esc(t(s.big)) + '</' + (i ? 'p' : 'h1') + '>' : '') + (t(s.cta) && s.href ? '<a class="btn light" href="' + esc(s.href) + '"' + (i ? ' tabindex="-1"' : '') + '>' + esc(t(s.cta)) + '</a>' : '') + '</div></div>';
       }).join('') +
@@ -438,8 +440,8 @@ function viewStyle(id){
   var info = STYLE_INFO[id] || STYLE_INFO.all, list = sortList(PRODUCTS.filter(function(p){ return id === 'new' ? p.isNew : !p.one && (id === 'all' || p.style === id); }), SORT);
   app.innerHTML =
     '<header class="ph-head wrap"><h1 class="u-h1">' + esc(t(info.title)) + '</h1><div class="rte"><p>' + esc(t(info.intro)) + '</p></div></header>' +
-    '<div class="bar"><div class="chips u-h7">' + STYLES.map(function(s){ return '<a href="#s-' + s.id + '"' + (s.id === id ? ' aria-current="page"' : '') + '>' + esc(t(s)) + '</a>'; }).join('') + '</div><div>' + sortSel('sortS', SORT) + '</div></div>' +
-    '<div class="wrap" style="padding-bottom:90px"><p class="u-h7 muted" style="margin:-16px 0 28px">' + count(list.length) + '</p>' + (list.length ? grid(list) : '<p class="center muted" style="padding:40px 0">' + tr('Nothing here yet. New pieces are announced on Instagram first.', 'لا توجد قطع هنا حاليًا. نعلن عن القطع الجديدة عبر إنستغرام أولًا.') + '</p>') + '</div>';
+    '<div class="bar"><div class="chips u-h7">' + stylesShown().map(function(s){ return '<a href="#s-' + s.id + '"' + (s.id === id ? ' aria-current="page"' : '') + '>' + esc(t(s)) + '</a>'; }).join('') + '</div><div>' + sortSel('sortS', SORT) + '</div></div>' +
+    '<div class="wrap" style="padding-bottom:90px"><p class="u-h7 muted" style="margin:-16px 0 28px">' + count(list.length) + '</p>' + (list.length ? grid(list) : '<p class="center muted" style="padding:40px 0">' + tr('New pieces are coming soon. ', 'قطع جديدة قريبًا. ') + '<a href="' + waLink(tr('Hello NMH, please tell me when new ', 'مرحبًا NMH، أخبروني عند وصول ') + esc(t(info.title)) + tr(' pieces arrive.', ' جديدة.')) + '" target="_blank" rel="noopener" style="text-decoration:underline">' + tr('Get notified on WhatsApp', 'أخبروني عبر واتساب') + '</a>' + '</p>') + '</div>';
 }
 
 /* ---------- product page ---------- */
@@ -458,7 +460,7 @@ function viewProduct(code){
         '<nav class="crumb u-h7" style="justify-content:flex-start" aria-label="' + tr('Breadcrumb', 'المسار') + '"><a href="#" data-home>' + tr('Home', 'الصفحة الرئيسية') + '</a><span>/</span><a href="#' + c.id + '">' + esc(t(c.name)) + '</a></nav>' +
         (one ? '<p class="one-badge"><span class="num">N° ' + p.no + '</span>' + (sold ? soldText(p, true) : tr('One of one', 'قطعة واحدة فقط')) + '</p>' : '') +
         ((p.labels && p.labels.length) || p.isNew ? '<p class="pp-lbls">' + (p.isNew ? '<span class="new">' + tr('New', 'جديد') + '</span>' : '') + (p.labels || []).map(function(l){ return '<span>' + esc(t(l)) + '</span>'; }).join('') + '</p>' : '') +
-        '<h1 class="u-h1">' + esc(t(p.name)) + '</h1><p class="pp-pr num">' + (sold ? soldText(p) : money(p.price)) + '</p><hr>' +
+        '<h1 class="u-h1">' + esc(t(p.name)) + '</h1><p class="pp-pr num">' + (sold ? soldText(p) : money(p.price)) + '</p>' + (sold ? '' : '<p class="pp-eta">' + tr('Made to order. Delivered in 7 to 10 working days.', 'يُفصَّل حسب الطلب. يصلكِ خلال ٧ إلى ١٠ أيام عمل.') + '</p>') + '<hr>' +
         '<div class="rte"><p>' + esc(t(p.desc)) + '</p>' + (one ? '<p>' + tr('This dress exists as a single piece. Once claimed, it is cut to your size and the design is never made again.', 'هذا الفستان قطعة فريدة. فور حجزه يُفصَّل وفق مقاسك، ولا يتكرر التصميم بعدها.') + '</p>' : '<p>' + tr('Collection: ', 'المجموعة:') + esc(t(c.name)) + '</p>') + '<p>' + (one ? tr('Made once in Dubai. Code ', 'يُصنع مرة واحدة في دبي. الرمز') : tr('Made to order in Dubai. Code ', 'يُفصَّل حسب الطلب في دبي. الرمز')) + p.code + '</p></div>' +
         '<button class="size-link" type="button" id="sizeChart"><svg viewBox="0 0 18 12" fill="none" stroke="currentColor"><rect x=".5" y=".5" width="17" height="11"/><path d="M4 1v4M7 1v6M10 1v4M13 1v6"/></svg>' + tr('Size chart', 'جدول المقاسات') + '</button>' +
         (sold ? '' : tryHTML(p.code)) +
@@ -469,15 +471,15 @@ function viewProduct(code){
             '<li><label class="pick" id="ppPickL" title="' + tr('Any colour', 'أي لون') + '"><span class="sr">' + tr('Pick any colour', 'اختاري أي لون') + '</span><input type="color" id="ppPick" value="#8a4a47"></label></li></ul>' +
             '<p class="dye-note">' + (p.dye ? tr('The photo changes to preview your colour. Before cutting we send you a photo of the real fabric.', 'تتغيّر الصورة لتعرض اللون. وقبل التفصيل نرسل لكِ صورة القماش الفعلي.') : tr('Made in the colour you choose. Before cutting we send you a photo of the real fabric.', 'يُفصَّل باللون الذي تختارينه. وقبل التفصيل نرسل لكِ صورة القماش الفعلي.')) + '</p></div>') +
           '<div class="opt"><label class="sr" for="ppSize">' + tr('Size', 'المقاس') + '</label><div class="sel"><select id="ppSize"><option value="">' + tr('Size', 'المقاس') + '</option>' + SIZES.map(function(s){ return '<option value="' + s.id + '">' + tr('Size: ', 'المقاس: ') + esc(t(s)) + '</option>'; }).join('') + '</select></div><p class="dye-note" id="ppSizeE" style="color:var(--err)" hidden>' + tr('Choose a size.', 'يرجى اختيار المقاس.') + '</p></div>' +
-          '<div class="opt"><p class="help">' + tr('Length of the piece, from shoulder to where you want it to end. Not your height.', 'طول القطعة من الكتف إلى حيث ترغبين أن تنتهي، وليس طولك.') + '</p><label class="sr" for="ppLen">' + tr('Length', 'الطول') + '</label><div class="sel"><select id="ppLen"><option value="">' + tr('Length', 'الطول') + '</option>' + LENGTHS.map(function(l){ return '<option value="' + l + '">' + tr('Length: ', 'الطول: ') + l + '″</option>'; }).join('') + '<option value="unsure">' + tr('Not sure? We will help', 'غير متأكدة؟ سنساعدك') + '</option></select></div><p class="dye-note" id="ppLenE" style="color:var(--err)" hidden>' + tr('Choose a length.', 'يرجى اختيار الطول.') + '</p></div>' +
+          '<div class="opt"><p class="help">' + tr('Length of the piece, from shoulder to where you want it to end. Not your height.', 'طول القطعة من الكتف إلى حيث ترغبين أن تنتهي، وليس طولك.') + '</p><label class="sr" for="ppLen">' + tr('Length', 'الطول') + '</label><div class="sel"><select id="ppLen"><option value="">' + tr('Length', 'الطول') + '</option>' + LENGTHS.map(function(l){ return '<option value="' + l + '">' + tr('Length: ', 'الطول: ') + l + '″</option>'; }).join('') + '<option value="unsure">' + tr('Not sure? We confirm it with you on WhatsApp', 'غير متأكدة؟ نؤكده معكِ عبر واتساب') + '</option></select></div><p class="dye-note" id="ppLenE" style="color:var(--err)" hidden>' + tr('Choose a length.', 'يرجى اختيار الطول.') + '</p></div>' +
           '<div class="buy"><div class="qty"' + (one ? ' hidden' : '') + ' role="group" aria-label="' + tr('Quantity', 'الكمية') + '"><button type="button" data-q="-1" aria-label="' + tr('Less', 'أقل') + '">−</button><output id="ppQty" class="num">1</output><button type="button" data-q="1" aria-label="' + tr('More', 'أكثر') + '">+</button></div>' +
             '<button class="btn full" type="submit" id="ppAdd"><span>' + (one && inCart(code) ? tr('In your cart', 'في الحقيبة') : one ? tr('Claim this piece', 'احجزي هذه القطعة') : tr('Add to cart', 'أضيفي إلى الحقيبة')) + '</span></button></div>' +
         '</form>') +
         '<div class="acc">' +
           (p.story && t(p.story) ? acc(tr('The story', 'القصة'), '<p>' + esc(t(p.story)) + '</p>', true) : '') +
           (one ? acc(tr('Why only one', 'لماذا قطعة واحدة'), '<p>' + tr('Some fabrics come in a single length and some designs deserve a single owner. Pieces in The One are made once; after that the pattern is retired and the dress is shown in our archive.', 'بعض الأقمشة تصلنا بقطعة واحدة فقط، وبعض التصاميم تستحق صاحبة واحدة. تُصنع قطع هذا الخط مرة واحدة، ثم يُغلق الباترون ويُعرض الفستان في الأرشيف.') + '</p>') : '') +
-          acc(tr('Fabric and care', 'القماش والعناية'), '<p>' + (p.fabric && t(p.fabric) ? esc(t(p.fabric)) : tr('[Fabric to confirm]. Dry clean or hand wash cold. Steam on low; do not tumble dry.', '[سيتم تأكيد نوع القماش]. تنظيف جاف أو غسيل يدوي بماء بارد. كيّ بالبخار على حرارة منخفضة، دون استخدام المجفف.')) + '</p>') +
-          acc(tr('Delivery and returns', 'التوصيل والاسترجاع'), '<p>' + tr('Each piece is cut after you order. We deliver across the UAE. Because pieces are made for you, they cannot be returned for a change of mind; see our refund policy before ordering.', 'تُفصَّل كل قطعة بعد طلبها. نوصّل داخل الإمارات. ولأن القطعة تُصنع لكِ خصيصًا، لا تُسترجع بسبب تغيير الرأي؛ يرجى مراجعة سياسة الاسترجاع قبل الطلب.') + ' <a href="#page-refund" style="text-decoration:underline">' + tr('Refund policy', 'سياسة الاسترجاع') + '</a></p>') +
+          acc(tr('Fabric and care', 'القماش والعناية'), '<p>' + (p.fabric && t(p.fabric) ? esc(t(p.fabric)) : tr('Crepe. Dry clean or hand wash cold. Steam on low; do not tumble dry.', 'كريب. تنظيف جاف أو غسيل يدوي بماء بارد. كيّ بالبخار على حرارة منخفضة، دون استخدام المجفف.')) + '</p>') +
+          acc(tr('Delivery and returns', 'التوصيل والاسترجاع'), '<p>' + tr('Each piece is cut after you order and delivered across the UAE within 7 to 10 working days. Because pieces are made for you, they cannot be returned for a change of mind; see our refund policy before ordering.', 'تُفصَّل كل قطعة بعد طلبها وتصلكِ داخل الإمارات خلال ٧ إلى ١٠ أيام عمل. ولأن القطعة تُصنع لكِ خصيصًا، لا تُسترجع بسبب تغيير الرأي؛ يرجى مراجعة سياسة الاسترجاع قبل الطلب.') + ' <a href="#page-refund" style="text-decoration:underline">' + tr('Refund policy', 'سياسة الاسترجاع') + '</a></p>') +
         '</div>' +
       '</div>' +
     '</div></div>' +
@@ -492,7 +494,7 @@ function ppDyed(p, i){ return !!(p.dye && ppHex() && i < 2); }
 function paintPP(first){
   var p = prod(PP.code), hex = ppHex(), media = '', th = '', dots = '';
   p.imgs.forEach(function(src, i){
-    var inner = ppDyed(p, i) ? dressHTML(p.dye, i, 'dyeP') : '<img' + (isCut(src) ? ' class="cut"' : '') + ' src="' + src + '" alt="' + (i ? '' : esc(t(p.name))) + '"' + (i ? ' loading="lazy"' : '') + '>';
+    var inner = ppDyed(p, i) ? dressHTML(p.dye, i, 'dyeP') : '<img' + (isCut(src) ? ' class="cut"' : '') + ' src="' + src + '" alt="' + esc(t(p.name)) + (i ? tr(', view ', '، صورة ') + (i + 1) : '') + '"' + (i ? ' loading="lazy"' : '') + '>';
     media += '<figure style="--tone:' + (p.tone || '') + '" data-zoom="' + i + '">' + inner + '</figure>';
     th += '<button type="button" data-th="' + i + '" style="--tone:' + (p.tone || '') + '" aria-label="' + tr('Photo ', 'صورة ') + (i + 1) + '"' + (i === PP.img ? ' aria-current="true"' : '') + '>' + (ppDyed(p, i) ? dressHTML(p.dye, i, 'dyeP') : '<img' + (isCut(src) ? ' class="cut"' : '') + ' src="' + src + '" alt="" loading="lazy">') + '</button>';
     dots += '<i' + (i ? '' : ' class="on"') + '></i>';
@@ -580,17 +582,18 @@ function sizeChartHTML(){
 function renderSide(){
   $('sideNav').innerHTML =
     '<details open><summary>' + tr('Collections', 'المجموعات') + '<i></i></summary><ul>' + colsShown().map(function(c){ return '<li><a href="#' + c.id + '" data-close-side>' + esc(t(c.name)) + '</a></li>'; }).join('') + '</ul></details>' +
-    '<details><summary>' + tr('Shop', 'تسوّقي') + '<i></i></summary><ul>' + STYLES.map(function(s){ return '<li><a href="#s-' + s.id + '" data-close-side>' + esc(t(s.id === 'all' ? {en:'All products', ar:'جميع المنتجات'} : s)) + '</a></li>'; }).join('') + '</ul></details>' +
+    '<details><summary>' + tr('Shop', 'تسوّقي') + '<i></i></summary><ul>' + stylesShown().map(function(s){ return '<li><a href="#s-' + s.id + '" data-close-side>' + esc(t(s.id === 'all' ? {en:'All products', ar:'جميع المنتجات'} : s)) + '</a></li>'; }).join('') + '</ul></details>' +
     (ONE.length ? '<a class="s-l" href="#the-one" data-close-side>' + tr('The One', 'القطعة الواحدة') + '</a>' : '') +
     '<a class="s-l" href="#page-how" data-close-side>' + tr('How ordering works', 'طريقة الطلب') + '</a>';
 }
+function stylesShown(){ return STYLES.filter(function(s){ return s.id === 'all' || PRODUCTS.some(function(p){ return s.id === 'new' ? p.isNew : !p.one && p.style === s.id; }); }); }
 function colsShown(){ return COLLECTIONS.filter(function(c){ return c.id !== 'the-one' || ONE.length; }); }
 function renderMenus(){
   document.querySelectorAll('.nav a[href="#the-one"]').forEach(function(x){ x.parentNode.hidden = !ONE.length; });
   $('megaCols').innerHTML = colsShown().map(function(c){ return '<li><a href="#' + c.id + '">' + esc(t(c.name)) + '</a></li>'; }).join('');
-  $('megaStyles').innerHTML = STYLES.map(function(s){ return '<li><a href="#s-' + s.id + '">' + esc(t(s.id === 'all' ? {en:'All products', ar:'جميع المنتجات'} : s)) + '</a></li>'; }).join('');
-  $('megaPics').innerHTML = colsShown().filter(function(c){ return c.id !== 'the-one' && (c.small || c.cover); }).slice(0, 2).map(function(c){ var id = c.id; return '<a href="#' + id + '"><div class="ph" style="aspect-ratio:3/4"><img src="' + esc(c.small || c.cover) + '" alt="" loading="lazy"></div><span class="u-h7">' + esc(t(c.name)) + '</span></a>'; }).join('');
-  $('ftShop').innerHTML = STYLES.map(function(s){ return '<li><a href="#s-' + s.id + '">' + esc(t(s.id === 'all' ? {en:'All products', ar:'جميع المنتجات'} : s)) + '</a></li>'; }).join('');
+  $('megaStyles').innerHTML = stylesShown().map(function(s){ return '<li><a href="#s-' + s.id + '">' + esc(t(s.id === 'all' ? {en:'All products', ar:'جميع المنتجات'} : s)) + '</a></li>'; }).join('');
+  $('megaPics').innerHTML = colsShown().filter(function(c){ return c.id !== 'the-one' && (c.small || c.cover); }).slice(0, 2).map(function(c){ var id = c.id; return '<a href="#' + id + '"><div class="ph" style="aspect-ratio:3/4"><img src="' + esc(c.small || c.cover) + '" alt="' + esc(t(c.name)) + '" loading="lazy"></div><span class="u-h7">' + esc(t(c.name)) + '</span></a>'; }).join('');
+  $('ftShop').innerHTML = stylesShown().map(function(s){ return '<li><a href="#s-' + s.id + '">' + esc(t(s.id === 'all' ? {en:'All products', ar:'جميع المنتجات'} : s)) + '</a></li>'; }).join('');
   $('ftCols').innerHTML = colsShown().map(function(c){ return '<li><a href="#' + c.id + '">' + esc(t(c.name)) + '</a></li>'; }).join('');
 }
 function setMega(on){ var m = $('mega'); m.classList.toggle('open', on); $('hd').classList.toggle('menu-on', on); $('megaBtn').setAttribute('aria-expanded', String(on)); }
@@ -659,6 +662,7 @@ function viewCheckout(){
   var sub = cartSub(), ship = shipFor(CO.country, CO.method, sub);
   var left =
     '<form id="coForm" novalidate>' +
+      '<p class="co-note">' + tr('No payment now. We confirm your fabric and fit on WhatsApp, then send you a secure card payment link.', 'لا دفع الآن. نؤكد معكِ القماش والمقاس عبر واتساب، ثم نرسل لكِ رابط دفع آمنًا بالبطاقة.') + '</p>' +
       '<section class="co-sec"><h2>' + tr('Contact', 'معلومات الاتصال') + '</h2>' +
         fl('email', tr('Email', 'البريد الإلكتروني'), 'email', d.email, 'autocomplete="email" dir="ltr" inputmode="email"') +
         '<label class="chk"><input type="checkbox" name="news"' + (d.news ? ' checked' : '') + '>' + tr('Email me with news and offers', 'أرسلوا لي آخر المجموعات والعروض') + '</label></section>' +
@@ -777,28 +781,31 @@ function viewOrder(id){
       '<div><h4>' + tr('Billing address', 'عنوان الفاتورة') + '</h4><p>' + (o.billing === 'same' ? tr('Same as shipping address', 'نفس عنوان التوصيل') : esc(o.billing.name) + '<br>' + esc(o.billing.line) + '<br>' + esc(o.billing.city)) + '</p></div>' +
       '<div><h4>' + tr('Shipping method', 'طريقة الشحن') + '</h4><p>' + (o.method === 'express' ? tr('Express', 'سريع') : tr('Standard', 'قياسي')) + '</p></div>' +
     '</div></div>' +
-    '<div class="co-btn" style="margin-top:20px"><p style="margin:0;font-size:14px">' + tr('Need help? ', 'هل تحتاجين مساعدة؟') + '<a href="https://www.instagram.com/_bynmh/" target="_blank" rel="noopener">' + tr('Contact us', 'تواصلي معنا') + '</a></p><a class="btn" href="#s-all" style="text-decoration:none"><span>' + tr('Continue shopping', 'متابعة التسوّق') + '</span></a></div>';
+    '<div class="co-btn" style="margin-top:20px"><p style="margin:0;font-size:14px">' + tr('Need help? ', 'هل تحتاجين مساعدة؟') + '<a href="' + waLink(tr('Hello NMH, about my order ', 'مرحبًا NMH، بخصوص طلبي ') + o.id) + '" target="_blank" rel="noopener">' + tr('Message us on WhatsApp', 'راسلينا عبر واتساب') + '</a></p><a class="btn" href="#s-all" style="text-decoration:none"><span>' + tr('Continue shopping', 'متابعة التسوّق') + '</span></a></div>';
   app.innerHTML = coShell(left, o.items, o.sub, o.ship, o.total, false);
 }
 
 /* ================= text pages ================= */
 var PAGES = {
   how:{t:{en:'How ordering works',ar:'طريقة الطلب'}, b:{
-    en:'<h2>1. Choose your piece</h2><p>Choose an abaya or a dress, then your size and length.</p><h2>2. Complete your order</h2><p>Check out with your contact details and your address in the UAE. No account is needed.</p><h2>3. We confirm with you</h2><p>Within one working day we message you on WhatsApp to confirm the fabric and fit, and send a photo of the real fabric.</p><h2>4. Pay securely</h2><p>Pay by Visa, Mastercard or Apple Pay through our secure payment page.</p><h2>5. Cut and delivered</h2><p>We cut your piece in Dubai and deliver it to your door anywhere in the UAE.</p>',
-    ar:'<h2>١. اختاري القطعة</h2><p>اختاري العباية أو الفستان، والمقاس والطول المناسبين لكِ.</p><h2>٢. أتمّي الطلب</h2><p>أدخلي بيانات الاتصال وعنوانك داخل الإمارات. لا حاجة لإنشاء حساب.</p><h2>٣. نؤكد معك</h2><p>خلال يوم عمل نتواصل معك عبر واتساب لتأكيد القماش والمقاس، ونرسل لكِ صورة القماش الفعلي.</p><h2>٤. ادفعي بأمان</h2><p>ادفعي ببطاقة Visa أو Mastercard أو عبر Apple Pay من خلال صفحة الدفع الآمنة.</p><h2>٥. التفصيل والتوصيل</h2><p>نفصّل القطعة في دبي ونوصلها إلى باب بيتك في أي مكان داخل الإمارات.</p>'}},
+    en:'<h2>1. Choose your piece</h2><p>Choose an abaya or a dress, then your size and length.</p><h2>2. Complete your order</h2><p>Check out with your contact details and your address in the UAE. No account is needed.</p><h2>3. We confirm with you</h2><p>Within one working day we message you on WhatsApp to confirm the fabric and fit, and send a photo of the real fabric.</p><h2>4. Pay securely</h2><p>Pay by Visa, Mastercard or Apple Pay through our secure payment page.</p><h2>5. Cut and delivered</h2><p>We cut your piece in Dubai and deliver it to your door anywhere in the UAE, within 7 to 10 working days of confirming your order.</p>',
+    ar:'<h2>١. اختاري القطعة</h2><p>اختاري العباية أو الفستان، والمقاس والطول المناسبين لكِ.</p><h2>٢. أتمّي الطلب</h2><p>أدخلي بيانات الاتصال وعنوانك داخل الإمارات. لا حاجة لإنشاء حساب.</p><h2>٣. نؤكد معك</h2><p>خلال يوم عمل نتواصل معك عبر واتساب لتأكيد القماش والمقاس، ونرسل لكِ صورة القماش الفعلي.</p><h2>٤. ادفعي بأمان</h2><p>ادفعي ببطاقة Visa أو Mastercard أو عبر Apple Pay من خلال صفحة الدفع الآمنة.</p><h2>٥. التفصيل والتوصيل</h2><p>نفصّل القطعة في دبي ونوصلها إلى باب بيتك في أي مكان داخل الإمارات، خلال ٧ إلى ١٠ أيام عمل من تأكيد الطلب.</p>'}},
   size:{t:{en:'Size guide',ar:'دليل المقاسات'}, b:null},
+  contact:{t:{en:'Contact us',ar:'تواصلي معنا'}, b:{
+    en:'<p>We are happy to help with sizes, fabric, colours and your order.</p><h2>WhatsApp</h2><p><a href="https://wa.me/971581332133" dir="ltr">+971 58 133 2133</a></p><h2>Email</h2><p><a href="mailto:hello@bynmh.ae">hello@bynmh.ae</a></p><h2>Instagram</h2><p><a href="https://www.instagram.com/_bynmh/" target="_blank" rel="noopener">@_bynmh</a></p><p>We reply within one working day.</p>',
+    ar:'<p>يسعدنا مساعدتكِ في المقاسات والقماش والألوان وطلبكِ.</p><h2>واتساب</h2><p><a href="https://wa.me/971581332133" dir="ltr">+971 58 133 2133</a></p><h2>البريد الإلكتروني</h2><p><a href="mailto:hello@bynmh.ae">hello@bynmh.ae</a></p><h2>إنستغرام</h2><p><a href="https://www.instagram.com/_bynmh/" target="_blank" rel="noopener" dir="ltr">@_bynmh</a></p><p>نرد خلال يوم عمل.</p>'}},
   shipping:{t:{en:'Shipping policy',ar:'سياسة الشحن'}, b:{
-    en:'<p>We currently deliver inside the United Arab Emirates only. Every piece is made to order in Dubai: production takes [X] working days after your order is confirmed, then delivery takes 1 to 3 working days.</p><h2>Delivery fees</h2><p>Standard delivery 25 AED. Express, with priority cutting and a faster courier, 65 AED. Free delivery applies only during announced offers.</p><h2>Delivery</h2><p>We message you when your piece is on its way, and the courier contacts you before delivery. Please make sure your address and phone number are correct; re-delivery after a failed attempt because of wrong details may be charged.</p>',
-    ar:'<p>نوصّل حاليًا داخل دولة الإمارات فقط. تُفصَّل كل قطعة حسب الطلب في دبي: مدة التفصيل [X] يوم عمل بعد تأكيد الطلب، ثم يستغرق التوصيل من ١ إلى ٣ أيام عمل.</p><h2>رسوم التوصيل</h2><p>التوصيل القياسي ٢٥ د.إ. التوصيل السريع، مع أولوية في التفصيل وشحن أسرع، ٦٥ د.إ. التوصيل المجاني متاح فقط خلال العروض المعلنة.</p><h2>التوصيل</h2><p>نراسلك عند خروج القطعة للتوصيل، ويتواصل المندوب معك قبل التسليم. يرجى التأكد من صحة العنوان ورقم الهاتف؛ قد تُحتسب رسوم إعادة التوصيل إذا تعذّر بسبب بيانات خاطئة.</p>'}},
+    en:'<p>We currently deliver inside the United Arab Emirates only. Every piece is made to order in Dubai and delivered within 7 to 10 working days after your order is confirmed.</p><h2>Delivery fees</h2><p>Standard delivery 25 AED. Express, with priority cutting and a faster courier, 65 AED. Free delivery applies only during announced offers.</p><h2>Delivery</h2><p>We message you when your piece is on its way, and the courier contacts you before delivery. Please make sure your address and phone number are correct; re-delivery after a failed attempt because of wrong details may be charged.</p>',
+    ar:'<p>نوصّل حاليًا داخل دولة الإمارات فقط. تُفصَّل كل قطعة حسب الطلب في دبي وتصلك خلال ٧ إلى ١٠ أيام عمل بعد تأكيد الطلب.</p><h2>رسوم التوصيل</h2><p>التوصيل القياسي ٢٥ د.إ. التوصيل السريع، مع أولوية في التفصيل وشحن أسرع، ٦٥ د.إ. التوصيل المجاني متاح فقط خلال العروض المعلنة.</p><h2>التوصيل</h2><p>نراسلك عند خروج القطعة للتوصيل، ويتواصل المندوب معك قبل التسليم. يرجى التأكد من صحة العنوان ورقم الهاتف؛ قد تُحتسب رسوم إعادة التوصيل إذا تعذّر بسبب بيانات خاطئة.</p>'}},
   refund:{t:{en:'Refund policy',ar:'سياسة الاسترجاع'}, b:{
-    en:'<p>[Draft for NMH to confirm.]</p><p>Every piece is made for you in the size and length you confirm, so we do not accept returns, exchanges or cancellations once your order is confirmed and paid.</p><h2>Damaged or wrong pieces</h2><p>Please check your piece on arrival. If it is damaged, faulty or not what you ordered, message us within 24 hours of delivery with photos and your order number. The piece must be unworn and unwashed, with its tags and packaging. After inspection we repair, replace or refund it.</p><h2>Alterations</h2><p>Alterations are available inside the UAE for 100 AED.</p><h2>Refunds</h2><p>Approved refunds are paid to the original payment method and usually appear within 10 to 45 days, depending on your bank.</p><p>Nothing in this policy limits your rights under UAE consumer protection law.</p>',
-    ar:'<p>[مسودة بانتظار تأكيد NMH.]</p><p>تُفصَّل كل قطعة لكِ بالمقاس والطول اللذين تؤكدينهما، لذلك لا نقبل الاسترجاع أو الاستبدال أو الإلغاء بعد تأكيد الطلب ودفعه.</p><h2>القطع التالفة أو الخاطئة</h2><p>يرجى فحص القطعة عند استلامها. إذا كانت تالفة أو بها عيب أو بخلاف ما طلبتِ، راسلينا خلال ٢٤ ساعة من الاستلام مع صور ورقم الطلب. يجب ألا تكون القطعة ملبوسة أو مغسولة، ومعها البطاقات والتغليف. بعد الفحص نصلحها أو نستبدلها أو نرد المبلغ.</p><h2>التعديلات</h2><p>التعديلات متاحة داخل الإمارات مقابل ١٠٠ د.إ.</p><h2>رد المبلغ</h2><p>يُرد المبلغ المعتمد إلى نفس طريقة الدفع، ويظهر عادةً خلال ١٠ إلى ٤٥ يومًا حسب البنك.</p><p>لا يُقيّد أي شيء في هذه السياسة حقوقكِ بموجب قانون حماية المستهلك في الإمارات.</p>'}},
+    en:'<ul class="sum"><li>Every piece is made for you, so orders cannot be cancelled or returned for a change of mind.</li><li>Damaged or wrong piece? Message us within 24 hours of delivery and we repair, replace or refund it.</li><li>Alterations inside the UAE for 100 AED.</li></ul><p>Every piece is made for you in the size and length you confirm, so we do not accept returns, exchanges or cancellations once your order is confirmed and paid.</p><h2>Damaged or wrong pieces</h2><p>Please check your piece on arrival. If it is damaged, faulty or not what you ordered, message us on WhatsApp <a href="https://wa.me/971581332133" dir="ltr">+971 58 133 2133</a> or email hello@bynmh.ae within 24 hours of delivery, with photos and your order number. The piece must be unworn and unwashed, with its tags and packaging. After inspection we repair, replace or refund it.</p><h2>Alterations</h2><p>Alterations are available inside the UAE for 100 AED.</p><h2>Refunds</h2><p>Approved refunds are paid to the original payment method and usually appear within 10 to 45 days, depending on your bank.</p><p>Nothing in this policy limits your rights under UAE consumer protection law.</p>',
+    ar:'<ul class="sum"><li>تُفصَّل كل قطعة لكِ خصيصًا، لذلك لا يمكن إلغاء الطلب أو استرجاعه بسبب تغيير الرأي.</li><li>وصلتكِ قطعة تالفة أو خاطئة؟ راسلينا خلال ٢٤ ساعة من الاستلام ونصلحها أو نستبدلها أو نرد المبلغ.</li><li>التعديلات داخل الإمارات مقابل ١٠٠ د.إ.</li></ul><p>تُفصَّل كل قطعة لكِ بالمقاس والطول اللذين تؤكدينهما، لذلك لا نقبل الاسترجاع أو الاستبدال أو الإلغاء بعد تأكيد الطلب ودفعه.</p><h2>القطع التالفة أو الخاطئة</h2><p>يرجى فحص القطعة عند استلامها. إذا كانت تالفة أو بها عيب أو بخلاف ما طلبتِ، راسلينا خلال ٢٤ ساعة من الاستلام مع صور ورقم الطلب. يجب ألا تكون القطعة ملبوسة أو مغسولة، ومعها البطاقات والتغليف. بعد الفحص نصلحها أو نستبدلها أو نرد المبلغ.</p><h2>التعديلات</h2><p>التعديلات متاحة داخل الإمارات مقابل ١٠٠ د.إ.</p><h2>رد المبلغ</h2><p>يُرد المبلغ المعتمد إلى نفس طريقة الدفع، ويظهر عادةً خلال ١٠ إلى ٤٥ يومًا حسب البنك.</p><p>لا يُقيّد أي شيء في هذه السياسة حقوقكِ بموجب قانون حماية المستهلك في الإمارات.</p>'}},
   privacy:{t:{en:'Privacy policy',ar:'سياسة الخصوصية'}, b:{
-    en:'<p>[Draft for NMH to confirm.]</p><h2>What we collect</h2><p>When you order: your name, email, phone number, delivery address and, for custom pieces, your measurements. When you subscribe: your email.</p><h2>Why</h2><p>To make and deliver your order, contact you about it, and, if you agree, send news about new collections.</p><h2>Where it is kept</h2><p>Orders are stored securely with Google Firebase. We never sell your details. Card payments are handled by our payment provider; we never see your card number.</p><h2>Your choices</h2><p>To see, change or delete your details, or to unsubscribe, message us on Instagram @_bynmh.</p>',
-    ar:'<p>[مسودة بانتظار تأكيد NMH.]</p><h2>ما الذي نجمعه</h2><p>عند الطلب: اسمك وبريدك الإلكتروني ورقم هاتفك وعنوان التوصيل، ومقاساتك إن كانت القطعة تفصيلًا. وعند الاشتراك: بريدك الإلكتروني.</p><h2>لماذا</h2><p>لتفصيل طلبك وتوصيله والتواصل معك بشأنه، وإن وافقتِ، لنرسل لكِ آخر المجموعات.</p><h2>أين تُحفظ</h2><p>تُحفظ الطلبات بأمان في Google Firebase. لا نبيع بياناتك أبدًا. يتم الدفع بالبطاقة عبر شركة الدفع، ولا نطّلع على رقم بطاقتك.</p><h2>خياراتك</h2><p>لعرض بياناتك أو تعديلها أو حذفها، أو لإلغاء الاشتراك، تواصلي معنا عبر إنستغرام ‎@_bynmh.</p>'}},
+    en:'<h2>What we collect</h2><p>When you order: your name, email, phone number, delivery address and, for custom pieces, your measurements. When you subscribe: your email.</p><h2>Why</h2><p>To make and deliver your order, contact you about it, and, if you agree, send news about new collections.</p><h2>Where it is kept</h2><p>Orders are stored securely with Google Firebase. We never sell your details. Card payments are handled by our payment provider; we never see your card number.</p><h2>Your choices</h2><p>To see, change or delete your details, or to unsubscribe, message us on WhatsApp <a href="https://wa.me/971581332133" dir="ltr">+971 58 133 2133</a> or email <a href="mailto:hello@bynmh.ae">hello@bynmh.ae</a>.</p>',
+    ar:'<h2>ما الذي نجمعه</h2><p>عند الطلب: اسمك وبريدك الإلكتروني ورقم هاتفك وعنوان التوصيل، ومقاساتك إن كانت القطعة تفصيلًا. وعند الاشتراك: بريدك الإلكتروني.</p><h2>لماذا</h2><p>لتفصيل طلبك وتوصيله والتواصل معك بشأنه، وإن وافقتِ، لنرسل لكِ آخر المجموعات.</p><h2>أين تُحفظ</h2><p>تُحفظ الطلبات بأمان في Google Firebase. لا نبيع بياناتك أبدًا. يتم الدفع بالبطاقة عبر شركة الدفع، ولا نطّلع على رقم بطاقتك.</p><h2>خياراتك</h2><p>لعرض بياناتك أو تعديلها أو حذفها، أو لإلغاء الاشتراك، راسلينا عبر واتساب <a href="https://wa.me/971581332133" dir="ltr">+971 58 133 2133</a> أو على <a href="mailto:hello@bynmh.ae">hello@bynmh.ae</a>.</p>'}},
   terms:{t:{en:'Terms of service',ar:'الشروط والأحكام'}, b:{
-    en:'<p>[Draft for NMH to confirm.]</p><p>Prices are in UAE dirhams and include VAT. An order is accepted once we confirm the fabric and fit with you. Colours on screen can differ slightly from the real fabric; the fabric photo we send before cutting is the reference.</p>',
-    ar:'<p>[مسودة بانتظار تأكيد NMH.]</p><p>الأسعار بالدرهم الإماراتي وشاملة الضريبة. يُعتمد الطلب بعد الاتفاق معك على القماش والمقاس. قد تختلف الألوان على الشاشة قليلًا عن القماش الفعلي، وصورة القماش التي نرسلها قبل التفصيل هي المرجع.</p>'}}
+    en:'<p>Prices are in UAE dirhams and include VAT. An order is accepted once we confirm the fabric and fit with you. Colours on screen can differ slightly from the real fabric; the fabric photo we send before cutting is the reference.</p>',
+    ar:'<p>الأسعار بالدرهم الإماراتي وشاملة الضريبة. يُعتمد الطلب بعد الاتفاق معك على القماش والمقاس. قد تختلف الألوان على الشاشة قليلًا عن القماش الفعلي، وصورة القماش التي نرسلها قبل التفصيل هي المرجع.</p>'}}
 };
 function pageTitle(id){ var x = PAGEX[id], v = x && x.t && (L === 'ar' ? x.t.ar : x.t.en); return v || t(PAGES[id].t); }
 /* simple text from the control room: blank line = new paragraph, "## " = heading, "- " = bullet */
@@ -833,6 +840,25 @@ function resolve(h){
   return null;
 }
 var READY = false;
+/* WhatsApp: floating button, message names the piece being viewed */
+var WA_NUM = '971581332133';
+function waLink(msg){ return 'https://wa.me/' + WA_NUM + (msg ? '?text=' + encodeURIComponent(msg) : ''); }
+function updateWA(h){
+  var b = $('waBtn'); if(!b) return;
+  var m = /^p-(\w+)$/.exec(h || ''), p = m && prod(m[1]);
+  b.href = waLink(p ? tr('Hello NMH, I am interested in ', 'مرحبًا NMH، أنا مهتمة بـ ') + t(p.name) + ' (' + p.code + ')' : tr('Hello NMH, ', 'مرحبًا NMH، '));
+  b.setAttribute('aria-label', tr('Message us on WhatsApp', 'راسلينا عبر واتساب'));
+  b.hidden = h === 'checkout' || /^order-/.test(h || '');
+}
+/* structured data for Google (product pages) */
+function updateLD(h){
+  var el = $('ldProd'), m = /^p-(\w+)$/.exec(h || ''), p = m && prod(m[1]);
+  if(!p){ if(el) el.remove(); return; }
+  if(!el){ el = document.createElement('script'); el.type = 'application/ld+json'; el.id = 'ldProd'; document.head.appendChild(el); }
+  var img = (p.imgs || []).slice(0, 3).map(function(x){ return /^https?:/.test(x) ? x : 'https://www.bynmh.ae/' + String(x).replace(/^\//, ''); });
+  el.textContent = JSON.stringify({'@context':'https://schema.org', '@type':'Product', name:p.name.en || t(p.name), sku:p.code, image:img, description:(p.desc && (p.desc.en || t(p.desc))) || '', brand:{'@type':'Brand', name:'NMH Dubai'}, material:'Crepe',
+    offers:{'@type':'Offer', price:String(p.price), priceCurrency:'AED', availability: isSold(p) ? 'https://schema.org/SoldOut' : 'https://schema.org/MadeToOrder', url:'https://www.bynmh.ae/#p-' + p.code}});
+}
 function route(){
   var h = decodeURIComponent(location.hash.slice(1));
   if(/^account/.test(h)){ history.replaceState(null, '', location.pathname); h = ''; }
@@ -849,6 +875,7 @@ function route(){
   if(!same && h !== 'colour') window.scrollTo(0, 0);
   headerState();
   document.title = titleFor(h);
+  updateWA(h); updateLD(h);
 }
 function titleFor(h){
   var base = 'NMH Dubai';

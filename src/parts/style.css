@@ -725,3 +725,11 @@ html[data-style="classic"] .sl-arr,html:not([data-style]) .sl-arr,html[data-styl
 .try .btn svg{width:20px;height:20px;flex:none}
 .try-n{display:flex;align-items:center;justify-content:center;gap:6px;margin:0;font-size:12px;color:var(--muted)}
 .try-n svg{width:13px;height:13px}
+
+/* WhatsApp button, delivery line, checkout note, policy summary */
+.wa{position:fixed;inset-inline-end:18px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:60;width:54px;height:54px;border-radius:50%;background:#25D366;color:#fff;display:grid;place-items:center;box-shadow:0 6px 20px rgba(0,0,0,.22);transition:transform .2s}
+.wa:hover{transform:scale(1.06)}.wa svg{width:30px;height:30px}.wa[hidden]{display:none}
+.pp-eta{font-size:13px;color:var(--muted,#6a6a6a);margin:6px 0 0}
+.co-note{margin:0 0 22px;padding:12px 14px;border:1px solid var(--line,#e5e5e5);font-size:14px;line-height:1.5}
+.page ul.sum{margin:0 0 28px;padding:16px 18px 16px 34px;border:1px solid var(--line,#e5e5e5);display:grid;gap:6px}
+[dir=rtl] .page ul.sum{padding:16px 34px 16px 18px}
